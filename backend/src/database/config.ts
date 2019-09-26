@@ -5,9 +5,9 @@ export interface ConString {
   database: string;
 }
 
-const address = "127.0.0.0";
-const user = "karcaghome";
-const password = "Abc123456";
+const address = "localhost";
+const user = "root";
+const password = "root";
 const database = "karcaghome";
 
 const connectionString: ConString = { host: address, user, password, database };

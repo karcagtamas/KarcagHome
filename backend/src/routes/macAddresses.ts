@@ -6,12 +6,9 @@ import MacAddress from "../models/macAddress";
 const router: Router = express.Router();
 
 router.get("/", (req: Request, res: Response) => {
-  db.createQuery(
-    "SELECT * FROM macs",
-    (err: MysqlError, result: MacAddress[]) => {
-      res.send(JSON.stringify(result));
-    }
-  );
+  db.query("SELECT * FROM macs", (err: MysqlError, result: MacAddress[]) => {
+    res.send(JSON.stringify(result));
+  });
 });
 
 export default router;

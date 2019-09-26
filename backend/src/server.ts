@@ -8,7 +8,8 @@ import macs from "./routes/macAddresses";
 const app: Application = express();
 
 app.use(bodyparser());
-app.use(cors());
+
+//app.use(cors());
 
 app.use("/api/macs", macs);
 

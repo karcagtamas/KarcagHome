@@ -7,7 +7,7 @@ interface IState {
 }
 
 const state: IState = {
-  macs: [new MacAddress('asd', 'asd', 'asd', 'asd')]
+  macs: []
 };
 
 const getters: GetterTree<IState, any> = {

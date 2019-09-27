@@ -1,6 +1,29 @@
 <template>
   <div>
     <h1>MAC Címek</h1>
+    <button class="btn btn-primary">Új MAC</button>
+    <div>
+      <div class="form-group">
+        <label for="mac">Mac</label>
+        <input class="form-control" type="text" name="mac" />
+      </div>
+      <div class="form-group">
+        <label for="owner">Tulaj</label>
+        <input class="form-control" type="text" name="owner" />
+      </div>
+      <div class="form-group">
+        <label for="name">Név</label>
+        <input class="form-control" type="text" name="name" />
+      </div>
+      <div class="form-group">
+        <label for="device">Eszköz név</label>
+        <input class="form-control" type="text" name="device" />
+      </div>
+      <div class="form-group">
+        <label for="ip">IP</label>
+        <input class="form-control" type="text" name="ip" />
+      </div>
+    </div>
     <table>
       <thead>
         <tr>

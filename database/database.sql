@@ -24,6 +24,15 @@ CREATE TABLE users(
     PRIMARY KEY(id)
 );
 
+CREATE TABLE tokens(
+    token VARCHAR(255) NOT NULL,
+    user INT(11) NOT NULL,
+    expDate date NOT NULL DEFAULT NOW + 1 DAY,
+    PRIMARY KEY(user),
+    ADD CONSTRAINT fk_tokens_user_users_id FOREIGN KEY user
+    REFERENCES users(id)
+);
+
 CREATE TABLE movies(
     id INT(11) NOT NULL AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,

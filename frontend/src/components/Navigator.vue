@@ -5,8 +5,11 @@
         <router-link to="/">
           <div class="title" title="Fő oldal">Karcag Home</div>
         </router-link>
-        <router-link to="macs">
+        <router-link to="macs" v-if="isLoggedIn">
           <div title="MAC címek">MAC címek</div>
+        </router-link>
+        <router-link to="login" v-if="!isLoggedIn">
+          <div title="Bejelentkezés">Bejelentkezés</div>
         </router-link>
       </div>
     </div>
@@ -15,9 +18,22 @@
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import LoginService from '../services/LoginService';
 
 @Component({})
-export default class Navigator extends Vue {}
+export default class Navigator extends Vue {
+  public isLoggedIn: boolean = false;
+
+  public created() {
+    LoginService.isLoggedIn()
+      .then(res => {
+        this.isLoggedIn = res;
+      })
+      .catch(err => {
+        this.isLoggedIn = false;
+      });
+  }
+}
 </script>
 
 <style scoped>
@@ -29,7 +45,7 @@ export default class Navigator extends Vue {}
 }
 
 .nav {
-  background-color: #6c34f0;
+  background-color: #9569fd;
   color: #fff;
   font-size: 1.5rem;
   margin: 0;
@@ -46,10 +62,13 @@ export default class Navigator extends Vue {}
 }
 
 .nav div:hover {
-  background-color: #f7a4a4;
-  color: #000;
+  background-color: #6a2cfa;
   transition-duration: 0.5s;
-  box-shadow: 0 0 10px 0px #000;
+  box-shadow: 0 0 10px 0px #fff;
+  text-decoration: unset !important;
+}
+
+.nav a:hover {
   text-decoration: unset !important;
 }
 

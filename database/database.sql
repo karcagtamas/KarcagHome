@@ -51,6 +51,7 @@ CREATE TABLE switch_movies_users(
     movie INT(11) NOT NULL,
     user INT(11) NOT NULL,
     seen BOOLEAN DEFAULT FALSE,
+    picked BOOLEAN DEFAULT FALSE,
     lastModification DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY(movie, user),
     ADD CONSTRAINT fk_switch_movies_users_user_users_id FOREIGN KEY user

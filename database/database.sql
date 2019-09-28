@@ -14,8 +14,8 @@ CREATE TABLE macs(
 
 CREATE TABLE users(
     id INT(11) NOT NULL AUTO_INCREMENT,
-    username VARCHAR(100) NOT NULL UNIQE,
-    email VARCHAR(100) NOT NULL UNIQE,
+    username VARCHAR(100) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     name VARCHAR(100) NOT NULL,
     displayName VARCHAR(100) NOT NULL,
@@ -27,9 +27,9 @@ CREATE TABLE users(
 CREATE TABLE tokens(
     token VARCHAR(255) NOT NULL,
     user INT(11) NOT NULL,
-    expDate date NOT NULL DEFAULT NOW + 1 DAY,
+    creationDate DATETIME NOT NULL DEFAULT NOW(),
     PRIMARY KEY(user),
-    ADD CONSTRAINT fk_tokens_user_users_id FOREIGN KEY user
+    CONSTRAINT fk_tokens_user_users_id FOREIGN KEY (user)
     REFERENCES users(id)
 );
 

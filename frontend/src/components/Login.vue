@@ -21,6 +21,7 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import LoginService from '../services/LoginService';
+import router from '../router';
 
 @Component({})
 export default class Login extends Vue {
@@ -39,7 +40,7 @@ export default class Login extends Vue {
     }
     LoginService.checkLogin(this.username, this.password).then(res => {
       if (res) {
-        this.setAlert('Yee');
+        router.replace('/');
       } else {
         this.setAlert('A belépési adatok hibásak!');
       }

@@ -6,6 +6,7 @@ export default class User {
   public displayName: string;
   public lastLogin: Date;
   public registration: Date;
+  public password: string = "";
 
   constructor(
     username: string,

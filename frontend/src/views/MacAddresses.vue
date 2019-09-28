@@ -1,8 +1,8 @@
 <template>
   <div>
     <h1>MAC Címek</h1>
-    <button class="btn btn-primary">Új MAC</button>
-    <div>
+    <button class="btn btn-primary mb-3" v-if="!newMac" @click="newMac = true">Új MAC</button>
+    <div v-if="newMac">
       <div class="form-group">
         <label for="mac">Mac</label>
         <input class="form-control" type="text" name="mac" />
@@ -23,6 +23,8 @@
         <label for="ip">IP</label>
         <input class="form-control" type="text" name="ip" />
       </div>
+      <button class="btn btn-warning mb-3 mr-1" @click="back">Vissza</button>
+      <button class="btn btn-success mb-3 ml-1" @click="save">Mentés</button>
     </div>
     <table>
       <thead>
@@ -32,6 +34,7 @@
           <th>Eszköz</th>
           <th>Eszköz név</th>
           <th>IP</th>
+          <th>Művletek</th>
         </tr>
       </thead>
       <tbody>
@@ -41,6 +44,10 @@
           <td>{{mac.name}}</td>
           <td>{{mac.deviceName}}</td>
           <td>{{mac.ip ? mac.ip : 'Nincs megadott IP'}}</td>
+          <td>
+            <button class="btn btn-danger mr-1" @click="deleteMac">X</button>
+            <button class="btn btn-warning ml-1" @click="modifyMac">X</button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -55,10 +62,25 @@ import MacAddress from '../models/macAddress';
 export default class MacAddresses extends Vue {
   @Action('fetchMacs') public fetch: any;
   @Getter('allMacs') public allMacs: MacAddress[];
+  public newMac: boolean = false;
+  public newMacAddress: MacAddress = new MacAddress('', '', '', '');
 
   public mounted() {
     this.fetch();
   }
+
+  public back() {
+    this.newMacAddress = new MacAddress('', '', '', '');
+    this.newMac = false;
+  }
+
+  public save() {
+    window.alert('Save');
+  }
+
+  public deleteMac() {}
+
+  public modifyMac() {}
 }
 </script>
 <style scoped>

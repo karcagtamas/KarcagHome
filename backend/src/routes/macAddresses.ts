@@ -8,9 +8,9 @@ const router: Router = express.Router();
 // Get MAC addresses
 router.get("/", (req: Request, res: Response) => {
   const sql: string = "CALL getMacAddresses();";
-  db.query(sql, (err: MysqlError, result: MacAddress[]) => {
+  db.query(sql, (err: MysqlError, result: any) => {
     if (err) throw err;
-    res.send(JSON.stringify(result));
+    res.send(JSON.stringify(result[0]));
   });
 });
 
@@ -18,9 +18,9 @@ router.get("/", (req: Request, res: Response) => {
 router.get("/:id", (req: Request, res: Response) => {
   const id: number = parseInt(req.params.id);
   const sql: string = "CALL getMacAddresses();";
-  db.query(sql, (err: MysqlError, result: MacAddress[]) => {
+  db.query(sql, (err: MysqlError, result: any) => {
     if (err) throw err;
-    res.send(JSON.stringify(result.find(x => x.id === id)));
+    res.send(JSON.stringify(result[0].find((x: MacAddress) => x.id === id)));
   });
 });
 
@@ -37,9 +37,10 @@ router.post("/", (req: Request, res: Response) => {
       address.deviceName,
       address.ip
     ],
-    (err: MysqlError | null) => {
+    (err: MysqlError | null, result: any) => {
       if (err) throw err;
-      res.sendStatus(200);
+      address.id = result[0][0].last_inserted_id;
+      res.send(JSON.stringify(address));
     }
   );
 });
@@ -70,7 +71,7 @@ router.put("/", (req: Request, res: Response) => {
     ],
     (err: MysqlError | null) => {
       if (err) throw err;
-      res.sendStatus(200);
+      res.send(JSON.stringify(address));
     }
   );
 });

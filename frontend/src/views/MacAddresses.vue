@@ -1,27 +1,35 @@
 <template>
   <div>
     <h1>MAC Címek</h1>
-    <button class="btn btn-primary mb-3" v-if="!newMac" @click="newMac = true">Új MAC</button>
-    <div v-if="newMac">
+    <button
+      class="btn btn-primary mb-3"
+      v-if="!newMac"
+      @click="newMac = true; onModify = false"
+    >Új MAC</button>
+    <div v-if="newMac || onModify">
+      <div class="alert alert-danger" v-if="error">
+        <strong>HIBA!</strong>
+        {{error}}
+      </div>
       <div class="form-group">
         <label for="mac">Mac</label>
-        <input class="form-control" type="text" name="mac" />
+        <input class="form-control" type="text" name="mac" v-model="newMacAddress.address" />
       </div>
       <div class="form-group">
         <label for="owner">Tulaj</label>
-        <input class="form-control" type="text" name="owner" />
+        <input class="form-control" type="text" name="owner" v-model="newMacAddress.owner" />
       </div>
       <div class="form-group">
         <label for="name">Név</label>
-        <input class="form-control" type="text" name="name" />
+        <input class="form-control" type="text" name="name" v-model="newMacAddress.name" />
       </div>
       <div class="form-group">
         <label for="device">Eszköz név</label>
-        <input class="form-control" type="text" name="device" />
+        <input class="form-control" type="text" name="device" v-model="newMacAddress.deviceName" />
       </div>
       <div class="form-group">
         <label for="ip">IP</label>
-        <input class="form-control" type="text" name="ip" />
+        <input class="form-control" type="text" name="ip" v-model="newMacAddress.ip" />
       </div>
       <button class="btn btn-warning mb-3 mr-1" @click="back">Vissza</button>
       <button class="btn btn-success mb-3 ml-1" @click="save">Mentés</button>
@@ -45,8 +53,8 @@
           <td>{{mac.deviceName}}</td>
           <td>{{mac.ip ? mac.ip : 'Nincs megadott IP'}}</td>
           <td>
-            <button class="btn btn-danger mr-1" @click="deleteMac">X</button>
-            <button class="btn btn-warning ml-1" @click="modifyMac">X</button>
+            <button class="btn btn-danger mr-1" @click="deleteMacAddress(mac.id)">X</button>
+            <button class="btn btn-warning ml-1" @click="modifyMac(mac)">&#9998;</button>
           </td>
         </tr>
       </tbody>
@@ -62,25 +70,68 @@ import MacAddress from '../models/macAddress';
 export default class MacAddresses extends Vue {
   @Action('fetchMacs') public fetch: any;
   @Getter('allMacs') public allMacs: MacAddress[];
+  @Action('addMac') public addMac: any;
+  @Action('deleteMac') public deleteMac: any;
+  @Action('updateMac') public updateMac: any;
   public newMac: boolean = false;
   public newMacAddress: MacAddress = new MacAddress('', '', '', '');
+  public error: string = '';
+  public onModify: boolean = false;
 
   public mounted() {
     this.fetch();
   }
 
-  public back() {
+  public back(): void {
     this.newMacAddress = new MacAddress('', '', '', '');
     this.newMac = false;
   }
 
-  public save() {
-    window.alert('Save');
+  public save(): void {
+    const address = this.newMacAddress;
+    if (!address.address && address.address.length != 17) {
+      this.setAlert('A MAC cím kitöltése kötelező');
+      return;
+    }
+    if (!address.deviceName) {
+      this.setAlert('Az eszköz név kitöltése kötelező');
+      return;
+    }
+    if (!address.owner) {
+      this.setAlert('A tulajdonos kitöltése kötelező');
+      return;
+    }
+    if (!address.name) {
+      this.setAlert('Az eszköz kitöltése kötelező');
+      return;
+    }
+    if (!address.deviceName) {
+      this.setAlert('Az eszköz név kitöltése kötélező');
+      return;
+    }
+    if (this.onModify) {
+      this.updateMac(address);
+      this.onModify = false;
+    } else {
+      this.addMac(address);
+      this.newMac = false;
+    }
+    this.newMacAddress = new MacAddress('', '', '', '');
   }
 
-  public deleteMac() {}
+  public deleteMacAddress(id: number): void {
+    this.deleteMac(id);
+  }
 
-  public modifyMac() {}
+  public modifyMac(address: MacAddress) {
+    this.onModify = true;
+    this.newMacAddress = { ...address };
+  }
+
+  public setAlert(value: string): void {
+    this.error = value;
+    setTimeout(() => (this.error = ''), 2000);
+  }
 }
 </script>
 <style scoped>

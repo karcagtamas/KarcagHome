@@ -1,7 +1,6 @@
 import express, { Application, response } from "express";
 import cors from "cors";
 import bodyparser from "body-parser";
-import db from "./database/connect";
 
 import macs from "./routes/macAddresses";
 import users from "./routes/users";
@@ -16,6 +15,10 @@ app.use((req, res, next) => {
     "X-Requested-With,content-type"
   );
   res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "OPTION, GET, PUT, POST, DELETE"
+  );
   next();
 });
 

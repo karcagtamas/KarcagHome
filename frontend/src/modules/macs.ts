@@ -6,6 +6,8 @@ interface IState {
   macs: MacAddress[];
 }
 
+const url = 'http://localhost:8000/api';
+
 const state: IState = {
   macs: []
 };
@@ -16,23 +18,20 @@ const getters: GetterTree<IState, any> = {
 
 const actions: ActionTree<IState, IState> = {
   async fetchMacs({ commit }) {
-    const response = await axios.get('http://localhost:8000/api/macs');
+    const response = await axios.get(`${url}/macs`);
 
     commit('setMacs', response.data);
-  } /*,
-  async addTodo({ commit }, title) {
-    const response = await axios.post(
-      'https://jsonplaceholder.typicode.com/todos',
-      { title, completed: false }
-    );
-
-    commit('newTodo', response.data);
   },
-  async deleteTodo({ commit }, id) {
-    await axios.delete(`https://jsonplaceholder.typicode.com/todos/${id}`);
+  async addMac({ commit }, mac: MacAddress) {
+    const response = await axios.post(`${url}/macs`, { address: mac });
 
-    commit('removeTsonplaceholder.typicode.com/todosodo', id);
+    commit('newMac', response.data);
   },
+  async deleteMac({ commit }, id: number) {
+    await axios.delete(`${url}/macs/${id}`);
+
+    commit('removeMac', id);
+  } /*
   async filterTodos({ commit }, e) {
     // Get selected number
     const limit = parseInt(
@@ -43,28 +42,24 @@ const actions: ActionTree<IState, IState> = {
     );
 
     commit('setTodos', response.data);
-  },
-  async updateTodo({ commit }, updatedTodo) {
-    const response = await axios.put(
-      `https://jsonplaceholder.typicode.com/todos/${updatedTodo.id}`,
-      updatedTodo
-    );
-    commit('updateTodo', response.data);
-  } */
+  },*/,
+  async updateMac({ commit }, updatedMac: MacAddress) {
+    const response = await axios.put(`${url}/macs`, { address: updatedMac });
+    commit('updateMac', response.data);
+  }
 };
 
 const mutations: MutationTree<IState> = {
-  setMacs: (cState, todos) =>
-    (cState.macs = todos) /*,
-  newTodo: (state, todo) => state.todos.unshift(todo),
-  removeTodo: (state, id) =>
-    (state.todos = state.todos.filter(x => x.id !== id)),
-  updateTodo: (state, todo) => {
-    const index = state.todos.findIndex(x => x.id === todo.id);
+  setMacs: (cState, macs: MacAddress[]) => (cState.macs = macs),
+  newMac: (cState, mac: MacAddress) => cState.macs.unshift(mac),
+  removeMac: (cState, id) =>
+    (cState.macs = cState.macs.filter(x => x.id !== id)),
+  updateMac: (cState, todo) => {
+    const index = cState.macs.findIndex(x => x.id === todo.id);
     if (index !== -1) {
-      state.todos.splice(index, 1, todo);
+      cState.macs.splice(index, 1, todo);
     }
-  } */
+  }
 };
 
 export default {

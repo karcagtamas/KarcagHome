@@ -10,6 +10,7 @@ CREATE OR REPLACE PROCEDURE addMacAddress(_address CHAR(17), _owner VARCHAR(255)
 BEGIN
     INSERT INTO macs (address, owner, name, deviceName, ip)
     VALUES(_address, _owner, _name, _device, _ip);
+    SELECT LAST_INSERT_ID() AS last_inserted_id;
 END;
 
 /* Delete MAC address */

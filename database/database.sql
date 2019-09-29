@@ -41,9 +41,9 @@ CREATE TABLE movies(
     lastModification DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     lastModifier INT(11) NOT NULL,
     PRIMARY KEY(id),
-    ADD CONSTRAINT fk_movies_creater_users_id FOREIGN KEY creater
+    CONSTRAINT fk_movies_creater_users_id FOREIGN KEY (creater)
     REFERENCES users(id),
-    ADD CONSTRAINT fk_movies_lastModifier_users_id FOREIGN KEY lastModifier
+    CONSTRAINT fk_movies_lastModifier_users_id FOREIGN KEY (lastModifier)
     REFERENCES users(id)
 );
 
@@ -51,12 +51,11 @@ CREATE TABLE switch_movies_users(
     movie INT(11) NOT NULL,
     user INT(11) NOT NULL,
     seen BOOLEAN DEFAULT FALSE,
-    picked BOOLEAN DEFAULT FALSE,
     lastModification DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY(movie, user),
-    ADD CONSTRAINT fk_switch_movies_users_user_users_id FOREIGN KEY user
+    CONSTRAINT fk_switch_movies_users_user_users_id FOREIGN KEY (user)
     REFERENCES users(id) ON DELETE CASCADE,
-    ADD CONSTRAINT fk_switch_movies_users_movie_movies_id FOREIGN KEY movie
+    CONSTRAINT fk_switch_movies_users_movie_movies_id FOREIGN KEY (movie)
     REFERENCES movies(id) ON DELETE CASCADE
 ); 
 

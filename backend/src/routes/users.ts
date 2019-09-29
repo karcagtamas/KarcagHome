@@ -44,6 +44,16 @@ router.post("/login", (req: Request, res: Response) => {
   });
 });
 
+router.post("/logout", (req: Request, res: Response) => {
+  const userId: number = req.body.userId;
+  const token: string = req.body.token;
+  const sql: string = "DELETE FROM tokens WHERE user = ?;";
+  db.query(sql, [userId], (err: MysqlError | null) => {
+    if (err) throw err;
+    res.sendStatus(200);
+  });
+});
+
 // Validate token
 router.post("/token", (req: Request, res: Response) => {
   const token: string = req.body.token;

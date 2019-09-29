@@ -1,12 +1,13 @@
 import Vue from 'vue';
-import Router from 'vue-router';
+import Router, { Route } from 'vue-router';
 import Home from './views/Home.vue';
 import MacAddresses from './views/MacAddresses.vue';
 import Login from './components/Login.vue';
+import LoginService from './services/LoginService';
 
 Vue.use(Router);
 
-export default new Router({
+const router = new Router({
   routes: [
     {
       path: '/',
@@ -25,3 +26,23 @@ export default new Router({
     }
   ]
 });
+
+router.beforeEach((to: Route, from: Route, next) => {
+  LoginService.isLoggedIn().then((res: boolean) => {
+    if (res) {
+      if (to.name === 'login') {
+        next(false);
+      } else {
+        next();
+      }
+    } else {
+      if (to.name === 'login') {
+        next();
+      } else {
+        next('/login');
+      }
+    }
+  });
+});
+
+export default router;

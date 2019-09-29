@@ -6,7 +6,7 @@
       v-if="!newMac"
       @click="newMac = true; onModify = false"
     >Új MAC</button>
-    <div v-if="newMac || onModify">
+    <div v-if="newMac || onModify" class="form-div">
       <div class="alert alert-danger" v-if="error">
         <strong>HIBA!</strong>
         {{error}}
@@ -138,6 +138,11 @@ export default class MacAddresses extends Vue {
 h1 {
   text-align: center;
   font-weight: bold;
+  transition-duration: 0.5s;
+}
+h1:hover {
+  transition-duration: 0.5s;
+  transform: scale(1.5, 1.5);
 }
 table {
   width: 100%;
@@ -179,5 +184,17 @@ table tbody tr:nth-child(even):hover {
 table tbody tr:nth-child(odd):hover {
   background-color: #3d03c2;
   transition-duration: 0.5s;
+}
+.form-div {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px 1px #000;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  border: 1px solod #333;
+}
+.form-div label {
+  font-weight: bold;
+  font-size: 1.2rem;
 }
 </style>

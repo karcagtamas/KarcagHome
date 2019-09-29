@@ -11,6 +11,7 @@
         <router-link to="login" v-if="!isLoggedIn">
           <div title="Bejelentkezés">Bejelentkezés</div>
         </router-link>
+        <div title="Kijelentkezés" v-if="isLoggedIn" @click="logout">Kijelentkezés</div>
       </div>
     </div>
     <div class="denethor"></div>
@@ -32,6 +33,14 @@ export default class Navigator extends Vue {
       .catch(err => {
         this.isLoggedIn = false;
       });
+  }
+
+  public logout(): void {
+    LoginService.logout().then(() => {
+      localStorage.removeItem('userId');
+      localStorage.removeItem('token');
+      this.isLoggedIn = false;
+    });
   }
 }
 </script>

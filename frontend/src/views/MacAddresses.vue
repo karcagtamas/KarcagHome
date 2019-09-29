@@ -89,7 +89,7 @@ export default class MacAddresses extends Vue {
 
   public save(): void {
     const address = this.newMacAddress;
-    if (!address.address && address.address.length != 17) {
+    if (!address.address && address.address.length !== 17) {
       this.setAlert('A MAC cím kitöltése kötelező');
       return;
     }

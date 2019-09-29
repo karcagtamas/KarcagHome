@@ -8,6 +8,9 @@
         <router-link to="macs" v-if="isLoggedIn">
           <div title="MAC címek">MAC címek</div>
         </router-link>
+        <router-link to="movies" v-if="isLoggedIn">
+          <div title="Movies">Filmek</div>
+        </router-link>
         <router-link to="login" v-if="!isLoggedIn">
           <div title="Bejelentkezés">Bejelentkezés</div>
         </router-link>

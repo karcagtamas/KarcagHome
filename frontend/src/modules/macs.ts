@@ -1,6 +1,7 @@
 import axios from 'axios';
 import MacAddress from '../models/macAddress';
-import { ActionTree, MutationTree, Getter, GetterTree } from 'vuex';
+import { ActionTree, MutationTree, GetterTree, Module } from 'vuex';
+import { RootState } from './types';
 
 interface IState {
   macs: MacAddress[];
@@ -16,7 +17,7 @@ const getters: GetterTree<IState, any> = {
   allMacs: sstate => sstate.macs
 };
 
-const actions: ActionTree<IState, IState> = {
+const actions: ActionTree<IState, RootState> = {
   async fetchMacs({ commit }) {
     const response = await axios.get(`${url}/macs`);
 
@@ -62,9 +63,11 @@ const mutations: MutationTree<IState> = {
   }
 };
 
-export default {
+const Macs: Module<IState, RootState> = {
   state,
   getters,
   actions,
   mutations
 };
+
+export default Macs;

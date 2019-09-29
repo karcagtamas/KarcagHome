@@ -1,9 +1,16 @@
+import { RootState } from './modules/types';
 import Vue from 'vue';
-import Vuex from 'vuex';
+import Vuex, { StoreOptions } from 'vuex';
 import macs from './modules/macs';
+import movies from './modules/movies';
 
 Vue.use(Vuex);
 
-export default new Vuex.Store({
-  modules: { macs }
-});
+const store: StoreOptions<RootState> = {
+  modules: {
+    macs,
+    movies
+  }
+};
+
+export default new Vuex.Store(store);

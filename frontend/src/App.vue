@@ -1,16 +1,17 @@
 <template>
-  <div id="app">
+  <v-app id="app">
     <Navigator></Navigator>
     <div class="view">
       <router-view />
     </div>
-  </div>
+  </v-app>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import Navigator from './components/Navigator.vue';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import '../node_modules/vuetify/dist/vuetify.min.css';
 
 @Component({ components: { Navigator } })
 export default class App extends Vue {}

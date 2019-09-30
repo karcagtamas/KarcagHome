@@ -1,16 +1,14 @@
 <template>
   <div>
     <h1>MAC Címek</h1>
-    <button
-      class="btn btn-primary mb-3"
-      v-if="!newMac"
-      @click="newMac = true; onModify = false"
-    >Új MAC</button>
+    <div class="my-3">
+      <v-btn raised color="primary" v-if="!newMac" @click="newMac = true; onModify = false">Új MAC</v-btn>
+    </div>
     <div v-if="newMac || onModify" class="form-div">
-      <div class="alert alert-danger" v-if="error">
+      <v-alert type="error" dismissible="true" border="left" v-if="error">
         <strong>HIBA!</strong>
         {{error}}
-      </div>
+      </v-alert>
       <div class="form-group">
         <label for="mac">Mac</label>
         <input class="form-control" type="text" name="mac" v-model="newMacAddress.address" />
@@ -31,8 +29,10 @@
         <label for="ip">IP</label>
         <input class="form-control" type="text" name="ip" v-model="newMacAddress.ip" />
       </div>
-      <button class="btn btn-warning mb-3 mr-1" @click="back">Vissza</button>
-      <button class="btn btn-success mb-3 ml-1" @click="save">Mentés</button>
+      <div>
+        <v-btn class="mr-2" raised color="warning" @click="back">Vissza</v-btn>
+        <v-btn class="ml-2" raised color="success" @click="save">Mentés</v-btn>
+      </div>
     </div>
     <table>
       <thead>

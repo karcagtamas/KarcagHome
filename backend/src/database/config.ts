@@ -8,7 +8,7 @@ export interface ConString {
 const address = "localhost";
 const user = "root";
 const password = "root";
-const database = "karcaghome";
+const database = "";
 
 const connectionString: ConString = { host: address, user, password, database };
 

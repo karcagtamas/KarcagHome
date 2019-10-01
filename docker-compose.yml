@@ -1,0 +1,49 @@
+version: "3"
+services:
+  db:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_HOST: localhost
+      MYSQL_DATABASE: karcaghome
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: karcaghome
+      MYSQL_PASSWORD: Abc123456
+    ports:
+      - "3306:3306"
+    volumes:
+      - my-db:/var/lib/mysql
+    networks:
+      - backend
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: ./Dockerfile
+    ports:
+      - "8080:80"
+    networks:
+      - backend
+  backend:
+    container_name: backend
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile
+    ports:
+      - "8000:8000"
+    networks:
+      - frontend
+      - db
+    depends_on:
+      - db
+volumes:
+  my-db:
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+  db:
+    driver: bridge

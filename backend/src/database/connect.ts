@@ -5,6 +5,8 @@ const connectionString: ConString = conString;
 
 const db = mysql.createConnection(connectionString);
 
-db.connect();
+db.connect(err => {
+  if (err) console.log(err);
+});
 
 export default db;

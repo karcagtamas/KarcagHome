@@ -3,13 +3,21 @@ export interface ConString {
   user: string;
   password: string;
   database: string;
+  port: number;
 }
 
-const address = "localhost";
-const user = "root";
-const password = "root";
-const database = "";
+const address = "0.0.0.0";
+const user = "karcaghome";
+const password = "Abc123456";
+const database = "karcaghome";
+const port = 3307;
 
-const connectionString: ConString = { host: address, user, password, database };
+const connectionString: ConString = {
+  host: address,
+  user,
+  password,
+  database,
+  port
+};
 
 export default connectionString;

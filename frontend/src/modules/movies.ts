@@ -15,7 +15,7 @@ const state: MovieState = {
   myMovies: []
 };
 
-const getters: GetterTree<MovieState, any> = {
+const getters: GetterTree<MovieState, RootState> = {
   movies: cState => cState.movies,
   myMovies: cState => cState.myMovies
 };

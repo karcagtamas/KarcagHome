@@ -1,9 +1,15 @@
 <template>
   <v-app id="app">
     <Navigator></Navigator>
-    <div class="view">
-      <router-view />
-    </div>
+    <v-content>
+      <v-container fluid>
+        <router-view />
+      </v-container>
+    </v-content>
+    <v-footer app>
+      Created by: Karcag Tamas --->&nbsp;
+      <a href="http://karcags.hu">karcags</a>
+    </v-footer>
   </v-app>
 </template>
 
@@ -24,8 +30,5 @@ body {
 #app {
   width: 100%;
   font-family: 'Inconsolata', monospace;
-}
-.view {
-  padding: 2rem;
 }
 </style>

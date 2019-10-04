@@ -1,30 +1,39 @@
 <template>
   <div class="frame">
-    <div class="login">
-      <div class="title">Bejelentkezés</div>
-      <div class="error alert alert-danger mt-4" v-if="error">
+    <v-card raised class="p-4">
+      <v-card-title>
+        <h1 class="text-center">Bejelentkezés</h1>
+      </v-card-title>
+      <v-alert type="error" dismissible border="left" v-if="error">
         <strong>HIBA!</strong>
         {{error}}
-      </div>
-      <div class="form-group">
-        <label>Felhasználónév:</label>
-        <input class="form-control" type="text" name="username" v-model="username" />
-      </div>
-      <div class="form-group">
-        <label for="password">Jelszó:</label>
-        <input class="form-control" type="password" name="password" v-model="password" />
-      </div>
-      <button class="btn btn-primary" @click="login">Bejelentkezés</button>
-    </div>
+      </v-alert>
+      <v-form onSubmit="return false">
+        <v-text-field v-model="username" label="Felhasználónév" required outlined dense clearable></v-text-field>
+        <v-text-field
+          v-model="password"
+          label="Jelszó"
+          type="password"
+          required
+          outlined
+          dense
+          clearable
+        ></v-text-field>
+        <v-btn type="submit" color="primary" @click="login">Bejelentkezés</v-btn>
+      </v-form>
+    </v-card>
   </div>
 </template>
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import LoginService from '../services/LoginService';
 import router from '../router';
+import { Action, State } from 'vuex-class';
 
 @Component({})
 export default class Login extends Vue {
+  @Action('fetchUser') public fetchUser: any;
+  @Action('setIsLoggedIn') public setIsLoggedIn: any;
   private username: string = '';
   private password: string = '';
   private error: string = '';
@@ -40,6 +49,12 @@ export default class Login extends Vue {
     }
     LoginService.checkLogin(this.username, this.password).then(res => {
       if (res) {
+        const userId = parseInt(
+          localStorage.getItem('userId') || '0',
+          undefined
+        );
+        this.fetchUser(userId);
+        this.setIsLoggedIn(true);
         router.replace('/');
       } else {
         this.setAlert('A belépési adatok hibásak!');

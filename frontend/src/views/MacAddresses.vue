@@ -1,64 +1,94 @@
 <template>
   <div>
     <h1>MAC Címek</h1>
+
+    <v-card raised>
+      <v-card-title>MAC címek</v-card-title>
+      <v-simple-table dense fixed-header height="25vh">
+        <template v-slot:default>
+          <thead>
+            <tr>
+              <th class="text-left">MAC</th>
+              <th class="text-left">Tulaj</th>
+              <th class="text-left">Név</th>
+              <th class="text-left">Eszköz név</th>
+              <th class="text-left">IP</th>
+              <th class="text-left">Művletek</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="mac in allMacs" :key="mac.id">
+              <td>{{mac.address}}</td>
+              <td>{{mac.owner}}</td>
+              <td>{{mac.name}}</td>
+              <td>{{mac.deviceName}}</td>
+              <td>{{mac.ip ? mac.ip : 'Nincs megadott IP'}}</td>
+              <td>
+                <v-btn class="m-1" color="error" fab x-small @click="deleteMacAddress(mac.id)">
+                  <v-icon>mdi-close</v-icon>
+                </v-btn>
+                <v-btn class="m-1" color="warning" fab x-small @click="modifyMac(mac)">
+                  <v-icon>mdi-border-color</v-icon>
+                </v-btn>
+              </td>
+            </tr>
+          </tbody>
+        </template>
+      </v-simple-table>
+    </v-card>
     <div class="my-3">
       <v-btn raised color="primary" v-if="!newMac" @click="newMac = true; onModify = false">Új MAC</v-btn>
     </div>
-    <div v-if="newMac || onModify" class="form-div">
+    <v-card raised v-if="newMac || onModify" class="p-3 add-new-address-panel">
+      <v-card-title>Új MAC cím</v-card-title>
       <v-alert type="error" dismissible="true" border="left" v-if="error">
         <strong>HIBA!</strong>
         {{error}}
       </v-alert>
-      <div class="form-group">
-        <label for="mac">Mac</label>
-        <input class="form-control" type="text" name="mac" v-model="newMacAddress.address" />
-      </div>
-      <div class="form-group">
-        <label for="owner">Tulaj</label>
-        <input class="form-control" type="text" name="owner" v-model="newMacAddress.owner" />
-      </div>
-      <div class="form-group">
-        <label for="name">Név</label>
-        <input class="form-control" type="text" name="name" v-model="newMacAddress.name" />
-      </div>
-      <div class="form-group">
-        <label for="device">Eszköz név</label>
-        <input class="form-control" type="text" name="device" v-model="newMacAddress.deviceName" />
-      </div>
-      <div class="form-group">
-        <label for="ip">IP</label>
-        <input class="form-control" type="text" name="ip" v-model="newMacAddress.ip" />
-      </div>
-      <div>
-        <v-btn class="mr-2" raised color="warning" @click="back">Vissza</v-btn>
-        <v-btn class="ml-2" raised color="success" @click="save">Mentés</v-btn>
-      </div>
-    </div>
-    <table>
-      <thead>
-        <tr>
-          <th>Cím</th>
-          <th>Tulaj</th>
-          <th>Eszköz</th>
-          <th>Eszköz név</th>
-          <th>IP</th>
-          <th>Művletek</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="mac in allMacs" :key="mac.id">
-          <td>{{mac.address}}</td>
-          <td>{{mac.owner}}</td>
-          <td>{{mac.name}}</td>
-          <td>{{mac.deviceName}}</td>
-          <td>{{mac.ip ? mac.ip : 'Nincs megadott IP'}}</td>
-          <td>
-            <button class="btn btn-danger mr-1" @click="deleteMacAddress(mac.id)">X</button>
-            <button class="btn btn-warning ml-1" @click="modifyMac(mac)">&#9998;</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+      <v-form>
+        <v-text-field
+          v-model="newMacAddress.address"
+          :counter="17"
+          label="MAC"
+          required
+          outlined
+          dense
+          clearable
+        ></v-text-field>
+        <v-text-field
+          v-model="newMacAddress.owner"
+          :counter="100"
+          label="Tulaj"
+          required
+          outlined
+          dense
+          clearable
+        ></v-text-field>
+        <v-text-field
+          v-model="newMacAddress.name"
+          :counter="100"
+          label="Név"
+          required
+          outlined
+          dense
+          clearable
+        ></v-text-field>
+        <v-text-field
+          v-model="newMacAddress.deviceName"
+          :counter="100"
+          label="Eszköz név"
+          required
+          outlined
+          dense
+          clearable
+        ></v-text-field>
+        <v-text-field v-model="newMacAddress.ip" :counter="15" label="IP" outlined dense clearable></v-text-field>
+        <div>
+          <v-btn class="mr-2" raised color="warning" @click="back">Vissza</v-btn>
+          <v-btn class="ml-2" raised color="success" @click="save">Mentés</v-btn>
+        </div>
+      </v-form>
+    </v-card>
   </div>
 </template>
 <script lang="ts">
@@ -85,6 +115,7 @@ export default class MacAddresses extends Vue {
   public back(): void {
     this.newMacAddress = new MacAddress('', '', '', '');
     this.newMac = false;
+    this.onModify = false;
   }
 
   public save(): void {
@@ -144,57 +175,7 @@ h1:hover {
   transition-duration: 0.5s;
   transform: scale(1.5, 1.5);
 }
-table {
-  width: 100%;
-  box-shadow: 0 0 10px 1px black;
-}
-table thead tr th {
-  padding: 0.5rem;
-  text-align: center;
-  font-weight: bold;
-  border: 1px solid white;
-  background-color: #6a2cfa;
-  color: white;
-  transition-duration: 0.5s;
-}
-table thead tr th:hover {
-  font-size: 1.3rem;
-  transition-duration: 0.5s;
-}
-table tbody tr td {
-  padding: 0.5rem;
-  text-align: center;
-  border: 1px solid white;
-
-  color: white;
-  transition-duration: 0.5s;
-}
-table tbody tr:nth-child(even) {
-  background-color: #ab86ff;
-  transition-duration: 0.5s;
-}
-table tbody tr:nth-child(odd) {
-  background-color: #9569fd;
-  transition-duration: 0.5s;
-}
-table tbody tr:nth-child(even):hover {
-  background-color: #3d03c2;
-  transition-duration: 0.5s;
-}
-table tbody tr:nth-child(odd):hover {
-  background-color: #3d03c2;
-  transition-duration: 0.5s;
-}
-.form-div {
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 0 10px 1px #000;
-  padding: 1.5rem;
-  margin-bottom: 1rem;
-  border: 1px solod #333;
-}
-.form-div label {
-  font-weight: bold;
-  font-size: 1.2rem;
+.add-new-address-panel {
+  margin: 2rem 20rem 0 20rem;
 }
 </style>

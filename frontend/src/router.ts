@@ -5,6 +5,7 @@ import MacAddresses from './views/MacAddresses.vue';
 import Login from './components/Login.vue';
 import LoginService from './services/LoginService';
 import Movies from './views/Movies.vue';
+import Profile from './views/Profile.vue';
 
 Vue.use(Router);
 
@@ -29,6 +30,11 @@ const router = new Router({
       path: '/movies',
       name: 'movies',
       component: Movies
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: Profile
     }
   ]
 });

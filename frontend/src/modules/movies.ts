@@ -1,6 +1,6 @@
+import Movie from '@/models/movies';
 import { ActionTree, MutationTree, GetterTree, Module } from 'vuex';
 import axios from 'axios';
-import Movie from '../models/movies';
 import { RootState } from './types';
 
 interface MovieState {
@@ -30,13 +30,42 @@ const actions: ActionTree<MovieState, RootState> = {
     const response = await axios.get(`${url}/movies/${userId}`);
 
     commit('setMyMovies', response.data);
+  },
+  async addMovie({ commit }, movie: Movie) {
+    const response = await axios.post(`${url}/movies`, { movie });
+
+    commit('addMovie', response.data);
+  },
+  async updateMovie({ commit }, movie: Movie) {
+    const response = await axios.put(`${url}/movies`, { movie });
+
+    commit('updateMovie', movie);
+  },
+  async deleteMovie({ commit }, movie: Movie) {
+    const response = await axios.delete(`${url}/movies/${movie.id}`);
+
+    commit('deleteMovie', movie.id);
   }
 };
 
 const mutations: MutationTree<MovieState> = {
-  setMovies: (cState: MovieState, movies: Movie[]) => (cState.movies = movies),
+  setMovies: (cState: MovieState, movies: Movie[]) =>
+    (cState.movies = movies.map(x => {
+      x.addedTime = new Date(x.addedTime);
+      x.lastModification = new Date(x.lastModification);
+      return x;
+    })),
   setMyMovies: (cState: MovieState, movies: Movie[]) =>
-    (cState.myMovies = movies)
+    (cState.myMovies = movies),
+  addMovie: (cState: MovieState, movie: Movie) => cState.movies.push(movie),
+  updateMovie: (cState: MovieState, movie: Movie) => {
+    const index = cState.movies.findIndex(x => x.id === movie.id);
+    if (index !== -1) {
+      cState.movies.splice(index, 1, movie);
+    }
+  },
+  deleteMovie: (cState: MovieState, movieId: number) =>
+    (cState.movies = cState.movies.filter(x => x.id !== movieId))
 };
 
 const Movies: Module<MovieState, RootState> = {

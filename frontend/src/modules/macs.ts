@@ -55,10 +55,10 @@ const mutations: MutationTree<IState> = {
   newMac: (cState, mac: MacAddress) => cState.macs.unshift(mac),
   removeMac: (cState, id) =>
     (cState.macs = cState.macs.filter(x => x.id !== id)),
-  updateMac: (cState, todo) => {
-    const index = cState.macs.findIndex(x => x.id === todo.id);
+  updateMac: (cState, mac) => {
+    const index = cState.macs.findIndex(x => x.id === mac.id);
     if (index !== -1) {
-      cState.macs.splice(index, 1, todo);
+      cState.macs.splice(index, 1, mac);
     }
   }
 };

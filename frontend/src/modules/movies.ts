@@ -45,6 +45,18 @@ const actions: ActionTree<MovieState, RootState> = {
     const response = await axios.delete(`${url}/movies/${movie.id}`);
 
     commit('deleteMovie', movie.id);
+  },
+  async seenMovie({ commit }, movie: Movie) {
+    const userId: number = parseInt(
+      localStorage.getItem('userId') || '0',
+      undefined
+    );
+    const response = await axios.post(`${url}/movies/${movie.id}/seen`, {
+      userId,
+      seen: movie.seen
+    });
+
+    commit('updateMyMovie', movie);
   }
 };
 
@@ -56,7 +68,12 @@ const mutations: MutationTree<MovieState> = {
       return x;
     })),
   setMyMovies: (cState: MovieState, movies: Movie[]) =>
-    (cState.myMovies = movies),
+    (cState.myMovies = movies.map(x => {
+      x.addedTime = new Date(x.addedTime);
+      x.lastModification = new Date(x.lastModification);
+
+      return x;
+    })),
   addMovie: (cState: MovieState, movie: Movie) => cState.movies.push(movie),
   updateMovie: (cState: MovieState, movie: Movie) => {
     const index = cState.movies.findIndex(x => x.id === movie.id);
@@ -65,7 +82,13 @@ const mutations: MutationTree<MovieState> = {
     }
   },
   deleteMovie: (cState: MovieState, movieId: number) =>
-    (cState.movies = cState.movies.filter(x => x.id !== movieId))
+    (cState.movies = cState.movies.filter(x => x.id !== movieId)),
+  updateMyMovie: (cState: MovieState, movie: Movie) => {
+    const index = cState.myMovies.findIndex(x => x.id === movie.id);
+    if (index !== -1) {
+      cState.myMovies.splice(index, 1, movie);
+    }
+  }
 };
 
 const Movies: Module<MovieState, RootState> = {

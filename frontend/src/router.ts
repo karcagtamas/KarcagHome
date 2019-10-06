@@ -6,6 +6,7 @@ import Login from './components/Login.vue';
 import LoginService from './services/LoginService';
 import Movies from './views/Movies.vue';
 import Profile from './views/Profile.vue';
+import MyMovies from './views/MyMovies.vue';
 
 Vue.use(Router);
 
@@ -35,6 +36,11 @@ const router = new Router({
       path: '/profile',
       name: 'profile',
       component: Profile
+    },
+    {
+      path: '/my-movies',
+      name: 'my-movies',
+      component: MyMovies
     }
   ]
 });

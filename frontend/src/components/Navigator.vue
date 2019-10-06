@@ -30,6 +30,13 @@
                 </router-link>
               </v-list-item-title>
             </v-list-item>
+            <v-list-item v-if="isLoggedIn">
+              <v-list-item-title>
+                <router-link to="/my-movies">
+                  <div class="link" title="Filmjeim">Filmjeim</div>
+                </router-link>
+              </v-list-item-title>
+            </v-list-item>
             <v-list-item>
               <v-list-item-title>
                 <a href="http://karcags.hu" target="_blank">

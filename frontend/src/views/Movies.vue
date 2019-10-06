@@ -76,6 +76,7 @@ import User from '../models/user';
 @Component({})
 export default class Movies extends Vue {
   @Action('fetchMovies') public fetchMovies: any;
+  @Action('fetchUser') public fetchUser: any;
   @Action('addMovie') public addMovie: any;
   @Action('updateMovie') public updateMovie: any;
   @Action('deleteMovie') public deleteMovie: any;
@@ -97,6 +98,7 @@ export default class Movies extends Vue {
   public onModify: boolean = false;
 
   public mounted() {
+    this.fetchUser();
     this.fetchMovies();
   }
 

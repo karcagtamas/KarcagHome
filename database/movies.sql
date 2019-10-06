@@ -33,7 +33,7 @@ BEGIN
     INNER JOIN users AS creater ON movies.creater = creater.id
     INNER JOIN users AS modifier ON movies.lastModifier = modifier.id
     WHERE switch_movies_users.user = _userId
-    ORDER BY movies.name;
+    ORDER BY switch_movies_users.seen, movies.name;
 END;
 
 /* Get movie by id */

@@ -1,5 +1,7 @@
+USE karcaghome;
+
 /* Get all movies */
-CREATE OR REPLACE PROCEDURE getAllMovies()
+CREATE PROCEDURE getAllMovies()
 BEGIN
     SELECT movies.id, 
         movies.name, 
@@ -17,7 +19,7 @@ BEGIN
 END;    
 
 /* Get movies for a user */
-CREATE OR REPLACE PROCEDURE getMovies(_userId INT(11))
+CREATE PROCEDURE getMovies(_userId INT(11))
 BEGIN
     SELECT movies.id, 
         movies.name, 
@@ -37,7 +39,7 @@ BEGIN
 END;
 
 /* Get movie by id */
-CREATE OR REPLACE PROCEDURE getMovie(_id INT(11))
+CREATE PROCEDURE getMovie(_id INT(11))
 BEGIN
     SELECT movies.id, 
         movies.name, 
@@ -57,7 +59,7 @@ END;
 
 
 /* Add new movie */
-CREATE OR REPLACE PROCEDURE addMovie(_creater INT(11), _name VARCHAR(100))
+CREATE PROCEDURE addMovie(_creater INT(11), _name VARCHAR(100))
 BEGIN
     INSERT INTO movies (name, creater, lastModifier)
     VALUES(_name, _creater, _creater);
@@ -65,32 +67,32 @@ BEGIN
 END;
 
 /* Update movie */
-CREATE OR REPLACE PROCEDURE updateMovie(_id INT(11), _updater INT(11), _name VARCHAR(100))
+CREATE PROCEDURE updateMovie(_id INT(11), _updater INT(11), _name VARCHAR(100))
 BEGIN
     UPDATE movies SET name = _name, lastModifier = _updater, lastModification = CURRENT_TIMESTAMP WHERE id = _id;
 END;
 
 /* Delete movie */
-CREATE OR REPLACE PROCEDURE deleteMovie(_id INT(11))
+CREATE PROCEDURE deleteMovie(_id INT(11))
 BEGIN
     DELETE FROM movies WHERE id = _id;
 END;
 
 /* Pick movie */
-CREATE OR REPLACE PROCEDURE pickMovie(_id INT(11), _userId INT(11))
+CREATE PROCEDURE pickMovie(_id INT(11), _userId INT(11))
 BEGIN
     INSERT INTO switch_movies_users (movie, user)
     VALUES (_id, _userId);
 END;
 
 /* Unpick movie */
-CREATE OR REPLACE PROCEDURE unPickMovie(_id INT(11), _userId INT(11))
+CREATE PROCEDURE unPickMovie(_id INT(11), _userId INT(11))
 BEGIN
     DELETE FROM switch_movies_users WHERE movie = _id AND user = _userId;
 END;
 
 /* See movie */
-CREATE OR REPLACE PROCEDURE seeMovie(_id INT(11), _userId INT(11), _value BOOLEAN)
+CREATE PROCEDURE seeMovie(_id INT(11), _userId INT(11), _value BOOLEAN)
 BEGIN
     UPDATE switch_movies_users SET seen = _value WHERE movie = _id AND user = _userId;
 END;

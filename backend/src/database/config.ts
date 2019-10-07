@@ -6,9 +6,9 @@ export interface ConString {
   port: number;
 }
 
-const address = "localhost";
-const user = "root";
-const password = "root";
+const address = "db";
+const user = "karcaghome";
+const password = "Abc123456";
 const database = "karcaghome";
 const port = 3306;
 

@@ -1,11 +1,14 @@
 <template>
   <v-app id="app">
+    <!-- Navigation -->
     <Navigator></Navigator>
+    <!-- Content -->
     <v-content>
       <v-container fluid>
         <router-view />
       </v-container>
     </v-content>
+    <!-- Footer -->
     <v-footer app>
       Created by: Karcag Tamas --->&nbsp;
       <a href="http://karcags.hu">karcags</a>

@@ -1,6 +1,8 @@
 <template>
   <div>
+    <!-- Navigator -->
     <v-app-bar color="deep-purple accent-4" dense dark>
+      <!-- Icon -->
       <v-app-bar-nav-icon>
         <v-menu left bottom>
           <template v-slot:activator="{ on }">
@@ -8,6 +10,7 @@
               <v-icon>mdi-dots-vertical</v-icon>
             </v-btn>
           </template>
+          <!-- Button list -->
           <v-list>
             <v-list-item v-if="!isLoggedIn">
               <v-list-item-title>
@@ -47,12 +50,14 @@
           </v-list>
         </v-menu>
       </v-app-bar-nav-icon>
+      <!-- Main title -->
       <v-toolbar-title>
         <router-link to="/">
           <div class="link main" title="Fő oldal">Karcag Home</div>
         </router-link>
       </v-toolbar-title>
       <div class="flex-grow-1"></div>
+      <!-- Profile menu -->
       <v-menu left bottom v-if="isLoggedIn">
         <template v-slot:activator="{ on }">
           <v-btn icon v-on="on">
@@ -111,13 +116,20 @@ import User from '../models/user';
 
 @Component({})
 export default class Navigator extends Vue {
+  // Current user fetch datas
   @Action('fetchUser') public fetchUser: any;
+  // Clear current user datas
   @Action('clearUser') public clearUser: any;
+  // Set is logged in status for the current user
   @Action('setIsLoggedIn') public setIsLoggedIn: any;
+  // Get current user
   @Getter('user') public user: User;
+  // Get logged in status
   @Getter('isLoggedIn') public isLoggedIn: boolean;
 
+  // Created event
   public created() {
+    // Check is logged in status
     LoginService.isLoggedIn()
       .then(res => {
         this.setIsLoggedIn(res);
@@ -134,10 +146,12 @@ export default class Navigator extends Vue {
       });
   }
 
+  // Open profile page
   public openProfile() {
     router.replace('/profile');
   }
 
+  // Logout
   public logout(): void {
     LoginService.logout().then(() => {
       localStorage.removeItem('userId');

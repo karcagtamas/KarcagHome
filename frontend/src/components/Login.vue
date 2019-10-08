@@ -1,13 +1,17 @@
 <template>
   <div class="frame">
+    <!-- Login panel -->
     <v-card raised class="p-4">
+      <!-- Title -->
       <v-card-title>
         <h1 class="text-center">Bejelentkezés</h1>
       </v-card-title>
+      <!-- Error -->
       <v-alert type="error" dismissible border="left" v-if="error">
         <strong>HIBA!</strong>
         {{error}}
       </v-alert>
+      <!-- Adding and modifier form -->
       <v-form onSubmit="return false">
         <v-text-field v-model="username" label="Felhasználónév" required outlined dense clearable></v-text-field>
         <v-text-field
@@ -32,21 +36,31 @@ import { Action, State } from 'vuex-class';
 
 @Component({})
 export default class Login extends Vue {
+  // Current user
   @Action('fetchUser') public fetchUser: any;
+  // Logged in status
   @Action('setIsLoggedIn') public setIsLoggedIn: any;
+  // Input username
   private username: string = '';
+  // Input password
   private password: string = '';
+  // Error message for form
   private error: string = '';
 
+  // Login event
   public login(): void {
+    // Check username is given
     if (!this.username) {
       this.setAlert('A felhasználó név megadás kötelező!');
       return;
     }
+    // Check password is given
     if (!this.password) {
       this.setAlert('A jelszó megadása kötelező!');
       return;
     }
+
+    // Check login if the given values are valid
     LoginService.checkLogin(this.username, this.password).then(res => {
       if (res) {
         const userId = parseInt(
@@ -62,6 +76,7 @@ export default class Login extends Vue {
     });
   }
 
+  // Set alert with the given text
   public setAlert(alert: string): void {
     this.error = alert;
     setTimeout(() => {

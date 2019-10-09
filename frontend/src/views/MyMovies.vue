@@ -36,6 +36,7 @@
 import { Vue, Component } from 'vue-property-decorator';
 import Movie from '../models/movies';
 import { Getter, Action, State } from 'vuex-class';
+import PickMyMovies from '../components/PickMyMovies.vue';
 
 @Component({})
 export default class MyMovies extends Vue {

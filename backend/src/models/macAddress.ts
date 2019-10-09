@@ -1,9 +1,21 @@
+// Mac Address model class
 export default class MacAddress {
+  // Id
   public id?: number;
+
+  // MAC address
   public address: string;
+
+  // Name of the device
   public deviceName: string;
+
+  // Owner of the device
   public owner: string;
+
+  // Own name of the device
   public name: string;
+
+  // Static ip address if it exists
   public ip?: string;
 
   constructor(

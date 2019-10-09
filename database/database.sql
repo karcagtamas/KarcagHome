@@ -1,7 +1,9 @@
+/* KarcagHome database */
 CREATE DATABASE karcaghome
 CHARACTER SET utf8
 COLLATE utf8_hungarian_ci;
 
+/* Mac addreses */
 CREATE TABLE macs(
     id INT(11) NOT NULL AUTO_INCREMENT,
     address CHAR(17) NOT NULL,
@@ -12,6 +14,7 @@ CREATE TABLE macs(
     PRIMARY KEY(id)
 );
 
+/* Users */
 CREATE TABLE users(
     id INT(11) NOT NULL AUTO_INCREMENT,
     username VARCHAR(100) NOT NULL UNIQUE,
@@ -24,6 +27,7 @@ CREATE TABLE users(
     PRIMARY KEY(id)
 );
 
+/* Tokens */
 CREATE TABLE tokens(
     token VARCHAR(255) NOT NULL,
     user INT(11) NOT NULL,
@@ -33,6 +37,7 @@ CREATE TABLE tokens(
     REFERENCES users(id)
 );
 
+/* Movies */
 CREATE TABLE movies(
     id INT(11) NOT NULL AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
@@ -47,6 +52,7 @@ CREATE TABLE movies(
     REFERENCES users(id)
 );
 
+/* Switch between users and movies */
 CREATE TABLE switch_movies_users(
     movie INT(11) NOT NULL,
     user INT(11) NOT NULL,
@@ -59,6 +65,7 @@ CREATE TABLE switch_movies_users(
     REFERENCES movies(id) ON DELETE CASCADE
 ); 
 
+/* Series */
 CREATE TABLE series(
     id INT(11) NOT NULL AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
@@ -73,6 +80,7 @@ CREATE TABLE series(
     REFERENCES users(id)
 );
 
+/* Seasons */
 CREATE TABLE seasons(
     id INT(11) NOT NULL AUTO_INCREMENT,
     series INT(11) NOT NULL AUTO_INCREMENT,
@@ -83,6 +91,7 @@ CREATE TABLE seasons(
     REFERENCES series(id) ON DELETE CASCADE
 );
 
+/* Episodes */
 CREATE TABLE episodes(
     id INT(11) NOT NULl AUTO_INCREMENT,
     season INT(11) NOT NULL AUTO_INCREMENT,
@@ -92,6 +101,7 @@ CREATE TABLE episodes(
     REFERENCES seasons(id) ON DELETE CASCADE
 );
 
+/* Switch between users and episodes */
 CREATE TABLE switch_episodes_users(
     episode INT(11) NOT NULL,
     user INT(11) NOT NULL,

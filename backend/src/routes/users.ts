@@ -44,6 +44,8 @@ router.post('/login', (req: Request, res: Response) => {
   });
 });
 
+// Logout from KarcagHome
+// Delete token from the database
 router.post('/logout', (req: Request, res: Response) => {
   const userId: number = req.body.userId;
   const token: string = req.body.token;
@@ -71,6 +73,7 @@ router.post('/token', (req: Request, res: Response) => {
   });
 });
 
+// Get user by id
 router.get('/:id', (req: Request, res: Response) => {
   const userId: number = parseInt(req.params.id) || 0;
   const sql: string = 'CALL getUser(?);';

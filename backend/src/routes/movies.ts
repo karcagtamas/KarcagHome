@@ -1,13 +1,13 @@
-import { Router, Request, Response } from "express";
-import db from "../database/connect";
-import { MysqlError } from "mysql";
-import Movie from "../models/movies";
+import { Router, Request, Response } from 'express';
+import db from '../database/connect';
+import { MysqlError } from 'mysql';
+import Movie from '../models/movie';
 
 const router: Router = Router();
 
 // Get all movie
-router.get("/", (req: Request, res: Response) => {
-  const sql: string = "CALL getAllMovies()";
+router.get('/', (req: Request, res: Response) => {
+  const sql: string = 'CALL getAllMovies()';
   db.query(sql, (err: MysqlError, results: any) => {
     if (err) throw err;
     res.send(JSON.stringify(results[0]));
@@ -15,9 +15,9 @@ router.get("/", (req: Request, res: Response) => {
 });
 
 // Get movies for a user
-router.get("/:user", (req: Request, res: Response) => {
+router.get('/:user', (req: Request, res: Response) => {
   const userId: number = parseInt(req.params.user);
-  const sql: string = "CALL getMovies(?)";
+  const sql: string = 'CALL getMovies(?)';
   db.query(sql, [userId], (err: MysqlError | null, results: any) => {
     if (err) throw err;
     res.send(JSON.stringify(results[0]));
@@ -25,9 +25,9 @@ router.get("/:user", (req: Request, res: Response) => {
 });
 
 // Add new movie
-router.post("/", (req: Request, res: Response) => {
+router.post('/', (req: Request, res: Response) => {
   const movie: Movie = req.body.movie;
-  const sql: string = "CALL addMovie(?, ?)";
+  const sql: string = 'CALL addMovie(?, ?)';
   db.query(
     sql,
     [movie.createrId, movie.name],
@@ -39,9 +39,9 @@ router.post("/", (req: Request, res: Response) => {
 });
 
 // Update movie
-router.put("/", (req: Request, res: Response) => {
+router.put('/', (req: Request, res: Response) => {
   const movie: Movie = req.body.movie;
-  const sql: string = "CALL updateMovie(?, ?, ?)";
+  const sql: string = 'CALL updateMovie(?, ?, ?)';
   db.query(
     sql,
     [movie.id, movie.lastModifierId, movie.name],
@@ -53,9 +53,9 @@ router.put("/", (req: Request, res: Response) => {
 });
 
 // Delete movie
-router.delete("/:id", (req: Request, res: Response) => {
+router.delete('/:id', (req: Request, res: Response) => {
   const id: number = parseInt(req.params.id);
-  const sql: string = "CALL deleteMovie(?)";
+  const sql: string = 'CALL deleteMovie(?)';
   db.query(sql, [id], (err: MysqlError | null, results: any) => {
     if (err) throw err;
     res.sendStatus(200);
@@ -63,10 +63,10 @@ router.delete("/:id", (req: Request, res: Response) => {
 });
 
 // Pick movie
-router.post("/:id/pick", (req: Request, res: Response) => {
+router.post('/:id/pick', (req: Request, res: Response) => {
   const id: number = parseInt(req.params.id);
   const userId: number = req.body.userId;
-  const sql: string = "CALL pickMovie(?, ?)";
+  const sql: string = 'CALL pickMovie(?, ?)';
   db.query(sql, [id, userId], (err: MysqlError | null, results: any) => {
     if (err) throw err;
     res.sendStatus(200);
@@ -74,10 +74,10 @@ router.post("/:id/pick", (req: Request, res: Response) => {
 });
 
 // Unpick movie
-router.post("/:id/unpick", (req: Request, res: Response) => {
+router.post('/:id/unpick', (req: Request, res: Response) => {
   const id: number = parseInt(req.params.id);
   const userId: number = req.body.userId;
-  const sql: string = "CALL unPickMovie(?, ?)";
+  const sql: string = 'CALL unPickMovie(?, ?)';
   db.query(sql, [id, userId], (err: MysqlError | null, results: any) => {
     if (err) throw err;
     res.sendStatus(200);
@@ -85,11 +85,11 @@ router.post("/:id/unpick", (req: Request, res: Response) => {
 });
 
 // See movie
-router.post("/:id/seen", (req: Request, res: Response) => {
+router.post('/:id/seen', (req: Request, res: Response) => {
   const id: number = parseInt(req.params.id);
   const userId: number = req.body.userId;
   const seen: boolean = req.body.seen;
-  const sql: string = "CALL seeMovie(?, ?, ?)";
+  const sql: string = 'CALL seeMovie(?, ?, ?)';
   db.query(sql, [id, userId, seen], (err: MysqlError | null, results: any) => {
     if (err) throw err;
     res.sendStatus(200);

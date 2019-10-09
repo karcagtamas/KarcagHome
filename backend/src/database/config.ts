@@ -1,3 +1,4 @@
+// Connection String interface for MySql database
 export interface ConString {
   host: string;
   user: string;
@@ -6,12 +7,13 @@ export interface ConString {
   port: number;
 }
 
-const address = "db";
-const user = "karcaghome";
-const password = "Abc123456";
-const database = "karcaghome";
+const address = 'db';
+const user = 'karcaghome';
+const password = 'Abc123456';
+const database = 'karcaghome';
 const port = 3306;
 
+// Create connection string
 const connectionString: ConString = {
   host: address,
   user,
@@ -20,4 +22,5 @@ const connectionString: ConString = {
   port
 };
 
+// Export connection string
 export default connectionString;

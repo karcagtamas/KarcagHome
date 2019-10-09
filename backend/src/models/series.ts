@@ -1,14 +1,32 @@
 import Season from './season';
 
+// Series model class
 export default class Series {
+  // Id
   public id?: number;
+
+  // Name of the series
   public name: string;
+
+  // Time of the creation
   public addedTime: Date;
+
+  // Name of the creater
   public creater: string;
+
+  // Id of the creater
   public createrId: number;
+
+  // Time of the last modification
   public lastModification: Date;
+
+  // Name of the last modifier
   public lastModifier: string;
+
+  // Id of the last modifier
   public lastModifierId: number;
+
+  // Seasons
   public seasons: Season[];
 
   constructor(

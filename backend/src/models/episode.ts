@@ -1,8 +1,18 @@
+// Episode model class
 export default class Episode {
+  // Id
   public id?: number;
+
+  // Season id
   public season: number;
+
+  // Season number
   public seasonNumber: number;
+
+  // Episode number
   public number: number;
+
+  // Episode is seen for the requester user
   public seen: boolean;
 
   constructor(

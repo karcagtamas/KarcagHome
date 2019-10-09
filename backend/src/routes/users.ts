@@ -83,7 +83,7 @@ router.get('/:id', (req: Request, res: Response) => {
   });
 });
 
-/* router.get('/hash/:pass', (req: Request, res: Response) => {
+/* router.get("/hash/:pass", (req: Request, res: Response) => {
   const pass = req.params.pass;
   genHash(pass, (err: any, hashV: string) => {
     res.send(hashV);

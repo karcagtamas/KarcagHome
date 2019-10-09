@@ -1,7 +1,10 @@
 <template>
   <div>
+    <!-- My movies page -->
     <v-card raised>
+      <!-- Title -->
       <v-card-title>Filmjeim</v-card-title>
+      <!-- List of my movies -->
       <v-simple-table dense fixed-header height="25vh">
         <template v-slot:default>
           <thead>
@@ -40,19 +43,25 @@ import PickMyMovies from '../components/PickMyMovies.vue';
 
 @Component({})
 export default class MyMovies extends Vue {
+  // Fetch my movies event
   @Action('fetchMyMovies') public fetchMyMovies: any;
+  // Set seen the movies action
   @Action('seenMovie') public seenMovie: any;
+  // Get may movies
   @Getter('myMovies') public movies: Movie[];
 
+  // Mounted
   public mounted() {
     const userId = parseInt(localStorage.getItem('userId') || '0', undefined);
     this.fetchMyMovies(userId);
   }
 
+  // Convert date to string with format 'yyyy-mm-dd'
   public toDateString(date: Date): string {
     return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
   }
 
+  // Change seen event for movies
   public changeSeen(movie: Movie): void {
     this.seenMovie(movie);
   }

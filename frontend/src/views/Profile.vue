@@ -8,7 +8,9 @@ import User from '../models/user';
 
 @Component({})
 export default class Profile extends Vue {
+  // Fetch user event
   @Action('fetchUser') public fetchUser: any;
+  // Get user
   @Getter('user') public user: User;
 
   public mounted() {

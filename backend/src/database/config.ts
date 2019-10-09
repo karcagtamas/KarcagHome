@@ -7,12 +7,11 @@ export interface ConString {
   port: number;
 }
 
-// MySql connection parameters
-const address: string = 'localhost'; // Address
-const user: string = 'root'; // Username
-const password: string = 'root'; // Password
-const database: string = 'karcaghome'; // Database name
-const port: number = 3306; // Port
+const address = 'db';
+const user = 'karcaghome';
+const password = 'Abc123456';
+const database = 'karcaghome';
+const port = 3306;
 
 // Create connection string
 const connectionString: ConString = {

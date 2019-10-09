@@ -1,6 +1,9 @@
 <template>
+  <!-- Home page -->
   <div class="home">
+    <!-- Title -->
     <h1>Karcag Home</h1>
+    <!-- Existing pages -->
     <v-card raised class="p-4">
       <v-card-title>Oldalak</v-card-title>
       <v-expansion-panels inset>
@@ -52,6 +55,7 @@
         </v-expansion-panel>
       </v-expansion-panels>
     </v-card>
+    <!-- Updates -->
     <v-card raised class="p-4">
       <v-card-title>Frissítések</v-card-title>
       <v-expansion-panels inset>

@@ -58,7 +58,7 @@
       </v-toolbar-title>
       <div class="flex-grow-1"></div>
       <!-- Profile menu -->
-      <v-menu left bottom v-if="isLoggedIn">
+      <v-menu left bottom v-if="isLoggedIn && user">
         <template v-slot:activator="{ on }">
           <v-btn icon v-on="on">
             <v-avatar>

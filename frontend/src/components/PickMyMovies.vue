@@ -1,9 +1,10 @@
 <template>
   <div>
+    <v-btn color="primary" @click="dialog = true">Add</v-btn>
     <v-dialog v-model="dialog">
-      <template v-slot:activator="{on}">
+      <!-- <template v-slot:activator="{on}">
         <v-btn color="deep-purple darken-4" v-on="on">Add</v-btn>
-      </template>
+      </template>-->
       <v-card>
         <v-card-title>Title</v-card-title>
         <v-card-text>asd</v-card-text>
@@ -17,9 +18,19 @@
 </template>
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
+import { Action, Getter, State } from 'vuex-class';
+import Movie from '../models/movies';
 
 @Component({})
 export default class PickMyMovies extends Vue {
+  @Action('fetchMovies') public fetchMovies: any;
+  @Action('fetchMyMovies') public fetchMyMovies: any;
+  @Getter('myMovies') public myMovies: Movie[];
   public dialog: boolean = false;
+
+  public mounted() {
+    this.fetchMovies();
+    this.fetchMyMovies();
+  }
 }
 </script>

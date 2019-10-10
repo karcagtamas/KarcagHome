@@ -5,7 +5,7 @@
       <!-- Title -->
       <v-card-title>Filmjeim</v-card-title>
       <!-- List of my movies -->
-      <v-simple-table dense fixed-header height="25vh">
+      <v-simple-table dense fixed-header height="75vh">
         <template v-slot:default>
           <thead>
             <tr>
@@ -21,6 +21,7 @@
                   @change="changeSeen(movie)"
                   v-model="movie.seen"
                   color="deep-purple darken-4"
+                  dense
                 ></v-switch>
               </td>
             </tr>
@@ -29,9 +30,7 @@
       </v-simple-table>
     </v-card>
     <div class="my-3">
-      <v-btn raised color="primary">
-        <v-icon>mdi-auto-fix</v-icon>
-      </v-btn>
+      <PickMyMovies></PickMyMovies>
     </div>
   </div>
 </template>
@@ -41,13 +40,13 @@ import Movie from '../models/movies';
 import { Getter, Action, State } from 'vuex-class';
 import PickMyMovies from '../components/PickMyMovies.vue';
 
-@Component({})
+@Component({ components: { PickMyMovies } })
 export default class MyMovies extends Vue {
   // Fetch my movies event
   @Action('fetchMyMovies') public fetchMyMovies: any;
   // Set seen the movies action
   @Action('seenMovie') public seenMovie: any;
-  // Get may movies
+  // Get my movies
   @Getter('myMovies') public movies: Movie[];
 
   // Mounted

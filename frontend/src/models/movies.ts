@@ -8,6 +8,7 @@ export default class Movies {
   public lastModifier: string;
   public lastModifierId: number;
   public seen: boolean;
+  public picked?: boolean = false;
 
   constructor(
     name: string,

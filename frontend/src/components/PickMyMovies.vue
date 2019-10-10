@@ -1,16 +1,39 @@
 <template>
   <div>
-    <v-btn color="primary" @click="dialog = true">Add</v-btn>
+    <v-btn color="primary" @click="dialog = true">
+      <v-icon>mdi-auto-fix</v-icon>
+    </v-btn>
     <v-dialog v-model="dialog">
-      <!-- <template v-slot:activator="{on}">
-        <v-btn color="deep-purple darken-4" v-on="on">Add</v-btn>
-      </template>-->
       <v-card>
-        <v-card-title>Title</v-card-title>
-        <v-card-text>asd</v-card-text>
+        <v-card-title>Film hozzáadása a listámhoz</v-card-title>
+        <v-card-text>
+          <v-simple-table dense fixed-header height="50vh">
+            <template v-slot:default>
+              <thead>
+                <tr>
+                  <th class="text-left">Név</th>
+                  <th class="text-left">Jelölve</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="movie in movies" :key="movie.id">
+                  <td>{{movie.name}}</td>
+                  <td>
+                    <v-switch
+                      dense="true"
+                      @change="pickingMovie(movie)"
+                      v-model="movie.picked"
+                      color="deep-purple darken-4"
+                    ></v-switch>
+                  </td>
+                </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
+        </v-card-text>
         <v-divider></v-divider>
         <v-card-actions>
-          <v-btn color="primary" @click="dialog = false">Add</v-btn>
+          <v-btn color="warning" @click="dialog = false">Close</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -25,12 +48,26 @@ import Movie from '../models/movies';
 export default class PickMyMovies extends Vue {
   @Action('fetchMovies') public fetchMovies: any;
   @Action('fetchMyMovies') public fetchMyMovies: any;
+  @Action('pickMovie') public pickMovie: any;
+  @Action('unPickMovie') public unPickMovie: any;
+  @Getter('movies') public movies: Movie[];
   @Getter('myMovies') public myMovies: Movie[];
   public dialog: boolean = false;
 
   public mounted() {
+    const userId = parseInt(localStorage.getItem('userId') || '0', undefined);
+    this.fetchMyMovies(userId);
     this.fetchMovies();
-    this.fetchMyMovies();
+  }
+
+  public pickingMovie(movie: Movie) {
+    const userId = parseInt(localStorage.getItem('userId') || '0', undefined);
+    if (movie.picked) {
+      this.pickMovie(movie);
+    } else {
+      this.unPickMovie(movie);
+    }
+    this.fetchMyMovies(userId);
   }
 }
 </script>

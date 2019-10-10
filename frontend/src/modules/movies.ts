@@ -70,6 +70,28 @@ const actions: ActionTree<MovieState, RootState> = {
     });
 
     commit('updateMyMovie', movie);
+  },
+  async pickMovie({ commit }, movie: Movie) {
+    const userId: number = parseInt(
+      localStorage.getItem('userId') || '0',
+      undefined
+    );
+    const response = await axios.post(`${url}/movies/${movie.id}/pick`, {
+      userId
+    });
+
+    commit('updateMovie', movie);
+  },
+  async unPickMovie({ commit }, movie: Movie) {
+    const userId: number = parseInt(
+      localStorage.getItem('userId') || '0',
+      undefined
+    );
+    const response = await axios.post(`${url}/movies/${movie.id}/unpick`, {
+      userId
+    });
+
+    commit('updateMovie', movie);
   }
 };
 
@@ -80,6 +102,7 @@ const mutations: MutationTree<MovieState> = {
     (cState.movies = movies.map(x => {
       x.addedTime = new Date(x.addedTime);
       x.lastModification = new Date(x.lastModification);
+      x.picked = cState.myMovies.find(f => f.id === x.id) ? true : false;
       return x;
     })),
   // Set my movies to the state
@@ -91,10 +114,16 @@ const mutations: MutationTree<MovieState> = {
       return x;
     })),
   // Add new movie in to the state
-  addMovie: (cState: MovieState, movie: Movie) => cState.movies.push(movie),
+  addMovie: (cState: MovieState, movie: Movie) => {
+    movie.addedTime = new Date(movie.addedTime);
+    movie.lastModification = new Date(movie.lastModification);
+    cState.movies.push(movie);
+  },
   // Update existing movie in the state
   updateMovie: (cState: MovieState, movie: Movie) => {
     const index = cState.movies.findIndex(x => x.id === movie.id);
+    movie.addedTime = new Date(movie.addedTime);
+    movie.lastModification = new Date(movie.lastModification);
     if (index !== -1) {
       cState.movies.splice(index, 1, movie);
     }

@@ -50,7 +50,7 @@
     <v-card raised v-if="onCreation || onModify" class="p-3 add-new-movie-panel">
       <v-card-title>Új film</v-card-title>
       <!-- Error alert -->
-      <v-alert type="error" dismissible border="left" v-model="showERror">
+      <v-alert type="error" dismissible border="left" v-model="showError">
         <strong>HIBA!</strong>
         {{error}}
       </v-alert>
@@ -117,7 +117,8 @@ export default class Movies extends Vue {
 
   // Mounted
   public mounted() {
-    this.fetchUser();
+    const userId = parseInt(localStorage.getItem('userId') || '0', undefined);
+    this.fetchUser(userId);
     this.fetchMovies();
   }
 

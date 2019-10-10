@@ -1,26 +1,26 @@
-import { Router, Request, Response } from "express";
-import db from "../database/connect";
-import { MysqlError } from "mysql";
-import Token from "../models/token";
-import User from "../models/user";
-import bcrypt from "bcrypt";
-import uuid from "uuid";
+import { Router, Request, Response } from 'express';
+import db from '../database/connect';
+import { MysqlError } from 'mysql';
+import Token from '../models/token';
+import User from '../models/user';
+import bcrypt from 'bcrypt';
+import uuid from 'uuid';
 
 const router: Router = Router();
 
 // Login into the KarcagHome
 // Check username and password, if all is valid, it will send back a token what will be usable for the next requests
-router.post("/login", (req: Request, res: Response) => {
+router.post('/login', (req: Request, res: Response) => {
   const { username, password } = req.body;
-  const sql: string = "SELECT * FROM users WHERE username = ?";
-  let response = { success: false, token: "", userId: 0 };
+  const sql: string = 'SELECT * FROM users WHERE username = ?';
+  let response = { success: false, token: '', userId: 0 };
   db.query(sql, [username], (err: MysqlError | null, results: User[]) => {
     if (results[0]) {
       const result: User = results[0];
       response.userId = result.id ? result.id : 0;
       comparePassword(
         password,
-        result.password ? result.password : "",
+        result.password ? result.password : '',
         (err: any, match: boolean) => {
           if (err) {
             response.success = false;
@@ -30,7 +30,7 @@ router.post("/login", (req: Request, res: Response) => {
           }
           if (response.success) {
             response.token = uuid.v4();
-            const sql2 = "CALL setToken(?, ?);";
+            const sql2 = 'CALL setToken(?, ?);';
             db.query(sql2, [response.userId, response.token], err => {
               if (err) throw err;
               res.send(JSON.stringify(response));
@@ -44,11 +44,23 @@ router.post("/login", (req: Request, res: Response) => {
   });
 });
 
+// Logout from KarcagHome
+// Delete token from the database
+router.post('/logout', (req: Request, res: Response) => {
+  const userId: number = req.body.userId;
+  const token: string = req.body.token;
+  const sql: string = 'DELETE FROM tokens WHERE user = ?;';
+  db.query(sql, [userId], (err: MysqlError | null) => {
+    if (err) throw err;
+    res.sendStatus(200);
+  });
+});
+
 // Validate token
-router.post("/token", (req: Request, res: Response) => {
+router.post('/token', (req: Request, res: Response) => {
   const token: string = req.body.token;
   const userId: number = parseInt(req.body.userId);
-  const sql: string = "SELECT * FROM tokens WHERE user = ? AND token = ?";
+  const sql: string = 'SELECT * FROM tokens WHERE user = ? AND token = ?';
   db.query(sql, [userId, token], (err: MysqlError | null, results: Token[]) => {
     if (err) {
       throw err;
@@ -61,13 +73,22 @@ router.post("/token", (req: Request, res: Response) => {
   });
 });
 
+// Get user by id
+router.get('/:id', (req: Request, res: Response) => {
+  const userId: number = parseInt(req.params.id) || 0;
+  const sql: string = 'CALL getUser(?);';
+  db.query(sql, [userId], (err: MysqlError | null, results: any) => {
+    if (err) throw err;
+    res.send(JSON.stringify(results[0]));
+  });
+});
+
 /* router.get("/hash/:pass", (req: Request, res: Response) => {
   const pass = req.params.pass;
   genHash(pass, (err: any, hashV: string) => {
     res.send(hashV);
   });
-});
- */
+}); */
 
 // Gen hash from a sample password
 function genHash(password: string, callback: any) {

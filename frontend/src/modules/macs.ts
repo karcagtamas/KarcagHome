@@ -1,32 +1,42 @@
 import axios from 'axios';
 import MacAddress from '../models/macAddress';
-import { ActionTree, MutationTree, Getter, GetterTree } from 'vuex';
+import { ActionTree, MutationTree, GetterTree, Module } from 'vuex';
+import { RootState } from './types';
 
-interface IState {
+// Mac State
+interface MacState {
   macs: MacAddress[];
 }
 
+// Backend url
 const url = 'http://localhost:8000/api';
 
-const state: IState = {
+// Init state
+const state: MacState = {
   macs: []
 };
 
-const getters: GetterTree<IState, any> = {
+// Getters
+const getters: GetterTree<MacState, RootState> = {
+  // Get all mac
   allMacs: sstate => sstate.macs
 };
 
-const actions: ActionTree<IState, IState> = {
+// Actions
+const actions: ActionTree<MacState, RootState> = {
+  // Fetch macs
   async fetchMacs({ commit }) {
     const response = await axios.get(`${url}/macs`);
 
     commit('setMacs', response.data);
   },
+  // Add new mac
   async addMac({ commit }, mac: MacAddress) {
     const response = await axios.post(`${url}/macs`, { address: mac });
 
     commit('newMac', response.data);
   },
+  // Delete mac
   async deleteMac({ commit }, id: number) {
     await axios.delete(`${url}/macs/${id}`);
 
@@ -43,28 +53,37 @@ const actions: ActionTree<IState, IState> = {
 
     commit('setTodos', response.data);
   },*/,
+  // Update mac
   async updateMac({ commit }, updatedMac: MacAddress) {
     const response = await axios.put(`${url}/macs`, { address: updatedMac });
     commit('updateMac', response.data);
   }
 };
 
-const mutations: MutationTree<IState> = {
+// Mutaions
+const mutations: MutationTree<MacState> = {
+  // Set macs
   setMacs: (cState, macs: MacAddress[]) => (cState.macs = macs),
+  // Add new mac into the state
   newMac: (cState, mac: MacAddress) => cState.macs.unshift(mac),
+  // Remove mac from the state
   removeMac: (cState, id) =>
     (cState.macs = cState.macs.filter(x => x.id !== id)),
-  updateMac: (cState, todo) => {
-    const index = cState.macs.findIndex(x => x.id === todo.id);
+  // Update mac in the state
+  updateMac: (cState, mac) => {
+    const index = cState.macs.findIndex(x => x.id === mac.id);
     if (index !== -1) {
-      cState.macs.splice(index, 1, todo);
+      cState.macs.splice(index, 1, mac);
     }
   }
 };
 
-export default {
+// MacModule
+const Macs: Module<MacState, RootState> = {
   state,
   getters,
   actions,
   mutations
 };
+
+export default Macs;

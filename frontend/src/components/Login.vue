@@ -1,45 +1,74 @@
 <template>
   <div class="frame">
-    <div class="login">
-      <div class="title">Bejelentkezés</div>
-      <div class="error alert alert-danger mt-4" v-if="error">
+    <!-- Login panel -->
+    <v-card raised class="p-4">
+      <!-- Title -->
+      <v-card-title>
+        <h1 class="text-center">Bejelentkezés</h1>
+      </v-card-title>
+      <!-- Error -->
+      <v-alert type="error" dismissible border="left" v-if="error">
         <strong>HIBA!</strong>
         {{error}}
-      </div>
-      <div class="form-group">
-        <label>Felhasználónév:</label>
-        <input class="form-control" type="text" name="username" v-model="username" />
-      </div>
-      <div class="form-group">
-        <label for="password">Jelszó:</label>
-        <input class="form-control" type="password" name="password" v-model="password" />
-      </div>
-      <button class="btn btn-primary" @click="login">Bejelentkezés</button>
-    </div>
+      </v-alert>
+      <!-- Adding and modifier form -->
+      <v-form onSubmit="return false">
+        <v-text-field v-model="username" label="Felhasználónév" required outlined dense clearable></v-text-field>
+        <v-text-field
+          v-model="password"
+          label="Jelszó"
+          type="password"
+          required
+          outlined
+          dense
+          clearable
+        ></v-text-field>
+        <v-btn type="submit" color="primary" @click="login">Bejelentkezés</v-btn>
+      </v-form>
+    </v-card>
   </div>
 </template>
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import LoginService from '../services/LoginService';
 import router from '../router';
+import { Action, State } from 'vuex-class';
 
 @Component({})
 export default class Login extends Vue {
+  // Current user
+  @Action('fetchUser') public fetchUser: any;
+  // Logged in status
+  @Action('setIsLoggedIn') public setIsLoggedIn: any;
+  // Input username
   private username: string = '';
+  // Input password
   private password: string = '';
+  // Error message for form
   private error: string = '';
 
+  // Login event
   public login(): void {
+    // Check username is given
     if (!this.username) {
       this.setAlert('A felhasználó név megadás kötelező!');
       return;
     }
+    // Check password is given
     if (!this.password) {
       this.setAlert('A jelszó megadása kötelező!');
       return;
     }
+
+    // Check login if the given values are valid
     LoginService.checkLogin(this.username, this.password).then(res => {
       if (res) {
+        const userId = parseInt(
+          localStorage.getItem('userId') || '0',
+          undefined
+        );
+        this.fetchUser(userId);
+        this.setIsLoggedIn(true);
         router.replace('/');
       } else {
         this.setAlert('A belépési adatok hibásak!');
@@ -47,6 +76,7 @@ export default class Login extends Vue {
     });
   }
 
+  // Set alert with the given text
   public setAlert(alert: string): void {
     this.error = alert;
     setTimeout(() => {

@@ -1,11 +1,9 @@
-import Season from './season';
-
-// Series model class
-export default class Series {
+// Movie model class
+export default class Movie {
   // Id
   public id?: number;
 
-  // Name of the series
+  // Name of the movie
   public name: string;
 
   // Time of the creation
@@ -26,8 +24,8 @@ export default class Series {
   // Id of the last modifier
   public lastModifierId: number;
 
-  // Seasons
-  public seasons: Season[];
+  // Movie is seen for the requester user
+  public seen: boolean;
 
   constructor(
     name: string,
@@ -37,7 +35,7 @@ export default class Series {
     lastModification: Date,
     lastModifier: string,
     lastModifierId: number,
-    seasons: Season[]
+    seen: boolean
   ) {
     this.name = name;
     this.addedTime = addedTime;
@@ -46,6 +44,6 @@ export default class Series {
     this.lastModification = lastModification;
     this.lastModifier = lastModifier;
     this.lastModifierId = lastModifierId;
-    this.seasons = seasons;
+    this.seen = seen;
   }
 }

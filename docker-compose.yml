@@ -1,0 +1,52 @@
+version: "3"
+services:
+  db:
+    container_name: db
+    image: mysql:latest
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      # MYSQL_HOST: localhost
+      MYSQL_DATABASE: "karcaghome"
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_USER: "karcaghome"
+      MYSQL_PASSWORD: "Abc123456"
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - "3306:3306"
+    expose:
+      - "3306"
+    volumes:
+      - my-db:/var/lib/mysql
+      - ./database/_tables.sql:/docker-entrypoint-initdb.d/_tables.sql
+      # - ./database/users.sql:/docker-entrypoint-initdb.d/users.sql
+      # - ./database/macs.sql:/docker-entrypoint-initdb.d/macs.sql
+      # - ./database/movies.sql:/docker-entrypoint-initdb.d/movies.sql
+    networks:
+      - karcaghome
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: ./Dockerfile
+    ports:
+      - "8080:80"
+  backend:
+    container_name: backend
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    links:
+      - db
+    networks:
+      - karcaghome
+volumes:
+  my-db:
+
+networks:
+  karcaghome:
+    driver: bridge

@@ -5,16 +5,22 @@
       <!-- Title -->
       <v-card-title>Filmjeim</v-card-title>
       <!-- List of my movies -->
-      <v-simple-table dense fixed-header height="75vh">
+      <v-simple-table dense fixed-header height="60vh">
         <template v-slot:default>
           <thead>
             <tr>
-              <th class="text-left">Név</th>
-              <th class="text-left">Láttam</th>
+              <th class="text-left">Film</th>
+              <th class="text-left">
+                <v-icon>mdi-eye</v-icon>
+              </th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="movie in movies" :key="movie.id">
+            <tr
+              v-for="movie in movies"
+              :key="movie.id"
+              :class="{seen : movie.seen, unseen: !movie.seen}"
+            >
               <td>{{movie.name}}</td>
               <td>
                 <v-switch
@@ -28,6 +34,19 @@
           </tbody>
         </template>
       </v-simple-table>
+      <div class="stat">
+        <h5>
+          <strong>Statisztika</strong>
+        </h5>
+        <p>
+          Látott filmek:
+          <strong>{{countOfSeen}}</strong>
+        </p>
+        <p>
+          Nem látott filmek:
+          <strong>{{countOfUnSeen}}</strong>
+        </p>
+      </div>
     </v-card>
     <div class="my-3">
       <PickMyMovies></PickMyMovies>
@@ -35,7 +54,7 @@
   </div>
 </template>
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { Vue, Component, Watch } from 'vue-property-decorator';
 import Movie from '../models/movies';
 import { Getter, Action, State } from 'vuex-class';
 import PickMyMovies from '../components/PickMyMovies.vue';
@@ -48,6 +67,13 @@ export default class MyMovies extends Vue {
   @Action('seenMovie') public seenMovie: any;
   // Get my movies
   @Getter('myMovies') public movies: Movie[];
+  // Seen movies
+  public countOfSeen: number = 0;
+  // Un seen movies
+  public countOfUnSeen: number = 0;
+  @Watch('movies') public onMoviesChanges() {
+    this.calculateCounts();
+  }
 
   // Mounted
   public mounted() {
@@ -64,7 +90,38 @@ export default class MyMovies extends Vue {
   public changeSeen(movie: Movie): void {
     this.seenMovie(movie);
   }
+
+  // calculateCounts
+  public calculateCounts() {
+    let count = 0;
+    for (const i of this.movies) {
+      if (i.seen) {
+        count++;
+      }
+    }
+    this.countOfSeen = count;
+    this.countOfUnSeen = this.movies.length - count;
+  }
 }
 </script>
 <style scoped>
+.seen {
+  background-color: rgba(6, 168, 6, 0.295);
+  transition-duration: 0.5s;
+}
+.seen:hover {
+  background-color: rgba(3, 112, 3, 0.562) !important;
+  transition-duration: 0.5s;
+}
+.unseen {
+  background-color: rgba(153, 0, 0, 0.301);
+  transition-duration: 0.5s;
+}
+.unseen:hover {
+  background-color: rgba(182, 0, 0, 0.521) !important;
+  transition-duration: 0.5s;
+}
+.stat {
+  padding: 1rem;
+}
 </style>

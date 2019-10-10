@@ -47,7 +47,10 @@ const actions: ActionTree<UserState, RootState> = {
 // Mutations
 const mutations: MutationTree<UserState> = {
   // Set user in to the state
-  setUser: (cState: UserState, user: User) => (cState.user = user),
+  setUser: (cState: UserState, user: User) => {
+    user.lastLogin = new Date(user.lastLogin ? user.lastLogin : '');
+    cState.user = user;
+  },
   // Set logged in status in to the state
   setLoggedInStatus: (cState: UserState, newVal: boolean) =>
     (cState.isLoggedIn = newVal)

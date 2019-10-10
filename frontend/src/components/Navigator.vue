@@ -74,10 +74,10 @@
               {{user.username}}
             </v-list-item-title>
           </v-list-item>
-          <v-list-item>
+          <v-list-item v-if="user.lastLogin">
             <v-list-item-title>
               <strong>Utolsó bejelentkezés:</strong>
-              {{user.lastLogin}}
+              {{toDateString(user.lastLogin)}}
             </v-list-item-title>
           </v-list-item>
           <v-list-item>
@@ -160,6 +160,11 @@ export default class Navigator extends Vue {
       this.clearUser();
       router.replace('/login');
     });
+  }
+
+  // Convert date to string with format 'yyyy-mm-dd'
+  public toDateString(date: Date): string {
+    return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
   }
 }
 </script>

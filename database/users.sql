@@ -4,6 +4,7 @@ CREATE PROCEDURE setToken(_user int(11), _token varchar(255))
 BEGIN
     DELETE FROM tokens WHERE user = _user;
     INSERT INTO tokens (user, token) VALUES(_user, _token);
+    UPDATE users SET lastLogin = NOW() WHERE id = _user;
 END;
 
 /* Get token for a user if it in the expiration day */

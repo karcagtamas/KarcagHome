@@ -60,14 +60,16 @@ export default class PickMyMovies extends Vue {
     this.fetchMovies();
   }
 
-  public pickingMovie(movie: Movie) {
+  public async pickingMovie(movie: Movie) {
     const userId = parseInt(localStorage.getItem('userId') || '0', undefined);
     if (movie.picked) {
-      this.pickMovie(movie);
+      await this.pickMovie(movie);
     } else {
-      this.unPickMovie(movie);
+      await this.unPickMovie(movie);
     }
     this.fetchMyMovies(userId);
   }
 }
 </script>
+<style scoped>
+</style>

@@ -40,6 +40,13 @@
                 </router-link>
               </v-list-item-title>
             </v-list-item>
+            <v-list-item v-if="isLoggedIn">
+              <v-list-item-title>
+                <router-link to="/series">
+                  <div class="link" title="Sorozatok">Sorozatok</div>
+                </router-link>
+              </v-list-item-title>
+            </v-list-item>
             <v-list-item>
               <v-list-item-title>
                 <a href="http://karcags.hu" target="_blank">

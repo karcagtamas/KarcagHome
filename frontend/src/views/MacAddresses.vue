@@ -14,7 +14,7 @@
               <th class="text-left">Név</th>
               <th class="text-left">Eszköz név</th>
               <th class="text-left">IP</th>
-              <th class="text-left">Művletek</th>
+              <th class="text-left">Műveletek</th>
             </tr>
           </thead>
           <tbody>

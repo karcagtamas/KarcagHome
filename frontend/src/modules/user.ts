@@ -1,6 +1,7 @@
 import { ActionTree, MutationTree, GetterTree, Module } from 'vuex';
 import axios from 'axios';
 import User from '../models/user';
+import { url } from '../utils/helper';
 import { RootState } from './types';
 
 // User state
@@ -8,9 +9,6 @@ interface UserState {
   user: User;
   isLoggedIn: boolean;
 }
-
-// Backend url
-const url = 'http://localhost:8000/api';
 
 // Init user state
 const state: UserState = {

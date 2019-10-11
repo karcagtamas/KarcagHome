@@ -7,6 +7,7 @@ import LoginService from './services/LoginService';
 import Movies from './views/Movies.vue';
 import Profile from './views/Profile.vue';
 import MyMovies from './views/MyMovies.vue';
+import SeriesView from './views/SeriesView.vue';
 
 Vue.use(Router);
 
@@ -47,6 +48,12 @@ const router = new Router({
       path: '/my-movies',
       name: 'my-movies',
       component: MyMovies
+    },
+    // Series page
+    {
+      path: '/series',
+      name: 'series',
+      component: SeriesView
     }
   ]
 });

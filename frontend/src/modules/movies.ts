@@ -1,6 +1,7 @@
 import Movie from '@/models/movies';
 import { ActionTree, MutationTree, GetterTree, Module } from 'vuex';
 import axios from 'axios';
+import { url } from '../utils/helper';
 import { RootState } from './types';
 
 // Movie state
@@ -8,9 +9,6 @@ interface MovieState {
   movies: Movie[];
   myMovies: Movie[];
 }
-
-// Backend url
-const url = 'http://localhost:8000/api';
 
 // Init state
 const state: MovieState = {

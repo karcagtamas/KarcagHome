@@ -1,15 +1,13 @@
 import axios from 'axios';
 import MacAddress from '../models/macAddress';
 import { ActionTree, MutationTree, GetterTree, Module } from 'vuex';
+import { url } from '../utils/helper';
 import { RootState } from './types';
 
 // Mac State
 interface MacState {
   macs: MacAddress[];
 }
-
-// Backend url
-const url = 'http://localhost:8000/api';
 
 // Init state
 const state: MacState = {

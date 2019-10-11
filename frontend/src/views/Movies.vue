@@ -14,7 +14,7 @@
               <th class="text-left">Létrehozó</th>
               <th class="text-left">Utolsó szerkesztés</th>
               <th class="text-left">Utolsó szerkesztő</th>
-              <th class="text-left">Művletek</th>
+              <th class="text-left">Műveletek</th>
             </tr>
           </thead>
           <tbody>

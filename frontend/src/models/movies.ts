@@ -1,14 +1,33 @@
-export default class Movies {
+// Movie model class
+export default class Movie {
+  // Id
   public id?: number;
+
+  // Name of the movie
   public name: string;
+
+  // Time of the creation
   public addedTime: Date;
+
+  // Name of the creater
   public creater: string;
+
+  // Id of the creater
   public createrId: number;
+
+  // Time of the last modification
   public lastModification: Date;
+
+  // Name of the last modifier
   public lastModifier: string;
+
+  // Id of the last modifier
   public lastModifierId: number;
+
+  // Movie is seen for the requester user
   public seen: boolean;
-  public picked?: boolean = false;
+
+  public picked?: boolean;
 
   constructor(
     name: string,

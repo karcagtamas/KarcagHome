@@ -18,6 +18,7 @@ export default class Episode {
   constructor(
     season: number,
     seasonNumber: number,
+    // tslint:disable-next-line: variable-name
     number: number,
     seen: boolean
   ) {

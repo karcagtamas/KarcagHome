@@ -23,6 +23,7 @@ export default class Season {
   constructor(
     series: string,
     seriesId: number,
+    // tslint:disable-next-line: variable-name
     number: number,
     episodeCount: number,
     episodes: Episode[]

@@ -3,6 +3,8 @@ import Series from '@/models/series';
 import { url } from '../utils/helper';
 import axios from 'axios';
 import { RootState } from './types';
+import Season from '@/models/season';
+import Episode from '@/models/episode';
 
 // Series state
 interface SeriesState {
@@ -12,7 +14,11 @@ interface SeriesState {
 
 // Init state
 const state: SeriesState = {
-  series: [],
+  series: [
+    new Series('Avatar', new Date(), 'Karcag', 1, new Date(), 'Karcag', 1, [
+      new Season('Avatar', 1, 1, 3, [new Episode(1, 1, 1, false)])
+    ])
+  ],
   mySeries: []
 };
 

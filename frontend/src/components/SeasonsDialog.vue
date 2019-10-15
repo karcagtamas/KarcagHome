@@ -46,16 +46,8 @@ import EpisodesDialog from './EpisodesDialog.vue';
 
 @Component({ components: { EpisodesDialog } })
 export default class SeasonsDialog extends Vue {
-  @Prop(Object) public series: Series = new Series(
-    '',
-    new Date(),
-    '',
-    0,
-    new Date(),
-    '',
-    0,
-    []
-  );
+  @Prop({ default: new Series('', new Date(), '', 0, new Date(), '', 0, []) })
+  public series: Series;
   @Prop(Boolean) public show: boolean = false;
   public showEpisodeDialogV: boolean = false;
   public episodeDialogData: Season = new Season('', 0, 0, 0, []);

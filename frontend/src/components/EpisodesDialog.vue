@@ -33,7 +33,7 @@ import Season from '../models/season';
 
 @Component({})
 export default class EpisodesDialog extends Vue {
-  @Prop(Object) public season: Season = new Season('', 0, 0, 0, []);
+  @Prop({ default: new Season('', 0, 0, 0, []) }) public season: Season;
   @Prop(Boolean) public show: boolean = false;
 
   @Emit('closeDialog') public close() {

@@ -14,13 +14,24 @@
             </thead>
             <tbody>
               <tr
-                v-for="season in series.seasons"
+                v-for="(season, index) in series.seasons"
                 :key="season.id"
                 @click="openEpisodeDialog(season)"
               >
                 <td>{{season.number}}</td>
                 <td>{{season.episodeCount}}</td>
-                <td></td>
+                <td>
+                  <v-btn
+                    class="m-1"
+                    color="error"
+                    fab
+                    x-small
+                    @click="remove(season)"
+                    :disabled="index !== series.seasons.length - 1"
+                  >
+                    <v-icon>mdi-close</v-icon>
+                  </v-btn>
+                </td>
               </tr>
             </tbody>
           </template>
@@ -43,17 +54,21 @@ import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import Series from '../models/series';
 import Season from '../models/season';
 import EpisodesDialog from './EpisodesDialog.vue';
+import { Action } from 'vuex-class';
 
 @Component({ components: { EpisodesDialog } })
 export default class SeasonsDialog extends Vue {
+  @Action('addSeason') public addSeason: any;
+  @Action('deleteSeason') public deleteSeason: any;
   @Prop({ default: new Series('', new Date(), '', 0, new Date(), '', 0, []) })
   public series: Series;
-  @Prop(Boolean) public show: boolean = false;
+  @Prop({ default: false })
+  public show: boolean;
   public showEpisodeDialogV: boolean = false;
   public episodeDialogData: Season = new Season('', 0, 0, 0, []);
 
   @Emit('closeDialog') public close() {
-    return false;
+    return;
   }
 
   public openEpisodeDialog(season: Season) {
@@ -64,6 +79,10 @@ export default class SeasonsDialog extends Vue {
   public closeEpisodeDialog() {
     this.episodeDialogData = new Season('', 0, 0, 0, []);
     this.showEpisodeDialogV = false;
+  }
+
+  public remove(season: Season) {
+    this.deleteSeason(season);
   }
 }
 </script>

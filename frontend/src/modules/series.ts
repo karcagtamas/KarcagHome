@@ -36,6 +36,42 @@ const actions: ActionTree<SeriesState, RootState> = {
     const response = await axios.get(`${url}/series`);
 
     commit('setSeries', response.data);
+  },
+  async addSeries({ commit }, series: Series) {
+    const response = await axios.post(`${url}/series`, {
+      name: series.name,
+      creater: series.createrId
+    });
+
+    commit('addSeries', response.data);
+  },
+  async updateSeries({ commit }, series: Series) {
+    await axios.put(`${url}/series/${series.id}`, {
+      name: series.name,
+      updater: series.lastModifierId
+    });
+
+    commit('updateSeries', series);
+  },
+  async deleteSeries({ commit }, series: Series) {
+    await axios.delete(`${url}/series/${series.id}`);
+
+    commit('deleteSeries', series.id);
+  },
+  async addSeason({ commit }, season: Season) {
+    if (season.seriesId) {
+      const response = await axios.post(`${url}/series/seasons`, {
+        series: season.seriesId || 0,
+        number: season.number,
+        episodes: season.episodeCount
+      });
+      commit('addSeason', response.data);
+    }
+  },
+  async deleteSeason({ commit }, season: Season) {
+    await axios.delete(`${url}/series/seasons/${season.id}`);
+
+    commit('deleteSeason', season.id);
   }
 };
 
@@ -46,6 +82,38 @@ const mutations: MutationTree<SeriesState> = {
       x.addedTime = new Date(x.addedTime);
       x.lastModification = new Date(x.lastModification);
       return x;
+    });
+  },
+  addSeries: (cState: SeriesState, series: Series) => {
+    series.addedTime = new Date(series.addedTime);
+    series.lastModification = new Date(series.lastModification);
+    cState.series.push(series);
+  },
+  updateSeries: (cState: SeriesState, series: Series) => {
+    const index = cState.series.findIndex(x => x.id === series.id);
+    series.addedTime = new Date(series.addedTime);
+    series.lastModification = new Date(series.lastModification);
+    if (index !== -1) {
+      cState.series.splice(index, 1, series);
+    }
+  },
+  deleteSeries: (cState: SeriesState, id: number) => {
+    cState.series = cState.series.filter(x => x.id !== id);
+  },
+  addSeason: (cState: SeriesState, season: Season) => {
+    cState.series.map(x => {
+      if (x.id === season.seriesId) {
+        x.seasons.push(season);
+      }
+      return x;
+    });
+  },
+  deleteSeason: (cState: SeriesState, season: Season) => {
+    cState.series.map(x => {
+      if (x.id === season.seriesId) {
+        x.seasons = x.seasons.filter(y => y.id !== season.id);
+        return x;
+      }
     });
   }
 };

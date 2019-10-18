@@ -93,10 +93,10 @@ CREATE OR REPLACE PROCEDURE addSeason(_series INT(11), _number INT(2), _episodes
        DECLARE last INT(11) DEFAULT 0;
        DECLARE counter INT(3) DEFAULT 1;
        INSERT INTO seasons(series, number, episodes)
-       VALUES(_series, _number, _episodes);
+       VALUES(_series, _number, 0);
        SET last = LAST_INSERT_ID();
        WHILE counter <= _episodes DO
-        CALL addEpisode(last, counter);
+        CALL addEpisode(last, counter, FALSE);
         SET counter = counter + 1;
        END WHILE;
        CALL getSeason(last);
@@ -113,8 +113,8 @@ CREATE OR REPLACE PROCEDURE getEpisodes(_season INT(11))
     BEGIN
         SELECT
         episodes.id,
-        episodes.season AS seasonId,
-        seasons.number AS season,
+        episodes.season AS season,
+        seasons.number AS seasonNumber,
         series.name AS series,
         series.id AS seriesId,
         episodes.number
@@ -130,8 +130,8 @@ CREATE OR REPLACE PROCEDURE getEpisode(_id INT(11))
     BEGIN
         SELECT
         episodes.id,
-        episodes.season AS seasonId,
-        seasons.number AS season,
+        episodes.season AS season,
+        seasons.number AS seasonNumber,
         series.name AS series,
         series.id AS seriesId,
         episodes.number
@@ -142,15 +142,22 @@ CREATE OR REPLACE PROCEDURE getEpisode(_id INT(11))
     END;
 
 /* Add episode */
-CREATE OR REPLACE PROCEDURE addEpisode(_season INT(11), _number INT(3))
+CREATE OR REPLACE PROCEDURE addEpisode(_season INT(11), _number INT(3), _getBack BOOLEAN)
     BEGIN
        INSERT INTO episodes(season, number)
        VALUES(_season, _number);
-       CALL getEpisode(LAST_INSERT_ID());
+       UPDATE seasons SET episodes = episodes + 1 WHERE seasons.id = _season;
+       IF _getBack
+        THEN
+            CALL getEpisode(LAST_INSERT_ID());
+        END IF;
     END;
 
 /* Delete episode */
 CREATE OR REPLACE PROCEDURE deleteEpisode(_id INT(11))
     BEGIN
+       DECLARE _season INT(11) DEFAULT 0;
+       SELECT episodes.season INTO _season FROM episodes WHERE episodes.id = _id;
        DELETE FROM episodes WHERE id = _id;
+       UPDATE seasons SET episodes = episodes - 1 WHERE seasons.id = _season;
     END;

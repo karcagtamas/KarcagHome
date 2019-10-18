@@ -34,7 +34,10 @@
             <strong>Saját Filmek</strong>
           </v-expansion-panel-header>
           <v-expansion-panel-content>
-            <p>Folyamatban...</p>
+            <p>Láthatod a filmjeidet, amiket a Filmek oldalon kiválaszottál és lehetőséged van látottként megjelölni ezeket. Az oldalon még található egy kis statisztika is a filmjeiddle kapcsolatban</p>
+            <router-link to="/my-movies">
+              <v-btn color="deep-purple accent-4" dark>Weboldal megnyitása</v-btn>
+            </router-link>
           </v-expansion-panel-content>
         </v-expansion-panel>
         <v-expansion-panel>
@@ -42,7 +45,10 @@
             <strong>Sorozatok</strong>
           </v-expansion-panel-header>
           <v-expansion-panel-content>
-            <p>Folyamatban...</p>
+            <p>Sorozatok tudsz felvenni, szerkeszteni és beállítani magadnak. Ezeknek a sorozatoknak az évadjait is tudod kezelni, illetve az évadokhoz tartozó epizódokat is.</p>
+            <router-link to="/my-movies">
+              <v-btn color="deep-purple accent-4" dark>Weboldal megnyitása</v-btn>
+            </router-link>
           </v-expansion-panel-content>
         </v-expansion-panel>
         <v-expansion-panel>
@@ -59,6 +65,16 @@
     <v-card raised class="p-4">
       <v-card-title>Frissítések</v-card-title>
       <v-expansion-panels inset>
+        <v-expansion-panel>
+          <v-expansion-panel-header>
+            <strong>2019.10. - Filmek, Saját filmek</strong>
+          </v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <p>Lehetőség van filmeket felvinni, szerkeszteni, illetve törölni a Filmek oldalon.</p>
+            <p>A Saját Filmek oldalon be tudod jelölni, hogy láttad-e már az adott filmet vagy még nem. Ehhez tartozó statisztika megtalálható az oldal alján.</p>
+            <p>E-melett a filmeket felveheted a saját listádra, amiket végül szintén megtalálsz az oldalon.</p>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
         <v-expansion-panel>
           <v-expansion-panel-header>
             <strong>2019.10. - Bejelentkezés, dizájn, MAC</strong>

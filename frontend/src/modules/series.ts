@@ -71,7 +71,20 @@ const actions: ActionTree<SeriesState, RootState> = {
   async deleteSeason({ commit }, season: Season) {
     await axios.delete(`${url}/series/seasons/${season.id}`);
 
-    commit('deleteSeason', season.id);
+    commit('deleteSeason', season);
+  },
+  async addEpisode({ commit }, episode: Episode) {
+    const response = await axios.post(`${url}/series/episodes`, {
+      season: episode.season,
+      number: episode.number
+    });
+
+    commit('addEpisode', response.data);
+  },
+  async deleteEpisode({ commit }, episode: Episode) {
+    await axios.delete(`${url}/series/episodes/${episode.id}`);
+
+    commit('deleteEpisode', episode);
   }
 };
 
@@ -112,8 +125,32 @@ const mutations: MutationTree<SeriesState> = {
     cState.series.map(x => {
       if (x.id === season.seriesId) {
         x.seasons = x.seasons.filter(y => y.id !== season.id);
-        return x;
       }
+      return x;
+    });
+  },
+  addEpisode: (cState: SeriesState, episode: Episode) => {
+    cState.series.map(x => {
+      x.seasons.map(y => {
+        if (y.id === episode.season) {
+          y.episodes.push(episode);
+          y.episodeCount++;
+        }
+        return y;
+      });
+      return x;
+    });
+  },
+  deleteEpisode: (cState: SeriesState, episode: Episode) => {
+    cState.series.map(x => {
+      x.seasons.map(y => {
+        if (y.id === episode.season) {
+          y.episodes = y.episodes.filter(z => z.id !== episode.id);
+          y.episodeCount--;
+        }
+        return y;
+      });
+      return x;
     });
   }
 };

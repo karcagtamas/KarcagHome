@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="show">
+  <v-dialog v-model="show" persistent>
     <v-card>
       <v-card-title>Évadok</v-card-title>
       <v-card-text>
@@ -13,11 +13,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr
-                v-for="(season, index) in series.seasons"
-                :key="season.id"
-                @click="openEpisodeDialog(season)"
-              >
+              <tr v-for="(season, index) in series.seasons" :key="season.id">
                 <td>{{season.number}}</td>
                 <td>{{season.episodeCount}}</td>
                 <td>
@@ -31,6 +27,9 @@
                   >
                     <v-icon>mdi-close</v-icon>
                   </v-btn>
+                  <v-btn class="m-1" color="success" fab x-small @click="openEpisodeDialog(season)">
+                    <v-icon>mdi-arrow-right-bold-circle</v-icon>
+                  </v-btn>
                 </td>
               </tr>
             </tbody>
@@ -39,7 +38,12 @@
       </v-card-text>
       <v-divider></v-divider>
       <v-card-actions>
-        <v-btn color="warning" @click="close">Close</v-btn>
+        <div class="m-1">
+          <v-btn color="warning" @click="close">Close</v-btn>
+        </div>
+        <div class="m-1">
+          <v-btn raised color="primary" @click="add">Új évad</v-btn>
+        </div>
       </v-card-actions>
     </v-card>
     <EpisodesDialog
@@ -83,6 +87,17 @@ export default class SeasonsDialog extends Vue {
 
   public remove(season: Season) {
     this.deleteSeason(season);
+  }
+
+  public add() {
+    const season: Season = new Season(
+      this.series.name,
+      this.series.id || 0,
+      this.series.seasons.length + 1,
+      10,
+      []
+    );
+    this.addSeason(season);
   }
 }
 </script>

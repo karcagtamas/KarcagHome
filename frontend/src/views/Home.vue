@@ -46,7 +46,7 @@
           </v-expansion-panel-header>
           <v-expansion-panel-content>
             <p>Sorozatok tudsz felvenni, szerkeszteni és beállítani magadnak. Ezeknek a sorozatoknak az évadjait is tudod kezelni, illetve az évadokhoz tartozó epizódokat is.</p>
-            <router-link to="/my-movies">
+            <router-link to="/series">
               <v-btn color="deep-purple accent-4" dark>Weboldal megnyitása</v-btn>
             </router-link>
           </v-expansion-panel-content>

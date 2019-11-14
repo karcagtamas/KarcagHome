@@ -29,6 +29,8 @@ export default class Series {
   // Seasons
   public seasons: Season[];
 
+  public picked: boolean = false;
+
   constructor(
     name: string,
     addedTime: Date,

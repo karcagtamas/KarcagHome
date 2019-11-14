@@ -91,6 +91,7 @@ CREATE TABLE episodes(
 );
 
 CREATE TABLE switch_episodes_users(
+    series INT(11) NOT NULL,
     episode INT(11) NOT NULL,
     user INT(11) NOT NULL,
     seen BOOLEAN DEFAULT FALSE,
@@ -99,5 +100,18 @@ CREATE TABLE switch_episodes_users(
     CONSTRAINT fk_switch_episodes_users_user_users_id FOREIGN KEY (user)
     REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_switch_episodes_users_episode_episodes_id FOREIGN KEY (episode)
-    REFERENCES episodes(id) ON DELETE CASCADE
+    REFERENCES episodes(id) ON DELETE CASCADE,
+    CONSTRAINT fk_switch_episodes_users_series_series_id FOREIGN KEY (series)
+    REFERENCES series(id) ON DELETE CASCADE
+);
+
+CREATE TABLE switch_series_users(
+    series INT(11) NOT NULL,
+    user INT(11) NOT NULL,
+    lastModification DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY(episode, user),
+    CONSTRAINT fk_switch_series_users_user_users_id FOREIGN KEY (user)
+    REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_switch_series_users_series_series_id FOREIGN KEY (series)
+    REFERENCES series(id) ON DELETE CASCADE
 );

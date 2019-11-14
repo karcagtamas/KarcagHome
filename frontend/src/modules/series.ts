@@ -37,6 +37,11 @@ const actions: ActionTree<SeriesState, RootState> = {
 
     commit('setSeries', response.data);
   },
+  async fetchMySeries({ commit }, userId: number) {
+    const response = await axios.get(`${url}/series/${userId}`);
+
+    commit('setMySeries', response.data);
+  },
   async addSeries({ commit }, series: Series) {
     const response = await axios.post(`${url}/series`, {
       name: series.name,
@@ -85,12 +90,56 @@ const actions: ActionTree<SeriesState, RootState> = {
     await axios.delete(`${url}/series/episodes/${episode.id}`);
 
     commit('deleteEpisode', episode);
+  },
+  async seenEpisode({ commit }, episode: Episode) {
+    const userId: number = parseInt(
+      localStorage.getItem('userId') || '0',
+      undefined
+    );
+    const response = await axios.post(
+      `${url}/series/episodes/${episode.id}/seen`,
+      {
+        userId,
+        seen: episode.seen
+      }
+    );
+
+    commit('updateMyEpisode', episode);
+  },
+  async pickSeries({ commit }, series: Series) {
+    const userId: number = parseInt(
+      localStorage.getItem('userId') || '0',
+      undefined
+    );
+    const response = await axios.post(`${url}/series/${series.id}/pick`, {
+      userId
+    });
+
+    commit('updateSeries', series);
+  },
+  async unPickSeries({ commit }, series: Series) {
+    const userId: number = parseInt(
+      localStorage.getItem('userId') || '0',
+      undefined
+    );
+    const response = await axios.post(`${url}/series/${series.id}/unpick`, {
+      userId
+    });
+
+    commit('updateSeries', series);
   }
 };
 
 // Mutations
 const mutations: MutationTree<SeriesState> = {
   setSeries: (cState: SeriesState, series: Series[]) => {
+    cState.series = series.map(x => {
+      x.addedTime = new Date(x.addedTime);
+      x.lastModification = new Date(x.lastModification);
+      return x;
+    });
+  },
+  setMySeries: (cState: SeriesState, series: Series[]) => {
     cState.series = series.map(x => {
       x.addedTime = new Date(x.addedTime);
       x.lastModification = new Date(x.lastModification);
@@ -147,6 +196,18 @@ const mutations: MutationTree<SeriesState> = {
         if (y.id === episode.season) {
           y.episodes = y.episodes.filter(z => z.id !== episode.id);
           y.episodeCount--;
+        }
+        return y;
+      });
+      return x;
+    });
+  },
+  updateMyEpisode: (cState: SeriesState, episode: Episode) => {
+    cState.series.map(x => {
+      x.seasons.map(y => {
+        const index = y.episodes.findIndex(z => z.id === episode.id);
+        if (index !== -1) {
+          y.episodes[index] = episode;
         }
         return y;
       });

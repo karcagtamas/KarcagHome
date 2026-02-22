@@ -1,16 +1,9 @@
-FROM node:10 as build-stage
+FROM gradle:9.0.0-jdk-21-and-24 as BUILD
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . . 
-RUN npm run build
-EXPOSE 8000
+COPY . .
+RUN gradle :backend:installDist
 
-# Time saver
-ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.2.1/wait /wait
-RUN chmod +x /wait
-
-## Launch the wait tool and then your application
-CMD /wait && npm run start
-
-
+FROM eclipse-temurin:24
+WORKDIR /app
+COPY --from=BUILD /app/backend/build/install/backend .
+CMD ["bin/backend"]

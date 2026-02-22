@@ -26,6 +26,7 @@ mongodb-coroutine-driver = { module = "org.mongodb:mongodb-driver-kotlin-corouti
 
 react = { module = "org.jetbrains.kotlin-wrappers:kotlin-react", version.ref = "reactWrappers" }
 react-dom = { module = "org.jetbrains.kotlin-wrappers:kotlin-react-dom", version.ref = "reactWrappers" }
+emotion = { module = "org.jetbrains.kotlin-wrappers:kotlin-emotion", version = "2025.3.26" }
 
 kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 

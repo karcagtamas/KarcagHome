@@ -5,7 +5,19 @@ plugins {
 
 kotlin {
     js(IR) {
-        browser()
+        browser {
+            commonWebpackConfig {
+                cssSupport {
+                    enabled = true
+                }
+
+                devServer = devServer?.copy(
+                    port = 5000,
+                    open = true,
+                )
+            }
+        }
+        binaries.executable()
     }
 
     sourceSets {
@@ -14,6 +26,7 @@ kotlin {
                 implementation(project(":shared"))
                 implementation(libs.react)
                 implementation(libs.react.dom)
+                implementation(libs.emotion)
             }
         }
     }

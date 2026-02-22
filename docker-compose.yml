@@ -1,52 +1,35 @@
-version: "3"
 services:
-  db:
-    container_name: db
-    image: mysql:latest
-    command: --default-authentication-plugin=mysql_native_password
+  mongodb:
+    container_name: mongodb
+    image: mongo:8.2
     restart: always
     environment:
-      # MYSQL_HOST: localhost
-      MYSQL_DATABASE: "karcaghome"
-      MYSQL_ROOT_PASSWORD: "root"
-      MYSQL_USER: "karcaghome"
-      MYSQL_PASSWORD: "Abc123456"
-      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MONGO_INITDB_DATABASE: khdb
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpass
     ports:
-      - "3306:3306"
-    expose:
-      - "3306"
+      - "27017:27017"
     volumes:
-      - my-db:/var/lib/mysql
-      - ./database/_tables.sql:/docker-entrypoint-initdb.d/_tables.sql
-      # - ./database/users.sql:/docker-entrypoint-initdb.d/users.sql
-      # - ./database/macs.sql:/docker-entrypoint-initdb.d/macs.sql
-      # - ./database/movies.sql:/docker-entrypoint-initdb.d/movies.sql
+      - mongodb_data:/data/db
     networks:
-      - karcaghome
-  frontend:
-    container_name: frontend
-    build:
-      context: ./frontend
-      dockerfile: ./Dockerfile
+      - kh_network
+  mongo-express:
+    container_name: mongo-express
+    image: mongo-express:1.0.2-18
     ports:
-      - "8080:80"
-  backend:
-    container_name: backend
-    build:
-      context: ./backend
-      dockerfile: ./Dockerfile
-    ports:
-      - "8000:8000"
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: rootpass
+      ME_CONFIG_MONGODB_SERVER: mongodb
+    networks:
+      - kh_network
     depends_on:
-      - db
-    links:
-      - db
-    networks:
-      - karcaghome
+      - mongodb
+
 volumes:
-  my-db:
+  mongodb_data:
 
 networks:
-  karcaghome:
+  kh_network:
     driver: bridge

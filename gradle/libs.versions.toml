@@ -6,7 +6,7 @@ junit = "6.0.3"
 detekt = "1.22.0"
 ktlint = "14.0.1"
 serialization = "1.10.0"
-logback = "1.5.18"
+logback = "1.5.32"
 
 [libraries]
 ktor-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
@@ -21,6 +21,8 @@ ktor-statusPages = { module = "io.ktor:ktor-server-status-pages-jvm", version.re
 ktor-host = { module = "io.ktor:ktor-server-host-common-jvm", version.ref = "ktor" }
 
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+
+mongodb-coroutine-driver = { module = "org.mongodb:mongodb-driver-kotlin-coroutine", version = "5.6.3" }
 
 react = { module = "org.jetbrains.kotlin-wrappers:kotlin-react", version.ref = "reactWrappers" }
 react-dom = { module = "org.jetbrains.kotlin-wrappers:kotlin-react-dom", version.ref = "reactWrappers" }

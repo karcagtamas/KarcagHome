@@ -9,6 +9,8 @@ plugins {
 dependencies {
     implementation(project(":shared"))
     implementation(libs.bundles.ktor)
+    implementation(libs.logback.classic)
+    implementation(libs.mongodb.coroutine.driver)
 
     testImplementation(kotlin("test"))
     testImplementation(libs.junit.api)

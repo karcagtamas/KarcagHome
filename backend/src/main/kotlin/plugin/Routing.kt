@@ -1,9 +1,9 @@
-package plugins
+package plugin
 
 import io.ktor.server.routing.Routing
 import io.ktor.server.routing.route
-import routes.measurementCategoryRoutes
-import routes.measurementRoutes
+import route.measurementCategoryRoutes
+import route.measurementRoutes
 
 fun Routing.api() {
     route("/api") {

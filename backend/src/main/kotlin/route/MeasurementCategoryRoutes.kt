@@ -1,5 +1,6 @@
-package routes
+package route
 
+import dto.MeasurementCategoryDTO
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
@@ -17,12 +18,12 @@ fun Route.measurementCategoryRoutes() {
         val measurementCategoryRepository = MeasurementCategoryRepository()
 
         get {
-            call.respond(measurementCategoryRepository.getAll())
+            call.respond(measurementCategoryRepository.getAll().map { it.toDTO() })
         }
 
         get("/{id}") {
             val id = call.parameters["id"]!!
-            val measurementCategory = measurementCategoryRepository.get(id)
+            val measurementCategory = measurementCategoryRepository.get(id)?.toDTO()
 
             if (measurementCategory != null) {
                 call.respond(measurementCategory)
@@ -32,14 +33,14 @@ fun Route.measurementCategoryRoutes() {
         }
 
         post {
-            val measurementCategory = call.receive<MeasurementCategory>()
+            val measurementCategory = call.receive<MeasurementCategoryDTO>()
             measurementCategoryRepository.create(measurementCategory)
             call.respond(HttpStatusCode.Created)
         }
 
         put("/{id}") {
             val id = call.parameters["id"]!!
-            val measurementCategory = call.receive<MeasurementCategory>()
+            val measurementCategory = call.receive<MeasurementCategoryDTO>()
             measurementCategoryRepository.update(id, measurementCategory)
             call.respond(HttpStatusCode.OK)
         }

@@ -11,6 +11,9 @@ dependencies {
     implementation(libs.bundles.ktor)
     implementation(libs.logback.classic)
     implementation(libs.mongodb.coroutine.driver)
+    implementation(libs.kotlinx.serialization.core)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.mongodb.bson.kotlinx)
 
     testImplementation(kotlin("test"))
     testImplementation(libs.junit.api)

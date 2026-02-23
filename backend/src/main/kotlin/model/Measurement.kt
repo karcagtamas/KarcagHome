@@ -11,10 +11,10 @@ import kotlin.time.Instant
 
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
-data class MeasurementCategory(
+data class Measurement(
     @SerialName("_id") @Contextual val id: ObjectId = ObjectId(),
-    val name: String,
+    val value: Double,
     @Serializable(with = InstantAsBsonDateTime::class) val createdAt: Instant = now(),
-    val color: String,
-    val unit: String,
+    @Contextual val categoryId: ObjectId,
+    val date: Instant,
 )

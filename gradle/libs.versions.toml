@@ -23,12 +23,14 @@ ktor-host = { module = "io.ktor:ktor-server-host-common-jvm", version.ref = "kto
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 
 mongodb-coroutine-driver = { module = "org.mongodb:mongodb-driver-kotlin-coroutine", version = "5.6.3" }
+mongodb-bson-kotlinx = { module = "org.mongodb:bson-kotlinx", version = "5.6.3" }
 
 react = { module = "org.jetbrains.kotlin-wrappers:kotlin-react", version.ref = "reactWrappers" }
 react-dom = { module = "org.jetbrains.kotlin-wrappers:kotlin-react-dom", version.ref = "reactWrappers" }
 emotion = { module = "org.jetbrains.kotlin-wrappers:kotlin-emotion", version = "2025.3.26" }
 
-kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "serialization" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 
 junit-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
 junit-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }

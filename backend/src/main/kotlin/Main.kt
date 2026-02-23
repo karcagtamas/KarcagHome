@@ -1,21 +1,13 @@
-import io.ktor.http.HttpStatusCode
-import io.ktor.serialization.kotlinx.json.json
-import io.ktor.server.application.Application
-import io.ktor.server.application.install
-import io.ktor.server.engine.embeddedServer
-import io.ktor.server.netty.Netty
-import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.server.plugins.openapi.openAPI
-import io.ktor.server.plugins.requestvalidation.RequestValidation
-import io.ktor.server.plugins.swagger.swaggerUI
-import io.ktor.server.request.receive
-import io.ktor.server.response.respond
-import io.ktor.server.routing.get
-import io.ktor.server.routing.post
-import io.ktor.server.routing.route
-import io.ktor.server.routing.routing
-import model.MeasurementCategory
-import repository.MeasurementCategoryRepository
+import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.application.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.openapi.*
+import io.ktor.server.plugins.requestvalidation.*
+import io.ktor.server.plugins.swagger.*
+import io.ktor.server.routing.*
+import plugins.api
 
 fun main() {
     embeddedServer(Netty, 8080) {
@@ -32,36 +24,7 @@ fun Application.mainModule() {
         swaggerUI("openapi")
         openAPI("openapi")
 
-        get("/api/user") {
-            call.respond("Alma")
-        }
-
-        route("/api") {
-            route("/measurement-categories") {
-                val measurementCategoryRepository = MeasurementCategoryRepository()
-
-                get {
-                    call.respond(measurementCategoryRepository.getAll())
-                }
-
-                get("/{id}") {
-                    val id = call.parameters["id"]!!
-                    val measurementCategory = measurementCategoryRepository.get(id)
-
-                    if (measurementCategory != null) {
-                        call.respond(measurementCategory)
-                    } else {
-                        call.respond(HttpStatusCode.NotFound)
-                    }
-                }
-
-                post {
-                    val measurementCategory = call.receive<MeasurementCategory>()
-                    measurementCategoryRepository.create(measurementCategory)
-                    call.respond(HttpStatusCode.Created)
-                }
-            }
-        }
+        api()
     }
 
     install(RequestValidation) {

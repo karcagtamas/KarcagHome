@@ -7,6 +7,7 @@ ktlint = "14.0.1"
 serialization = "1.10.0"
 logback = "1.5.32"
 compose = "1.7.3"
+voyager = "1.1.0-beta02"
 
 [libraries]
 ktor-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
@@ -19,6 +20,7 @@ ktor-swagger = { module = "io.ktor:ktor-server-swagger-jvm", version.ref = "ktor
 ktor-openapi = { module = "io.ktor:ktor-server-openapi-jvm", version.ref = "ktor" }
 ktor-statusPages = { module = "io.ktor:ktor-server-status-pages-jvm", version.ref = "ktor" }
 ktor-host = { module = "io.ktor:ktor-server-host-common-jvm", version.ref = "ktor" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 
@@ -33,7 +35,10 @@ compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.re
 compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose" }
 compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "compose" }
 compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose" }
-compose-html-core = { module = "org.jetbrains.compose.html:html-core-js", version.ref = "compose" }
+compose-material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "compose" }
+
+voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
+voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
 
 junit-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
 junit-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }

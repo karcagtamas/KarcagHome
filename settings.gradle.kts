@@ -16,4 +16,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "karcag-home"
 
-include("backend", "frontend", "shared")
+include("backend", "composeApp", "shared")

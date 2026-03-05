@@ -53,7 +53,7 @@ class HomeScreen : Screen {
                         "Measurements",
                         "Data tracking",
                         Icons.Rounded.Monitor,
-                    ) { /* navigator.push(...) */ }
+                    ) { navigator.push(MeasurementScreen()) }
 
                     FeatureTile("SmartHome", "IoT Control", Icons.Rounded.Home) { /* navigator.push(...) */ }
 

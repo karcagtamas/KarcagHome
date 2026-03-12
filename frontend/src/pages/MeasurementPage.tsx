@@ -1,39 +1,45 @@
-import { Button, DrawerHeader, DrawerHeaderTitle, OverlayDrawer, Toolbar, ToolbarButton } from "@fluentui/react-components";
-import { AddRegular, DismissRegular } from "@fluentui/react-icons";
+import { Button, DrawerHeader, DrawerHeaderTitle, InlineDrawer, Toolbar, ToolbarButton } from "@fluentui/react-components";
+import { AddRegular, DismissRegular, HistoryRegular, SettingsRegular } from "@fluentui/react-icons";
+import React from "react";
 import { useState } from "react"
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { MeasurementList } from "../components/MeasurementList";
+import { MeasurementCategoryList } from "../components/MeasurementCategoryList";
 
 export const MeasurementPage: React.FC = () => {
-    const [drawer, setDrawer] = useState<'history' | 'categories' | null>(null);
+    const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
+    const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+        <React.Fragment>
             <Toolbar style={{ justifyContent: 'flex-end', padding: '8px' }}>
-                <ToolbarButton icon={<AddRegular />} onClick={() => setDrawer('categories')}>Categories</ToolbarButton>
-                <ToolbarButton appearance="primary" icon={<AddRegular />}>Plus</ToolbarButton>
+                <ToolbarButton icon={<HistoryRegular />} onClick={() => setLeftDrawerOpen(true)}>Measurements</ToolbarButton>
+                <ToolbarButton icon={<SettingsRegular />} onClick={() => setRightDrawerOpen(true)}>Categories</ToolbarButton>
+                <ToolbarButton appearance="primary" icon={<AddRegular />}>Add</ToolbarButton>
             </Toolbar>
 
-            <OverlayDrawer position="start" open={!!drawer} onOpenChange={() => setDrawer(null)}>
+            <InlineDrawer position="start" open={leftDrawerOpen}>
                 <DrawerHeader>
-                    <DrawerHeaderTitle action={<Button appearance="subtle" icon={<DismissRegular />} onClick={() => setDrawer(null)} />}>
-                        {drawer === 'history' ? 'History (Edit/Delete)' : 'Categories'}
+                    <DrawerHeaderTitle action={<Button appearance="subtle" icon={<DismissRegular />} onClick={() => setLeftDrawerOpen(false)} />}>
+                        Measurements
                     </DrawerHeaderTitle>
                 </DrawerHeader>
-                <div style={{ padding: '20px' }}></div>
 
-            </OverlayDrawer>
+                <MeasurementList />
+            </InlineDrawer>
 
-            <div style={{ flex: 1, padding: '40px' }}>
-                <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={[]}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-                        <XAxis dataKey="timestamp" stroke="#888" />
-                        <YAxis stroke="#888" />
-                        <Tooltip contentStyle={{ backgroundColor: "#333", border: "none" }} />
-                        <Line type="monotone" dataKey="value" stroke="#0078d4" strokeWidth={3} dot={{ r: 6 }} />
-                    </LineChart>
-                </ResponsiveContainer>
+            <InlineDrawer position="end" open={rightDrawerOpen}>
+                <DrawerHeader>
+                    <DrawerHeaderTitle action={<Button appearance="subtle" icon={<DismissRegular />} onClick={() => setRightDrawerOpen(false)} />}>
+                        Categories
+                    </DrawerHeaderTitle>
+                </DrawerHeader>
+
+                <MeasurementCategoryList />
+            </InlineDrawer>
+
+            <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+
             </div>
-        </div>
+        </React.Fragment>
     );
 }

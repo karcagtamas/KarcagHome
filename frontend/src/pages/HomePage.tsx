@@ -10,6 +10,8 @@ const useStyles = makeStyles({
         padding: '40px',
         maxWidth: '1200px',
         margin: '0 auto',
+        flex: 1,
+        alignItems: 'center'
     },
     card: {
         height: '180px',

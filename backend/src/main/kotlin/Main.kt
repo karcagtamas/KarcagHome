@@ -3,6 +3,7 @@ import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.openapi.*
 import io.ktor.server.plugins.requestvalidation.*
 import io.ktor.server.plugins.swagger.*
@@ -25,6 +26,10 @@ fun Application.mainModule() {
         openAPI("openapi")
 
         api()
+    }
+
+    install(CORS) {
+        anyHost()
     }
 
     install(RequestValidation) {

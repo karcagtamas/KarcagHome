@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { HomePage } from './pages/HomePage'
 import { MeasurementPage } from './pages/MeasurementPage'
 import { FluentProvider, makeStyles, webLightTheme } from '@fluentui/react-components'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const useStyles = makeStyles({
   provider: {
@@ -21,14 +22,16 @@ function App() {
 
   return (
     <FluentProvider className={styles.provider} theme={webLightTheme}>
-      <BrowserRouter>
-        <div className={styles.frame}>
-          <Routes>
-            <Route path='/' element={<HomePage />} />
-            <Route path='/measurements' element={<MeasurementPage />} />
-          </Routes>
-        </div>
-      </BrowserRouter>
+      <QueryClientProvider client={new QueryClient()}>
+        <BrowserRouter>
+          <div className={styles.frame}>
+            <Routes>
+              <Route path='/' element={<HomePage />} />
+              <Route path='/measurements' element={<MeasurementPage />} />
+            </Routes>
+          </div>
+        </BrowserRouter>
+      </QueryClientProvider>
     </FluentProvider>
   )
 }

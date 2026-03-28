@@ -19,6 +19,9 @@ object DatabaseFactory {
         }
 
         val dataSource = HikariDataSource(hikariConfig)
+
+        FlywayFactory.migrate(dataSource)
+
         Database.connect(dataSource)
     }
 }

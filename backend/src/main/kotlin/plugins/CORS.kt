@@ -4,10 +4,12 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
+import io.ktor.server.config.ApplicationConfig
 import io.ktor.server.plugins.cors.routing.CORS
+import org.koin.ktor.ext.get
 
 fun Application.configureCORS() {
-    val corsConfig = environment.config.config("app.cors")
+    val corsConfig = get<ApplicationConfig>().config("app.cors")
 
     install(CORS) {
         if (corsConfig.property("anyHost").getString().toBoolean()) {

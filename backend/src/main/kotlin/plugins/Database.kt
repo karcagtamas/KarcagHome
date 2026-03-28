@@ -1,9 +1,11 @@
 package plugins
 
+import config.DatabaseConfig
 import database.DatabaseFactory
-import io.ktor.server.application.Application
-import org.koin.ktor.ext.get
+import io.ktor.server.application.*
+import org.koin.ktor.ext.inject
 
 fun Application.configureDatabase() {
-    get<DatabaseFactory>()
+    val config: DatabaseConfig by inject()
+    DatabaseFactory.init(config)
 }

@@ -26,9 +26,24 @@ services:
       - kh_network
     depends_on:
       - mongodb
+  postgres:
+    container_name: postgres
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: kh
+      POSTGRES_PASSWORD: Abc123456%
+      POSTGRES_DB: khdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - kh_network
 
 volumes:
   mongodb_data:
+  postgres_data:
 
 networks:
   kh_network:

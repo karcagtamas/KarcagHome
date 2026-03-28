@@ -15,6 +15,17 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.mongodb.bson.kotlinx)
 
+    implementation(libs.koin.core)
+    implementation(libs.koin.ktor)
+    implementation(libs.koin.logger)
+
+    implementation(libs.exposed.core)
+    implementation(libs.exposed.dao)
+    implementation(libs.exposed.jdbc)
+
+    implementation(libs.hikari)
+    implementation(libs.postgresql)
+
     testImplementation(kotlin("test"))
     testImplementation(libs.junit.api)
     testRuntimeOnly(libs.junit.engine)

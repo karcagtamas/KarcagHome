@@ -1,4 +1,4 @@
-package plugin
+package plugins
 
 import io.ktor.server.routing.Routing
 import io.ktor.server.routing.route

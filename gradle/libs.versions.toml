@@ -40,6 +40,7 @@ koin-logger = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
 exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed" }
 exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
+exposed-kotlin-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datetime", version.ref = "exposed" }
 
 hikari = { module = "com.zaxxer:HikariCP", version = "5.1.0" }
 postgresql = { module = "org.postgresql:postgresql", version = "42.7.10" }

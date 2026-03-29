@@ -1,6 +1,7 @@
 package modules.tasks
 
 import io.ktor.server.application.Application
+import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import modules.AppModule
 import modules.tasks.repository.TaskRepository
@@ -15,7 +16,9 @@ class TasksModule : AppModule {
         val repository by inject<TaskRepository>()
 
         routing {
-            taskRoutes(repository)
+            route("/api") {
+                taskRoutes(repository)
+            }
         }
     }
 }

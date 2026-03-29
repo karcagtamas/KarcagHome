@@ -5,6 +5,8 @@ import config.loadDatabaseConfig
 import io.ktor.server.application.*
 import io.ktor.server.config.*
 import modules.ModuleRegistry
+import modules.measurements.MeasurementsModule
+import modules.measurements.measurementsModule
 import modules.tasks.TasksModule
 import modules.tasks.tasksModule
 import org.koin.dsl.module
@@ -17,7 +19,10 @@ val appModule = module {
 
     single {
         ModuleRegistry(
-            modules = listOf(TasksModule()),
+            modules = listOf(
+                TasksModule(),
+                MeasurementsModule(),
+            ),
         )
     }
 }
@@ -29,6 +34,7 @@ fun Application.configureDI() {
             module { single { this@configureDI } },
             appModule,
             tasksModule,
+            measurementsModule,
         )
     }
 }

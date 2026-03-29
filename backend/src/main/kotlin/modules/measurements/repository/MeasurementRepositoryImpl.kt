@@ -3,10 +3,12 @@ package modules.measurements.repository
 import kotlinx.datetime.LocalDate
 import modules.measurements.data.*
 import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.innerJoin
+import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insert
-import org.jetbrains.exposed.v1.jdbc.select
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.update
 import kotlin.time.Clock
 
 class MeasurementRepositoryImpl : MeasurementRepository {
@@ -15,6 +17,14 @@ class MeasurementRepositoryImpl : MeasurementRepository {
         MeasurementCategoriesTable
             .selectAll()
             .map { it.toMeasurementCategory() }
+    }
+
+    override fun getCategoryById(id: Long): MeasurementCategory? = transaction {
+        MeasurementCategoriesTable
+            .selectAll()
+            .where { MeasurementCategoriesTable.id eq MeasurementCategoriesTable.id }
+            .singleOrNull()
+            ?.toMeasurementCategory()
     }
 
     override fun createCategory(
@@ -40,16 +50,55 @@ class MeasurementRepositoryImpl : MeasurementRepository {
         )
     }
 
-    override fun getMeasurements(): List<Measurement> = transaction {
-        val categories = MeasurementCategoriesTable
-            .selectAll()
-            .associateBy { it[MeasurementCategoriesTable.id] }
-            .mapValues { it.value.toMeasurementCategory() }
+    override fun updateCategory(
+        id: Long,
+        name: String,
+        color: String,
+        unit: String
+    ): MeasurementCategory? = transaction {
+        val updated = MeasurementCategoriesTable.update(where = { MeasurementCategoriesTable.id eq id }) {
+            it[MeasurementCategoriesTable.name] = name
+            it[MeasurementCategoriesTable.color] = color
+            it[MeasurementCategoriesTable.unit] = unit
+        }
 
-        MeasurementsTable
+        if (updated == 0) return@transaction null
+
+        getCategoryById(id)
+    }
+
+    override fun deleteCategory(id: Long): Boolean = transaction {
+        MeasurementCategoriesTable.deleteWhere { MeasurementCategoriesTable.id eq id } > 0
+    }
+
+    override fun getMeasurements(): List<Measurement> = transaction {
+        val join = MeasurementsTable.innerJoin(
+            MeasurementCategoriesTable,
+            { categoryId },
+            { MeasurementCategoriesTable.id }
+        )
+
+        join
             .selectAll()
             .map {
-                val category = categories[it[MeasurementsTable.categoryId]]!!
+                val category = it.toMeasurementCategory()
+                it.toMeasurement(category)
+            }
+    }
+
+    override fun getMeasurementById(id: Long): Measurement? = transaction {
+        val join = MeasurementsTable.innerJoin(
+            MeasurementCategoriesTable,
+            { categoryId },
+            { MeasurementCategoriesTable.id }
+        )
+
+        join
+            .selectAll()
+            .where { MeasurementsTable.id eq id }
+            .singleOrNull()
+            ?.let {
+                val category = it.toMeasurementCategory()
                 it.toMeasurement(category)
             }
     }
@@ -68,17 +117,31 @@ class MeasurementRepositoryImpl : MeasurementRepository {
             it[createdAt] = now
         }
 
-        val category = MeasurementCategoriesTable
-            .select(MeasurementCategoriesTable.id eq categoryId)
-            .single()
-            .toMeasurementCategory()
+        getMeasurementById(row[MeasurementsTable.id])!!
+    }
 
-        Measurement(
-            id = row[MeasurementsTable.id],
-            value = value,
-            category = category,
-            date = date,
-            createdAt = now,
-        )
+    override fun updateMeasurement(
+        id: Long,
+        value: Double,
+        categoryId: Long,
+        date: LocalDate
+    ): Measurement? = transaction {
+        val updated = MeasurementsTable.update(
+            where = { MeasurementsTable.id eq id }
+        ) {
+            it[MeasurementsTable.value] = value
+            it[MeasurementsTable.categoryId] = categoryId
+            it[MeasurementsTable.date] = date
+        }
+
+        if (updated == 0) return@transaction null
+
+        getMeasurementById(id)
+    }
+
+    override fun deleteMeasurement(id: Long): Boolean = transaction {
+        MeasurementsTable.deleteWhere {
+            MeasurementsTable.id eq id
+        } > 0
     }
 }

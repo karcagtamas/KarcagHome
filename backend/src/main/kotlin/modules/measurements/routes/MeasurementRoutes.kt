@@ -3,10 +3,12 @@ package modules.measurements.routes
 import core.idLong
 import core.requireAndSend
 import core.sendDeleted
+import dto.measurements.MeasurementCategoryEditDTO
+import dto.measurements.MeasurementEditDTO
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.datetime.LocalDate
+import modules.measurements.data.toDTO
 import modules.measurements.repository.MeasurementRepository
 
 fun Route.measurementRoutes(repository: MeasurementRepository) {
@@ -20,11 +22,11 @@ fun Route.measurementRoutes(repository: MeasurementRepository) {
         get("/{id}") {
             val id = call.idLong()
 
-            call.requireAndSend(repository.getMeasurementById(id))
+            call.requireAndSend(repository.getMeasurementById(id)) { it.toDTO() }
         }
 
         post {
-            val body = call.receive<CreateMeasurementRequest>()
+            val body = call.receive<MeasurementEditDTO>()
             call.respond(
                 repository.createMeasurement(
                     body.value,
@@ -37,9 +39,16 @@ fun Route.measurementRoutes(repository: MeasurementRepository) {
         put("/{id}") {
             val id = call.idLong()
 
-            val body = call.receive<CreateMeasurementRequest>()
+            val body = call.receive<MeasurementEditDTO>()
 
-            call.requireAndSend(repository.updateMeasurement(id, body.value, body.categoryId, body.date))
+            call.requireAndSend(
+                repository.updateMeasurement(
+                    id,
+                    body.value,
+                    body.categoryId,
+                    body.date,
+                )
+            ) { it.toDTO() }
         }
 
         delete("/{id}") {
@@ -58,11 +67,11 @@ fun Route.measurementRoutes(repository: MeasurementRepository) {
         get("/{id}") {
             val id = call.idLong()
 
-            call.requireAndSend(repository.getCategoryById(id))
+            call.requireAndSend(repository.getCategoryById(id)) { it.toDTO() }
         }
 
         post {
-            val body = call.receive<CreateMeasurementCategoryRequest>()
+            val body = call.receive<MeasurementCategoryEditDTO>()
 
             call.respond(
                 repository.createCategory(
@@ -76,9 +85,16 @@ fun Route.measurementRoutes(repository: MeasurementRepository) {
         put("/{id}") {
             val id = call.idLong()
 
-            val body = call.receive<CreateMeasurementCategoryRequest>()
+            val body = call.receive<MeasurementCategoryEditDTO>()
 
-            call.requireAndSend(repository.updateCategory(id, body.name, body.color, body.unit))
+            call.requireAndSend(
+                repository.updateCategory(
+                    id,
+                    body.name,
+                    body.color,
+                    body.unit,
+                )
+            ) { it.toDTO() }
         }
 
         delete("/{id}") {
@@ -88,15 +104,3 @@ fun Route.measurementRoutes(repository: MeasurementRepository) {
         }
     }
 }
-
-data class CreateMeasurementRequest(
-    val value: Double,
-    val categoryId: Long,
-    val date: LocalDate,
-)
-
-data class CreateMeasurementCategoryRequest(
-    val name: String,
-    val color: String,
-    val unit: String,
-)

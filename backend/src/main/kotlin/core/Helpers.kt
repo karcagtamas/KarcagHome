@@ -26,9 +26,9 @@ suspend fun RoutingCall.idString(): String {
     return id
 }
 
-suspend fun <T> RoutingCall.requireAndSend(value: T?) {
+suspend inline fun <T, reified U : Any> RoutingCall.requireAndSend(value: T?, mapper: (T) -> U) {
     value
-        ?.let { respond(it) }
+        ?.let { respond(mapper(it)) }
         ?: respond(HttpStatusCode.NotFound)
 }
 

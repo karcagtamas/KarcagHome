@@ -6,22 +6,21 @@ import modules.AppModule
 import modules.measurements.repository.MeasurementRepository
 import modules.measurements.repository.MeasurementRepositoryImpl
 import modules.measurements.routes.measurementRoutes
+import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.koin.ktor.ext.inject
 
 class MeasurementsModule : AppModule {
 
-    override fun Application.register() {
+    override fun Application.register() {}
+
+    override fun Route.apiRoutes() {
         val repository by inject<MeasurementRepository>()
 
-        routing {
-            route("/api") {
-                measurementRoutes(repository)
-            }
-        }
+        measurementRoutes(repository)
     }
-}
 
-val measurementsModule = module {
-    single<MeasurementRepository> { MeasurementRepositoryImpl() }
+    override fun module(): Module = module {
+        single<MeasurementRepository> { MeasurementRepositoryImpl() }
+    }
 }

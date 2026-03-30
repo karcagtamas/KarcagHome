@@ -27,6 +27,7 @@ dependencies {
     implementation(libs.hikari)
     implementation(libs.postgresql)
     implementation(libs.flyway)
+    implementation(libs.flyway.postgresql)
 
     testImplementation(kotlin("test"))
     testImplementation(libs.junit.api)

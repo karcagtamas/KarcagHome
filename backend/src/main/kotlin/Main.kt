@@ -5,6 +5,7 @@ import io.ktor.server.plugins.openapi.*
 import io.ktor.server.plugins.swagger.*
 import io.ktor.server.routing.*
 import modules.ModuleRegistry
+import org.koin.core.context.loadKoinModules
 import org.koin.ktor.ext.getKoin
 import plugins.*
 
@@ -28,13 +29,16 @@ fun Application.mainModule() {
     configureCompression()
     configureMonitoring()
 
+    val registry = getKoin().get<ModuleRegistry>()
+    registry.registerAll(this)
+    loadKoinModules(registry.modules())
+
     routing {
         swaggerUI("openapi")
         openAPI("openapi")
 
-        api()
+        route("api") {
+            registry.routesForAll(this)
+        }
     }
-
-    val registry = getKoin().get<ModuleRegistry>()
-    registry.registerAll(this)
 }

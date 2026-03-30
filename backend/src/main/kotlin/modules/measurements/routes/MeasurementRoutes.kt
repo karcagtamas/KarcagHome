@@ -1,5 +1,8 @@
 package modules.measurements.routes
 
+import core.idLong
+import core.requireAndSend
+import core.sendDeleted
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -15,12 +18,9 @@ fun Route.measurementRoutes(repository: MeasurementRepository) {
         }
 
         get("/{id}") {
-            val id = call.parameters["id"]?.toLongOrNull()
-                ?: return@get call.respondText("Invalid id")
+            val id = call.idLong()
 
-            repository.getMeasurementById(id)
-                ?.let { call.respond(it) }
-                ?: call.respondText("Not found")
+            call.requireAndSend(repository.getMeasurementById(id))
         }
 
         post {
@@ -34,24 +34,18 @@ fun Route.measurementRoutes(repository: MeasurementRepository) {
             )
         }
 
-
         put("/{id}") {
-            val id = call.parameters["id"]?.toLongOrNull()
-                ?: return@put call.respondText("Invalid id")
+            val id = call.idLong()
 
             val body = call.receive<CreateMeasurementRequest>()
 
-            repository.updateMeasurement(id, body.value, body.categoryId, body.date)
-                ?.let { call.respond(it) }
-                ?: call.respondText("Not found")
+            call.requireAndSend(repository.updateMeasurement(id, body.value, body.categoryId, body.date))
         }
 
         delete("/{id}") {
-            val id = call.parameters["id"]?.toLongOrNull()
-                ?: return@delete call.respondText("Invalid id")
+            val id = call.idLong()
 
-            if (repository.deleteMeasurement(id)) call.respondText("Deleted")
-            else call.respondText("Not found")
+            call.sendDeleted(repository.deleteMeasurement(id))
         }
     }
 
@@ -62,12 +56,9 @@ fun Route.measurementRoutes(repository: MeasurementRepository) {
         }
 
         get("/{id}") {
-            val id = call.parameters["id"]?.toLongOrNull()
-                ?: return@get call.respondText("Invalid id")
+            val id = call.idLong()
 
-            repository.getCategoryById(id)
-                ?.let { call.respond(it) }
-                ?: call.respondText("Not found")
+            call.requireAndSend(repository.getCategoryById(id))
         }
 
         post {
@@ -83,22 +74,17 @@ fun Route.measurementRoutes(repository: MeasurementRepository) {
         }
 
         put("/{id}") {
-            val id = call.parameters["id"]?.toLongOrNull()
-                ?: return@put call.respondText("Invalid id")
+            val id = call.idLong()
 
             val body = call.receive<CreateMeasurementCategoryRequest>()
 
-            repository.updateCategory(id, body.name, body.color, body.unit)
-                ?.let { call.respond(it) }
-                ?: call.respondText("Not found")
+            call.requireAndSend(repository.updateCategory(id, body.name, body.color, body.unit))
         }
 
-        delete("{id}") {
-            val id = call.parameters["id"]?.toLongOrNull()
-                ?: return@delete call.respondText("Invalid id")
+        delete("/{id}") {
+            val id = call.idLong()
 
-            if (repository.deleteCategory(id)) call.respondText("Deleted")
-            else call.respondText("Not found")
+            call.sendDeleted(repository.deleteCategory(id))
         }
     }
 }

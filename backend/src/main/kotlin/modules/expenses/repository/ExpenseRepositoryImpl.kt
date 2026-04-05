@@ -1,10 +1,14 @@
 package modules.expenses.repository
 
 import kotlinx.datetime.LocalDate
+import modules.expenses.data.AccountsTable
+import modules.expenses.data.CurrenciesTable
 import modules.expenses.data.Expense
 import modules.expenses.data.ExpenseCategoriesTable
 import modules.expenses.data.ExpenseCategory
 import modules.expenses.data.ExpensesTable
+import modules.expenses.data.toAccount
+import modules.expenses.data.toCurrency
 import modules.expenses.data.toExpense
 import modules.expenses.data.toExpenseCategory
 import org.jetbrains.exposed.v1.core.eq
@@ -67,21 +71,39 @@ class ExpenseRepositoryImpl : ExpenseRepository {
     override fun getExpenses(): List<Expense> = transaction {
         val join = ExpensesTable.innerJoin(
             ExpenseCategoriesTable,
-            { categoryId },
+            { ExpensesTable.categoryId },
             { ExpenseCategoriesTable.id },
+        ).innerJoin(
+            AccountsTable,
+            { ExpensesTable.accountId },
+            { AccountsTable.id }
+        ).innerJoin(
+            CurrenciesTable,
+            { AccountsTable.currencyId },
+            { CurrenciesTable.id }
         )
 
         join.selectAll().map {
             val category = it.toExpenseCategory()
-            it.toExpense(category)
+            val currency = it.toCurrency()
+            val account = it.toAccount(currency)
+            it.toExpense(category, account)
         }
     }
 
     override fun getExpenseById(id: Long): Expense? = transaction {
         val join = ExpensesTable.innerJoin(
             ExpenseCategoriesTable,
-            { categoryId },
+            { ExpensesTable.categoryId },
             { ExpenseCategoriesTable.id },
+        ).innerJoin(
+            AccountsTable,
+            { ExpensesTable.accountId },
+            { AccountsTable.id }
+        ).innerJoin(
+            CurrenciesTable,
+            { AccountsTable.currencyId },
+            { CurrenciesTable.id }
         )
 
         join
@@ -89,7 +111,9 @@ class ExpenseRepositoryImpl : ExpenseRepository {
             .singleOrNull()
             ?.let {
                 val category = it.toExpenseCategory()
-                it.toExpense(category)
+                val currency = it.toCurrency()
+                val account = it.toAccount(currency)
+                it.toExpense(category, account)
             }
     }
 

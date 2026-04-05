@@ -10,4 +10,5 @@ data class Expense(
     val date: LocalDate,
     val createdAt: Instant,
     val category: ExpenseCategory,
+    val account: Account,
 )

@@ -10,4 +10,5 @@ data class ExpenseDTO(
     val description: String?,
     val date: LocalDate,
     val category: ExpenseCategoryDTO,
+    val account: AccountDTO,
 )

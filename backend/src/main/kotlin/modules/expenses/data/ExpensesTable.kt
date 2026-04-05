@@ -8,6 +8,8 @@ object ExpensesTable : Table("expenses") {
     val id = long("id").autoIncrement()
     val amount = double("amount")
     val description = text("description").nullable()
+    val accountId = long("account_id")
+        .references(AccountsTable.id)
     val categoryId = long("category_id")
         .references(ExpenseCategoriesTable.id)
     val date = date("date")

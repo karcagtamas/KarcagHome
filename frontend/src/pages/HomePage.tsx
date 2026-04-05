@@ -1,5 +1,5 @@
 import { Caption1, Card, CardHeader, makeStyles, Text } from "@fluentui/react-components";
-import { DataLineRegular, HomeRegular, MoneyRegular } from "@fluentui/react-icons";
+import { DataLineRegular, HomeRegular, MoneyRegular, TasksAppRegular } from "@fluentui/react-icons";
 import { useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles({
@@ -31,7 +31,8 @@ export const HomePage: React.FC = () => {
     const menuItems = [
         { title: 'Measurements', desc: 'Data tracking', icon: <DataLineRegular fontSize={40} />, path: '/measurements', },
         { title: 'Smart Home', desc: 'IoT Device Control', icon: <HomeRegular fontSize={40} />, path: '/smart-home', },
-        { title: 'Moneylens', desc: 'Financial Analytics', icon: <MoneyRegular fontSize={40} />, path: '/moneylens', }
+        { title: 'Expenses', desc: 'Financial Analytics', icon: <MoneyRegular fontSize={40} />, path: '/expenses', },
+        { title: 'Tasks', desc: '', icon: <TasksAppRegular fontSize={40} />, path: '/tasks', },
     ];
 
     return (

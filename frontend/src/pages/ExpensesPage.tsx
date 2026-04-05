@@ -1,47 +1,40 @@
-import { Card, Spinner, Text } from "@fluentui/react-components";
-import { useExpenses } from "../hooks/useExpenses"
+import { Button, Card, makeStyles, Spinner, Text } from "@fluentui/react-components";
+import { BookmarkRegular, CurrencyDollarEuroRegular } from "@fluentui/react-icons";
+import { useNavigate } from "react-router-dom";
+import { useAccounts } from "../hooks/useAccounts";
+
+const useStyles = makeStyles({
+    toolbar: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: '1rem',
+    },
+    spacer: {
+        flexGrow: 1
+    }
+});
 
 export const ExpensesPage = () => {
-    const { data, isLoading } = useExpenses();
+    const styles = useStyles();
+    const { data, isLoading } = useAccounts();
+    const navigate = useNavigate();
 
     if (isLoading) return <Spinner />
 
-    const total = data?.reduce((sum, e) => sum + e.amount, 0) ?? 0;
-
-    const byCategory = Object.values(
-        (data ?? []).reduce((acc, e) => {
-            const key = e.category.name;
-            acc[key] = (acc[key] || 0) + e.amount;
-            return acc;
-        }, {} as Record<string, number>)
-    );
-
     return (
         <div style={{ padding: 24 }}>
-            <Text size={700} weight="semibold">
-                Expenses
-            </Text>
-
-            <div style={{ display: 'flex', gap: 16, marginTop: 16 }}>
-                <Card>
-                    <Text>Total</Text>
-                    <Text size={600}>{total.toFixed(2)} HUF</Text>
-                </Card>
-
-                <Card>
-                    <Text>Entries</Text>
-                    <Text size={600}>{data?.length ?? 0}</Text>
-                </Card>
+            <div className={styles.toolbar}>
+                <Text size={700} weight="semibold">Expenses</Text>
+                <span className={styles.spacer} />
+                <Button icon={<CurrencyDollarEuroRegular />} onClick={() => navigate("/currencies")} />
+                <Button icon={<BookmarkRegular />} onClick={() => navigate("/expense-categories")} />
             </div>
 
             <div style={{ marginTop: 24 }}>
-                <Text weight="semibold">Recent</Text>
+                <Text weight="semibold">Accounts</Text>
 
-                {(data ?? []).slice(0, 5).map((e) => (
-                    <Card key={e.id} style={{ marginTop: 8 }}>
-                        <Text>{e.amount} HUF - {e.category.name}</Text>
-                    </Card>
-                ))}
+                {data?.map(account => (<Card key={account.id}>{account.name}</Card>))}
             </div>
         </div>
     );

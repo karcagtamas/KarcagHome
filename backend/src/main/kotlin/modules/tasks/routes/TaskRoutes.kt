@@ -14,7 +14,7 @@ fun Route.taskRoutes(repository: TaskRepository) {
 
     route("/tasks") {
         get {
-            call.respond(repository.getAll())
+            call.respond(repository.getAll().map { it.toDTO() })
         }
 
         get("/{id}") {

@@ -16,7 +16,7 @@ fun Route.measurementRoutes(repository: MeasurementRepository) {
     route("/measurements") {
 
         get {
-            call.respond(repository.getMeasurements())
+            call.respond(repository.getMeasurements().map { it.toDTO() })
         }
 
         get("/{id}") {
@@ -38,7 +38,6 @@ fun Route.measurementRoutes(repository: MeasurementRepository) {
 
         put("/{id}") {
             val id = call.idLong()
-
             val body = call.receive<MeasurementEditDTO>()
 
             call.requireAndSend(
@@ -61,7 +60,7 @@ fun Route.measurementRoutes(repository: MeasurementRepository) {
     route("/measurement-categories") {
 
         get {
-            call.respond(repository.getCategories())
+            call.respond(repository.getCategories().map { it.toDTO() })
         }
 
         get("/{id}") {
@@ -84,7 +83,6 @@ fun Route.measurementRoutes(repository: MeasurementRepository) {
 
         put("/{id}") {
             val id = call.idLong()
-
             val body = call.receive<MeasurementCategoryEditDTO>()
 
             call.requireAndSend(

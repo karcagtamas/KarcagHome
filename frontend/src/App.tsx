@@ -4,6 +4,7 @@ import { MeasurementPage } from './pages/MeasurementPage'
 import { FluentProvider, makeStyles, webLightTheme } from '@fluentui/react-components'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ExpensesPage } from './pages/ExpensesPage';
+import { CurrenciesPage } from './pages/CurrenciesPage';
 
 const useStyles = makeStyles({
   provider: {
@@ -32,6 +33,7 @@ function App() {
               <Route path='/measurements' element={<MeasurementPage />} />
               <Route path='/tasks' element={<MeasurementPage />} />
               <Route path='/expenses' element={<ExpensesPage />} />
+              <Route path='/currencies' element={<CurrenciesPage />} />
             </Routes>
           </div>
         </BrowserRouter>

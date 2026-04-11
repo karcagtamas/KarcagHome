@@ -1,7 +1,7 @@
 import { Button, Card, makeStyles, Spinner, Text } from "@fluentui/react-components";
 import { BookmarkRegular, CurrencyDollarEuroRegular } from "@fluentui/react-icons";
 import { useNavigate } from "react-router-dom";
-import { useAccounts } from "../hooks/useAccounts";
+import { useAccounts } from "../../../hooks/useAccounts";
 
 const useStyles = makeStyles({
     toolbar: {

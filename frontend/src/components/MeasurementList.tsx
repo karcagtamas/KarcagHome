@@ -1,5 +1,5 @@
 import { Button, createTableColumn, DataGrid, DataGridBody, DataGridCell, DataGridHeader, DataGridHeaderCell, DataGridRow, makeStyles, tokens, type TableColumnDefinition, Text } from "@fluentui/react-components";
-import type { Measurement } from "../models/measurement";
+import type { Measurement } from "../modules/measurements/models/measurement";
 import { AddRegular, DeleteRegular, EditRegular } from "@fluentui/react-icons";
 
 const useStyles = makeStyles({

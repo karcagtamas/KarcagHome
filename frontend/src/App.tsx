@@ -1,22 +1,22 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { HomePage } from './pages/HomePage'
-import { MeasurementPage } from './pages/MeasurementPage'
-import { FluentProvider, makeStyles, webLightTheme } from '@fluentui/react-components'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ExpensesPage } from './pages/ExpensesPage';
-import { CurrenciesPage } from './pages/CurrenciesPage';
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { HomePage } from "./pages/HomePage";
+import { FluentProvider, makeStyles, webLightTheme } from "@fluentui/react-components";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ExpensesPage } from "./modules/expenses/pages/ExpensesPage";
+import { CurrenciesPage } from "./modules/expenses/pages/CurrenciesPage";
+import { MeasurementPage } from "./modules/measurements/pages/MeasurementPage";
 
 const useStyles = makeStyles({
   provider: {
-    display: 'flex',
+    display: "flex",
     flex: 1,
-    width: '100%',
+    width: "100%",
   },
   frame: {
-    display: 'flex',
+    display: "flex",
     flex: 1,
-    flexDirection: 'column',
-  }
+    flexDirection: "column",
+  },
 });
 
 function App() {
@@ -28,18 +28,18 @@ function App() {
         <BrowserRouter>
           <div className={styles.frame}>
             <Routes>
-              <Route path='/' element={<HomePage />} />
-              <Route path='/dashboard' element={<MeasurementPage />} />
-              <Route path='/measurements' element={<MeasurementPage />} />
-              <Route path='/tasks' element={<MeasurementPage />} />
-              <Route path='/expenses' element={<ExpensesPage />} />
-              <Route path='/currencies' element={<CurrenciesPage />} />
+              <Route path="/" element={<HomePage />} />
+              <Route path="/dashboard" element={<MeasurementPage />} />
+              <Route path="/measurements" element={<MeasurementPage />} />
+              <Route path="/tasks" element={<MeasurementPage />} />
+              <Route path="/expenses" element={<ExpensesPage />} />
+              <Route path="/currencies" element={<CurrenciesPage />} />
             </Routes>
           </div>
         </BrowserRouter>
       </QueryClientProvider>
     </FluentProvider>
-  )
+  );
 }
 
-export default App
+export default App;

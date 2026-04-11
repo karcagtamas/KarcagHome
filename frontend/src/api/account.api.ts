@@ -1,4 +1,4 @@
-import type { AccountDTO } from "../models/account";
+import type { AccountDTO } from "../modules/expenses/models/account";
 import { api } from "./client";
 
 export const accountApi = {

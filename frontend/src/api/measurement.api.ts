@@ -1,4 +1,4 @@
-import type { Measurement } from "../models/measurement";
+import type { Measurement } from "../modules/measurements/models/measurement";
 import { api } from "./client";
 
 export const MeasurementApi = {

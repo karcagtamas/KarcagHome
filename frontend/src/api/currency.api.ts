@@ -1,4 +1,4 @@
-import type { CurrencyDTO } from "../models/currency";
+import type { CurrencyDTO } from "../modules/expenses/models/currency";
 import { api } from "./client";
 
 export const currencyApi = {

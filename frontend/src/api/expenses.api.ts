@@ -1,4 +1,4 @@
-import type { ExpenseDTO } from "../models/expenses";
+import type { ExpenseDTO } from "../modules/expenses/models/expenses";
 import { api } from "./client";
 
 export const expensesApi = {

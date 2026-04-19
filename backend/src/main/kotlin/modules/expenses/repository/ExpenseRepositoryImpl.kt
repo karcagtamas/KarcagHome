@@ -1,21 +1,11 @@
 package modules.expenses.repository
 
 import kotlinx.datetime.LocalDate
-import modules.expenses.data.AccountsTable
-import modules.expenses.data.CurrenciesTable
-import modules.expenses.data.Expense
-import modules.expenses.data.ExpenseCategoriesTable
-import modules.expenses.data.ExpenseCategory
-import modules.expenses.data.ExpensesTable
-import modules.expenses.data.toAccount
-import modules.expenses.data.toCurrency
-import modules.expenses.data.toExpense
-import modules.expenses.data.toExpenseCategory
+import modules.expenses.data.*
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.innerJoin
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insert
-import org.jetbrains.exposed.v1.jdbc.select
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.update
@@ -28,7 +18,8 @@ class ExpenseRepositoryImpl : ExpenseRepository {
     }
 
     override fun getCategoryById(id: Long): ExpenseCategory? = transaction {
-        ExpenseCategoriesTable.select(ExpenseCategoriesTable.id eq id)
+        ExpenseCategoriesTable.selectAll()
+            .where { ExpenseCategoriesTable.id eq id }
             .singleOrNull()
             ?.toExpenseCategory()
     }
@@ -107,7 +98,8 @@ class ExpenseRepositoryImpl : ExpenseRepository {
         )
 
         join
-            .select(ExpenseCategoriesTable.id eq id)
+            .selectAll()
+            .where { ExpenseCategoriesTable.id eq id }
             .singleOrNull()
             ?.let {
                 val category = it.toExpenseCategory()

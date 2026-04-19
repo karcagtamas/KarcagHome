@@ -3,8 +3,8 @@ import { AddRegular, DismissRegular, HistoryRegular, SettingsRegular } from "@fl
 import React from "react";
 import { useState } from "react"
 import { MeasurementList } from "../components/MeasurementList";
+import { useMeasurements } from "../../../hooks/useMeasurements";
 import { MeasurementCategoryList } from "../components/MeasurementCategoryList";
-import { useMeasurements } from "../hooks/useMeasurements";
 
 const useStyles = makeStyles({
     root: {

@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
 import type { CurrencyDTO } from "../models/currency";
 import { AppDialog } from "../../../components/dialog/AppDialog";
-import { Button, Field, Input } from "@fluentui/react-components";
+import { Button, Field, Input, Spinner } from "@fluentui/react-components";
 
 type Props = {
   open: boolean;
   currency?: CurrencyDTO | null;
   onClose: () => void;
-  onSubmit: (data: Omit<CurrencyDTO, "id">, id?: number) => void;
+  onSubmit: (data: Omit<CurrencyDTO, "id">, id?: number) => Promise<void>;
+  loading?: boolean;
 };
 
-export const CurrencyDialog: React.FC<Props> = ({ open, currency, onClose, onSubmit }) => {
+export const CurrencyDialog: React.FC<Props> = ({ open, currency, onClose, onSubmit, loading }) => {
   const isEdit = !!currency;
 
   const [name, setName] = useState("");
@@ -23,36 +24,53 @@ export const CurrencyDialog: React.FC<Props> = ({ open, currency, onClose, onSub
     }
   }, [currency, open]);
 
-  const handleSubmit = () => {
-    if (!name || !abbreviation) return;
+  const isValid = name.trim().length > 0 && abbreviation.trim().length > 0;
 
-    onSubmit({ name, abbreviation }, currency?.id);
+  const handleSubmit = async () => {
+    if (!isValid || loading) return;
 
-    onClose();
+    try {
+      await onSubmit({ name: name.trim(), abbreviation: abbreviation.trim().toUpperCase() }, currency?.id);
+
+      onClose();
+    } catch (err) {
+      console.error("Save failed", err);
+    }
   };
 
   return (
     <AppDialog
       open={open}
-      onOpenChange={(o) => !o && onClose()}
+      onOpenChange={(o) => !o && !loading && onClose()}
       title={isEdit ? "Edit Currency" : "Create Currency"}
       footer={
         <>
-          <Button appearance="secondary" onClick={onClose}>
+          <Button appearance="secondary" onClick={onClose} disabled={loading}>
             Cancel
           </Button>
-          <Button appearance="primary" onClick={handleSubmit}>
-            {isEdit ? "Save" : "Create"}
+          <Button appearance="primary" onClick={handleSubmit} disabled={!isValid || loading}>
+            {loading ? <Spinner size="tiny" /> : isEdit ? "Save" : "Create"}
           </Button>
         </>
       }
     >
       <Field label="Name" required>
-        <Input value={name} onChange={(_, d) => setName(d.value)} placeholder="e.g. Euro" />
+        <Input
+          autoFocus
+          value={name}
+          onChange={(_, d) => setName(d.value)}
+          disabled={loading}
+          placeholder="e.g. Euro"
+        />
       </Field>
 
       <Field label="Abbreviation" required>
-        <Input value={abbreviation} onChange={(_, d) => setAbbreviation(d.value)} placeholder="e.g. EUR" />
+        <Input
+          value={abbreviation}
+          onChange={(_, d) => setAbbreviation(d.value)}
+          disabled={loading}
+          placeholder="e.g. EUR"
+        />
       </Field>
     </AppDialog>
   );

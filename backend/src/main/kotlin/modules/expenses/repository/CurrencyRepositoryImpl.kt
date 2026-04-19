@@ -5,7 +5,6 @@ import modules.expenses.data.Currency
 import modules.expenses.data.toCurrency
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.insert
-import org.jetbrains.exposed.v1.jdbc.select
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.update
@@ -18,7 +17,7 @@ class CurrencyRepositoryImpl : CurrencyRepository {
     }
 
     override fun getCurrencyById(id: Long): Currency? = transaction {
-        CurrenciesTable.select(CurrenciesTable.id eq id).singleOrNull()?.toCurrency()
+        CurrenciesTable.selectAll().where { CurrenciesTable.id eq id }.singleOrNull()?.toCurrency()
     }
 
     override fun createCurrency(name: String, abbreviation: String): Currency = transaction {

@@ -13,6 +13,15 @@ fun ResultRow.toCurrency(): Currency = Currency(
     createdAt = this[CurrenciesTable.createdAt],
 )
 
+fun ResultRow.toExchange(currencyFrom: Currency, currencyTo: Currency): CurrencyMonthlyExchange =
+    CurrencyMonthlyExchange(
+        currencyFrom = currencyFrom,
+        currencyTo = currencyTo,
+        year = this[CurrencyMonthlyExchangesTable.year],
+        month = this[CurrencyMonthlyExchangesTable.month],
+        value = this[CurrencyMonthlyExchangesTable.value],
+    )
+
 fun ResultRow.toAccount(currency: Currency): Account = Account(
     id = this[AccountsTable.id],
     name = this[AccountsTable.name],

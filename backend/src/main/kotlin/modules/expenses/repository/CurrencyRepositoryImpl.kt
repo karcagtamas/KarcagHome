@@ -2,7 +2,12 @@ package modules.expenses.repository
 
 import modules.expenses.data.CurrenciesTable
 import modules.expenses.data.Currency
+import modules.expenses.data.CurrencyMonthlyExchange
+import modules.expenses.data.CurrencyMonthlyExchangesTable
 import modules.expenses.data.toCurrency
+import modules.expenses.data.toExchange
+import org.jetbrains.exposed.v1.core.JoinType
+import org.jetbrains.exposed.v1.core.alias
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
@@ -44,5 +49,34 @@ class CurrencyRepositoryImpl : CurrencyRepository {
 
         if (updated == 0) return@transaction null
         getCurrencyById(id)
+    }
+
+    override fun getYearlyExchangeRates(year: Int): List<CurrencyMonthlyExchange> = transaction {
+        val from = CurrenciesTable.alias("from")
+        val to = CurrenciesTable.alias("to")
+
+        CurrencyMonthlyExchangesTable
+            .join(from, JoinType.INNER) {
+                CurrencyMonthlyExchangesTable.currencyFromId eq from[CurrenciesTable.id]
+            }.join(to, JoinType.INNER) {
+                CurrencyMonthlyExchangesTable.currencyToId eq to[CurrenciesTable.id]
+            }
+            .selectAll()
+            .where { CurrencyMonthlyExchangesTable.year eq year }
+            .map {
+                val fromCurrency = Currency(
+                    id = it[from[CurrenciesTable.id]],
+                    name = it[from[CurrenciesTable.name]],
+                    abbreviation = it[from[CurrenciesTable.abbreviation]],
+                    createdAt = it[from[CurrenciesTable.createdAt]],
+                )
+                val toCurrency = Currency(
+                    id = it[to[CurrenciesTable.id]],
+                    name = it[to[CurrenciesTable.name]],
+                    abbreviation = it[to[CurrenciesTable.abbreviation]],
+                    createdAt = it[to[CurrenciesTable.createdAt]],
+                )
+                it.toExchange(fromCurrency, toCurrency)
+            }
     }
 }

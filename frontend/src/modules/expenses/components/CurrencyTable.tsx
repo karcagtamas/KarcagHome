@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { CurrencyTreeDTO } from "../models/currency";
+import type { CurrencyDTO, CurrencyTreeDTO } from "../models/currency";
 import {
   Button,
   Table,
@@ -10,19 +10,37 @@ import {
   TableRow,
 } from "@fluentui/react-components";
 import React from "react";
-import { ChevronDownRegular, ChevronRightRegular } from "@fluentui/react-icons";
+import { ChevronDownRegular, ChevronRightRegular, DeleteRegular, EditRegular } from "@fluentui/react-icons";
 
 type Props = {
   data?: CurrencyTreeDTO[];
+  onEdit: (data: CurrencyDTO) => void;
+  onRemove: (data: CurrencyDTO) => void;
 };
 
-export const CurrencyTable: React.FC<Props> = ({ data = [] }) => {
+export const CurrencyTable: React.FC<Props> = ({ data = [], onEdit, onRemove }) => {
   const [expanded, setExpanded] = useState<Record<number, boolean>>({});
   const toggle = (id: number) => {
     setExpanded((prev) => ({
       ...prev,
       [id]: !prev[id],
     }));
+  };
+
+  const handleEdit = (currency: CurrencyTreeDTO) => {
+    onEdit({
+      id: currency.currencyId,
+      name: currency.currencyName,
+      abbreviation: currency.currencyAbbreviation,
+    });
+  };
+
+  const handleRemove = (currency: CurrencyTreeDTO) => {
+    onRemove({
+      id: currency.currencyId,
+      name: currency.currencyName,
+      abbreviation: currency.currencyAbbreviation,
+    });
   };
 
   return (
@@ -32,6 +50,7 @@ export const CurrencyTable: React.FC<Props> = ({ data = [] }) => {
           <TableHeaderCell>Currency</TableHeaderCell>
           <TableHeaderCell>Month</TableHeaderCell>
           <TableHeaderCell>Rates</TableHeaderCell>
+          <TableHeaderCell>Actions</TableHeaderCell>
         </TableRow>
       </TableHeader>
 
@@ -50,6 +69,10 @@ export const CurrencyTable: React.FC<Props> = ({ data = [] }) => {
               </TableCell>
               <TableCell />
               <TableCell />
+              <TableCell>
+                <Button icon={<EditRegular />} appearance="subtle" onClick={() => handleEdit(currency)} />
+                <Button icon={<DeleteRegular />} appearance="subtle" onClick={() => handleRemove(currency)} />
+              </TableCell>
             </TableRow>
 
             {expanded[currency.currencyId] &&
@@ -68,6 +91,7 @@ export const CurrencyTable: React.FC<Props> = ({ data = [] }) => {
                       <TableCell>
                         {rate.currencyToName}: {rate.value}
                       </TableCell>
+                      <TableCell />
                     </TableRow>
                   ))}
                 </React.Fragment>

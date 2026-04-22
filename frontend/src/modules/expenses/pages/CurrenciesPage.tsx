@@ -43,6 +43,8 @@ export const CurrenciesPage: React.FC = () => {
     setDialogOpen(true);
   };
 
+  const handleRemove = (currency: CurrencyDTO) => {}
+
   const loading = createMutation.isPending || updateMutation.isPending;
 
   const handleSubmit = async (data: Omit<CurrencyDTO, "id">, id: number | undefined) => {
@@ -71,7 +73,7 @@ export const CurrenciesPage: React.FC = () => {
         }
       ></PageHeader>
 
-      {isLoading ? <div>Loading...</div> : <CurrencyTable data={data} />}
+      {isLoading ? <div>Loading...</div> : <CurrencyTable data={data} onEdit={handleEdit} onRemove={handleRemove} />}
 
       <CurrencyDialog
         open={dialogOpen}

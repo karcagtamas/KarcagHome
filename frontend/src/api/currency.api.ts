@@ -7,6 +7,6 @@ export const currencyApi = {
   create: (data: Omit<CurrencyDTO, "id">) => api.post<CurrencyDTO>("/currencies", data).then((res) => res.data),
   update: (id: number, data: Omit<CurrencyDTO, "id">) =>
     api.put<CurrencyDTO>(`/currencies/${id}`, data).then((res) => res.data),
-  getTree: (year: number) =>
-    api.get<CurrencyTreeDTO[]>("/currencies/tree", { params: { year } }).then((res) => res.data),
+  getTree: (year: number, showDisabled: boolean) =>
+    api.get<CurrencyTreeDTO[]>("/currencies/tree", { params: { year, showDisabled } }).then((res) => res.data),
 };

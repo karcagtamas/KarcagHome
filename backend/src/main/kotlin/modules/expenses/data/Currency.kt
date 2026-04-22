@@ -7,4 +7,5 @@ data class Currency(
     val name: String,
     val abbreviation: String,
     val createdAt: Instant,
+    val disabled: Boolean,
 )

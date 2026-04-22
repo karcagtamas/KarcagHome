@@ -4,9 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CurrencyTreeDTO(
-    val currencyId: Long,
-    val currencyName: String,
-    val currencyAbbreviation: String,
+    val data: CurrencyDTO,
     val months: List<MonthNode>
 )
 

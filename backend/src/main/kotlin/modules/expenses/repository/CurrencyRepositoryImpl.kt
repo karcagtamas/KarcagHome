@@ -69,12 +69,14 @@ class CurrencyRepositoryImpl : CurrencyRepository {
                     name = it[from[CurrenciesTable.name]],
                     abbreviation = it[from[CurrenciesTable.abbreviation]],
                     createdAt = it[from[CurrenciesTable.createdAt]],
+                    disabled = it[from[CurrenciesTable.disabled]],
                 )
                 val toCurrency = Currency(
                     id = it[to[CurrenciesTable.id]],
                     name = it[to[CurrenciesTable.name]],
                     abbreviation = it[to[CurrenciesTable.abbreviation]],
                     createdAt = it[to[CurrenciesTable.createdAt]],
+                    disabled = it[to[CurrenciesTable.disabled]],
                 )
                 it.toExchange(fromCurrency, toCurrency)
             }

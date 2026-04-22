@@ -11,6 +11,7 @@ fun ResultRow.toCurrency(): Currency = Currency(
     name = this[CurrenciesTable.name],
     abbreviation = this[CurrenciesTable.abbreviation],
     createdAt = this[CurrenciesTable.createdAt],
+    disabled = this[CurrenciesTable.disabled],
 )
 
 fun ResultRow.toExchange(currencyFrom: Currency, currencyTo: Currency): CurrencyMonthlyExchange =
@@ -60,6 +61,7 @@ fun Currency.toDTO(): CurrencyDTO = CurrencyDTO(
     id = this.id,
     name = this.name,
     abbreviation = this.abbreviation,
+    disabled = this.disabled,
 )
 
 fun Account.toDTO(): AccountDTO = AccountDTO(

@@ -1,4 +1,4 @@
-import { Button, Dropdown, Option } from "@fluentui/react-components";
+import { Button, Dropdown, Label, Option, Switch } from "@fluentui/react-components";
 import { PageFrame } from "../../../components/common/PageFrame";
 import { PageHeader } from "../../../components/common/PageHeader";
 import { AddRegular } from "@fluentui/react-icons";
@@ -13,11 +13,12 @@ import { CurrencyTable } from "../components/CurrencyTable";
 
 export const CurrenciesPage: React.FC = () => {
   const queryClient = useQueryClient();
+  const [showDisabled, setShowDisabled] = useState(false);
   const [year, setYear] = useState(new Date().getFullYear());
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<CurrencyDTO | null>(null);
 
-  const { data, isLoading } = useCurrencyTree(year);
+  const { data, isLoading } = useCurrencyTree(year, showDisabled);
 
   const createMutation = useMutation({
     mutationFn: currencyApi.create,
@@ -43,8 +44,6 @@ export const CurrenciesPage: React.FC = () => {
     setDialogOpen(true);
   };
 
-  const handleRemove = (currency: CurrencyDTO) => {}
-
   const loading = createMutation.isPending || updateMutation.isPending;
 
   const handleSubmit = async (data: Omit<CurrencyDTO, "id">, id: number | undefined) => {
@@ -61,6 +60,12 @@ export const CurrenciesPage: React.FC = () => {
         title={"Currencies"}
         actions={
           <>
+            <Label htmlFor="show-disabled-toggle">Show Disabled</Label>
+            <Switch
+              id="show-disabled-toggle"
+              checked={showDisabled}
+              onChange={(_, data) => setShowDisabled(data.checked)}
+            />
             <Dropdown value={year.toString()} onOptionSelect={(_, data) => setYear(Number(data.optionValue))}>
               {[2023, 2024, 2025, 2026].map((y) => (
                 <Option key={y} value={y.toString()} text={y.toString()}>
@@ -73,7 +78,7 @@ export const CurrenciesPage: React.FC = () => {
         }
       ></PageHeader>
 
-      {isLoading ? <div>Loading...</div> : <CurrencyTable data={data} onEdit={handleEdit} onRemove={handleRemove} />}
+      {isLoading ? <div>Loading...</div> : <CurrencyTable data={data} onEdit={handleEdit} />}
 
       <CurrencyDialog
         open={dialogOpen}

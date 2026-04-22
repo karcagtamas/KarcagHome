@@ -2,6 +2,7 @@ export interface CurrencyDTO {
   id: number;
   name: string;
   abbreviation: string;
+  disabled: boolean;
 }
 
 export interface RateNode {
@@ -17,8 +18,6 @@ export interface MonthNode {
 }
 
 export interface CurrencyTreeDTO {
-  currencyId: number;
-  currencyName: string;
-  currencyAbbreviation: string;
+  data: CurrencyDTO;
   months: MonthNode[];
 }

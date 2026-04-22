@@ -7,4 +7,5 @@ data class CurrencyDTO(
     val id: Long,
     val name: String,
     val abbreviation: String,
+    val disabled: Boolean,
 )

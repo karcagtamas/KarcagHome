@@ -8,6 +8,7 @@ object CurrenciesTable : Table("currencies") {
     val name = varchar("name", 240)
     val abbreviation = varchar("abbreviation", 12)
     val createdAt = timestamp("created_at")
+    val disabled = bool("disabled").default(false)
 
     override val primaryKey = PrimaryKey(id)
 }

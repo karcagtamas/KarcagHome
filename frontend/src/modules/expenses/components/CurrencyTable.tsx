@@ -10,14 +10,15 @@ import {
   TableRow,
 } from "@fluentui/react-components";
 import React from "react";
-import { ChevronDownRegular, ChevronRightRegular, EditRegular } from "@fluentui/react-icons";
+import { AddRegular, ChevronDownRegular, ChevronRightRegular, EditRegular } from "@fluentui/react-icons";
 
 type Props = {
   data?: CurrencyTreeDTO[];
   onEdit: (data: CurrencyDTO) => void;
+  onAddExchange: (data: CurrencyDTO) => void;
 };
 
-export const CurrencyTable: React.FC<Props> = ({ data = [], onEdit }) => {
+export const CurrencyTable: React.FC<Props> = ({ data = [], onEdit, onAddExchange }) => {
   const [expanded, setExpanded] = useState<Record<number, boolean>>({});
   const toggle = (id: number) => {
     setExpanded((prev) => ({
@@ -28,6 +29,12 @@ export const CurrencyTable: React.FC<Props> = ({ data = [], onEdit }) => {
 
   const handleEdit = (currency: CurrencyTreeDTO) => {
     onEdit({
+      ...currency.data,
+    });
+  };
+
+  const handleAddExchange = (currency: CurrencyTreeDTO) => {
+    onAddExchange({
       ...currency.data,
     });
   };
@@ -63,6 +70,13 @@ export const CurrencyTable: React.FC<Props> = ({ data = [], onEdit }) => {
                   icon={<EditRegular />}
                   appearance="subtle"
                   onClick={() => handleEdit(currency)}
+                  disabled={currency.data.disabled}
+                />
+
+                <Button
+                  icon={<AddRegular />}
+                  appearance="subtle"
+                  onClick={() => handleAddExchange(currency)}
                   disabled={currency.data.disabled}
                 />
               </TableCell>

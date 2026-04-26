@@ -5,6 +5,14 @@ export interface CurrencyDTO {
   disabled: boolean;
 }
 
+export interface CurrencyExchangeDTO {
+  currencyFromId: number;
+  currencyToId: number;
+  year: number;
+  month: number;
+  value: number;
+}
+
 export interface RateNode {
   currencyToId: number;
   currencyToName: string;

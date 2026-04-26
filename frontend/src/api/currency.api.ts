@@ -1,4 +1,4 @@
-import type { CurrencyDTO, CurrencyTreeDTO } from "../modules/expenses/models/currency";
+import type { CurrencyDTO, CurrencyExchangeDTO, CurrencyTreeDTO } from "../modules/expenses/models/currency";
 import { api } from "./client";
 
 export const currencyApi = {
@@ -9,4 +9,6 @@ export const currencyApi = {
     api.put<CurrencyDTO>(`/currencies/${id}`, data).then((res) => res.data),
   getTree: (year: number, showDisabled: boolean) =>
     api.get<CurrencyTreeDTO[]>("/currencies/tree", { params: { year, showDisabled } }).then((res) => res.data),
+  saveExchange: (data: CurrencyExchangeDTO) =>
+    api.post<CurrencyExchangeDTO>(`/currencies/exchanges`, data).then((res) => res.data),
 };

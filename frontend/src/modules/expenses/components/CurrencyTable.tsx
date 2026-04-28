@@ -11,6 +11,7 @@ import {
 } from "@fluentui/react-components";
 import React from "react";
 import { AddRegular, ChevronDownRegular, ChevronRightRegular, EditRegular } from "@fluentui/react-icons";
+import { MONTHS } from "../../../common/month";
 
 type Props = {
   data?: CurrencyTreeDTO[];
@@ -87,8 +88,8 @@ export const CurrencyTable: React.FC<Props> = ({ data = [], onEdit, onAddExchang
                 <React.Fragment key={month.month}>
                   <TableRow>
                     <TableCell />
-                    <TableCell>Month {month.month}</TableCell>
-                    <TableCell />
+                    <TableCell>{Object.values(MONTHS).find(m => m.value === month.month)?.displayText}</TableCell>
+                    <TableCell>1 {currency.data.name} [{currency.data.abbreviation}]</TableCell>
                   </TableRow>
 
                   {month.rates.map((rate) => (
@@ -96,7 +97,7 @@ export const CurrencyTable: React.FC<Props> = ({ data = [], onEdit, onAddExchang
                       <TableCell />
                       <TableCell />
                       <TableCell>
-                        {rate.currencyToName}: {rate.value}
+                        {rate.value} {rate.currencyToName} [{rate.currencyToAbbreviation}]
                       </TableCell>
                       <TableCell />
                     </TableRow>

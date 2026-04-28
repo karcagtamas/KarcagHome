@@ -3,7 +3,7 @@ import { PageFrame } from "../../../components/common/PageFrame";
 import { PageHeader } from "../../../components/common/PageHeader";
 import { AddRegular } from "@fluentui/react-icons";
 import { useState } from "react";
-import type { CurrencyDTO, CurrencyExchangeDTO } from "../models/currency";
+import type { CurrencyDTO, CurrencyExchangeDTO, MonthNode, RateNode } from "../models/currency";
 import { CurrencyDialog } from "../dialogs/CurrencyDialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { currencyApi } from "../../../api/currency.api";
@@ -38,8 +38,25 @@ export const CurrenciesPage: React.FC = () => {
     },
   });
 
-  const saveExchangeMutation = useMutation({
+  const exchangeSaveMutation = useMutation({
     mutationFn: currencyApi.saveExchange,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: currencyKeys.all });
+    },
+  });
+
+  const exchangeRemoveMutation = useMutation({
+    mutationFn: ({
+      currencyFromId,
+      currencyToId,
+      year,
+      month,
+    }: {
+      currencyFromId: number;
+      currencyToId: number;
+      year: number;
+      month: number;
+    }) => currencyApi.deleteExchange(currencyFromId, currencyToId, year, month),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: currencyKeys.all });
     },
@@ -55,13 +72,25 @@ export const CurrenciesPage: React.FC = () => {
     setCurrencyDialogOpen(true);
   };
 
-  const handleAddExchange = (currency: CurrencyDTO) => {
+  const handleExchangeAdd = (currency: CurrencyDTO) => {
     setSelectedCurrency(currency);
     setSelectedExchange(null);
     setCurrencyExchangeDialogOpen(true);
   };
 
-  const loading = createMutation.isPending || updateMutation.isPending || saveExchangeMutation.isPending;
+  const handleExchangeEdit = (currency: CurrencyDTO, month: MonthNode, rate: RateNode) => {
+    setSelectedCurrency(currency);
+    setSelectedExchange({
+      currencyFromId: currency.id,
+      currencyToId: rate.currencyToId,
+      year: year,
+      month: month.month,
+      value: rate.value,
+    });
+    setCurrencyExchangeDialogOpen(true);
+  };
+
+  const loading = createMutation.isPending || updateMutation.isPending || exchangeSaveMutation.isPending;
 
   const handleSubmit = async (data: Omit<CurrencyDTO, "id">, id: number | undefined) => {
     if (id) {
@@ -72,7 +101,16 @@ export const CurrenciesPage: React.FC = () => {
   };
 
   const handleExchangeSubmit = async (data: CurrencyExchangeDTO) => {
-    await saveExchangeMutation.mutateAsync(data);
+    await exchangeSaveMutation.mutateAsync(data);
+  };
+
+  const handleExchangeRemove = async (currency: CurrencyDTO, month: MonthNode, rate: RateNode) => {
+    await exchangeRemoveMutation.mutateAsync({
+      currencyFromId: currency.id,
+      currencyToId: rate.currencyToId,
+      year: year,
+      month: month.month,
+    });
   };
 
   return (
@@ -102,7 +140,13 @@ export const CurrenciesPage: React.FC = () => {
       {isLoading ? (
         <div>Loading...</div>
       ) : (
-        <CurrencyTable data={data} onEdit={handleEdit} onAddExchange={handleAddExchange} />
+        <CurrencyTable
+          data={data}
+          onEdit={handleEdit}
+          onExchangeAdd={handleExchangeAdd}
+          onExchangeEdit={handleExchangeEdit}
+          onExchangeRemove={handleExchangeRemove}
+        />
       )}
 
       <CurrencyDialog

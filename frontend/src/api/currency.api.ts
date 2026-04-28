@@ -11,4 +11,6 @@ export const currencyApi = {
     api.get<CurrencyTreeDTO[]>("/currencies/tree", { params: { year, showDisabled } }).then((res) => res.data),
   saveExchange: (data: CurrencyExchangeDTO) =>
     api.post<CurrencyExchangeDTO>(`/currencies/exchanges`, data).then((res) => res.data),
+  deleteExchange: (currencyFromId: number, currencyToId: number, year: number, month: number) =>
+    api.delete("/currencies/exchanges", { params: { currencyFromId, currencyToId, year, month } }),
 };

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { CurrencyDTO, CurrencyTreeDTO } from "../models/currency";
+import type { CurrencyDTO, CurrencyTreeDTO, MonthNode, RateNode } from "../models/currency";
 import {
   Button,
   Table,
@@ -10,16 +10,24 @@ import {
   TableRow,
 } from "@fluentui/react-components";
 import React from "react";
-import { AddRegular, ChevronDownRegular, ChevronRightRegular, EditRegular } from "@fluentui/react-icons";
+import { AddRegular, ChevronDownRegular, ChevronRightRegular, DeleteRegular, EditRegular } from "@fluentui/react-icons";
 import { MONTHS } from "../../../common/month";
 
 type Props = {
   data?: CurrencyTreeDTO[];
   onEdit: (data: CurrencyDTO) => void;
-  onAddExchange: (data: CurrencyDTO) => void;
+  onExchangeAdd: (data: CurrencyDTO) => void;
+  onExchangeEdit: (currency: CurrencyDTO, month: MonthNode, rate: RateNode) => void;
+  onExchangeRemove: (currency: CurrencyDTO, month: MonthNode, rate: RateNode) => void;
 };
 
-export const CurrencyTable: React.FC<Props> = ({ data = [], onEdit, onAddExchange }) => {
+export const CurrencyTable: React.FC<Props> = ({
+  data = [],
+  onEdit,
+  onExchangeAdd,
+  onExchangeEdit,
+  onExchangeRemove,
+}) => {
   const [expanded, setExpanded] = useState<Record<number, boolean>>({});
   const toggle = (id: number) => {
     setExpanded((prev) => ({
@@ -34,10 +42,18 @@ export const CurrencyTable: React.FC<Props> = ({ data = [], onEdit, onAddExchang
     });
   };
 
-  const handleAddExchange = (currency: CurrencyTreeDTO) => {
-    onAddExchange({
+  const handleExchangeAdd = (currency: CurrencyTreeDTO) => {
+    onExchangeAdd({
       ...currency.data,
     });
+  };
+
+  const handleExchangeEdit = (currency: CurrencyDTO, month: MonthNode, rate: RateNode) => {
+    onExchangeEdit(currency, month, rate);
+  };
+
+  const handleExchangeRemove = (currency: CurrencyDTO, month: MonthNode, rate: RateNode) => {
+    onExchangeRemove(currency, month, rate);
   };
 
   return (
@@ -77,7 +93,7 @@ export const CurrencyTable: React.FC<Props> = ({ data = [], onEdit, onAddExchang
                 <Button
                   icon={<AddRegular />}
                   appearance="subtle"
-                  onClick={() => handleAddExchange(currency)}
+                  onClick={() => handleExchangeAdd(currency)}
                   disabled={currency.data.disabled}
                 />
               </TableCell>
@@ -88,8 +104,10 @@ export const CurrencyTable: React.FC<Props> = ({ data = [], onEdit, onAddExchang
                 <React.Fragment key={month.month}>
                   <TableRow>
                     <TableCell />
-                    <TableCell>{Object.values(MONTHS).find(m => m.value === month.month)?.displayText}</TableCell>
-                    <TableCell>1 {currency.data.name} [{currency.data.abbreviation}]</TableCell>
+                    <TableCell>{Object.values(MONTHS).find((m) => m.value === month.month)?.displayText}</TableCell>
+                    <TableCell>
+                      1 {currency.data.name} [{currency.data.abbreviation}]
+                    </TableCell>
                   </TableRow>
 
                   {month.rates.map((rate) => (
@@ -99,7 +117,20 @@ export const CurrencyTable: React.FC<Props> = ({ data = [], onEdit, onAddExchang
                       <TableCell>
                         {rate.value} {rate.currencyToName} [{rate.currencyToAbbreviation}]
                       </TableCell>
-                      <TableCell />
+                      <TableCell>
+                        <Button
+                          icon={<EditRegular />}
+                          appearance="subtle"
+                          onClick={() => handleExchangeEdit(currency.data, month, rate)}
+                          disabled={currency.data.disabled}
+                        />
+                        <Button
+                          icon={<DeleteRegular />}
+                          appearance="subtle"
+                          onClick={() => handleExchangeRemove(currency.data, month, rate)}
+                          disabled={currency.data.disabled}
+                        />
+                      </TableCell>
                     </TableRow>
                   ))}
                 </React.Fragment>

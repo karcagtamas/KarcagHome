@@ -2,10 +2,12 @@ package modules.expenses.routes
 
 import core.idLong
 import core.requireAndSend
+import core.sendDeleted
 import dto.expenses.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.util.getOrFail
 import modules.expenses.data.CurrenciesTable
 import modules.expenses.data.CurrencyMonthlyExchangesTable
 import modules.expenses.data.toDTO
@@ -45,7 +47,7 @@ fun Route.currencyRoutes(repository: CurrencyRepository) {
         }
 
         get("/tree") {
-            val year = call.queryParameters["year"]?.toIntOrNull() ?: 0
+            val year = call.queryParameters.getOrFail<Int>("year")
             val showDisabled = call.queryParameters["showDisabled"]?.toBoolean() ?: false
             val tree = transaction {
                 val from = CurrenciesTable.alias("from")
@@ -142,6 +144,15 @@ fun Route.currencyRoutes(repository: CurrencyRepository) {
                 ) {
                     it.toDTO()
                 }
+            }
+
+            delete {
+                val currencyFromId = call.queryParameters.getOrFail<Long>("currencyFromId")
+                val currencyToId = call.queryParameters.getOrFail<Long>("currencyToId")
+                val year = call.queryParameters.getOrFail<Int>("year")
+                val month = call.queryParameters.getOrFail<Int>("month")
+
+                call.sendDeleted(repository.deleteExchange(currencyFromId, currencyToId, year, month))
             }
         }
     }

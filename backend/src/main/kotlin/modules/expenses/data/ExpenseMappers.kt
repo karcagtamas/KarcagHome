@@ -2,6 +2,7 @@ package modules.expenses.data
 
 import dto.expenses.AccountDTO
 import dto.expenses.CurrencyDTO
+import dto.expenses.CurrencyExchangeDTO
 import dto.expenses.ExpenseCategoryDTO
 import dto.expenses.ExpenseDTO
 import org.jetbrains.exposed.v1.core.ResultRow
@@ -62,6 +63,14 @@ fun Currency.toDTO(): CurrencyDTO = CurrencyDTO(
     name = this.name,
     abbreviation = this.abbreviation,
     disabled = this.disabled,
+)
+
+fun CurrencyMonthlyExchange.toDTO(): CurrencyExchangeDTO = CurrencyExchangeDTO(
+    currencyFromId = this.currencyFrom.id,
+    currencyToId = this.currencyTo.id,
+    year = this.year,
+    month = this.month,
+    value = this.value,
 )
 
 fun Account.toDTO(): AccountDTO = AccountDTO(

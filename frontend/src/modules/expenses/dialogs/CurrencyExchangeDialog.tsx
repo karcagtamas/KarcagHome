@@ -78,6 +78,8 @@ export const CurrencyExchangeDialog: React.FC<Props> = ({
       month,
       value: parsedValue,
     });
+
+    onClose();
   };
 
   return (

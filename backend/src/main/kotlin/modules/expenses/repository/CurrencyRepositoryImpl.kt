@@ -6,9 +6,14 @@ import modules.expenses.data.CurrencyMonthlyExchange
 import modules.expenses.data.CurrencyMonthlyExchangesTable
 import modules.expenses.data.toCurrency
 import modules.expenses.data.toExchange
+import org.jetbrains.exposed.v1.core.Alias
 import org.jetbrains.exposed.v1.core.JoinType
+import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.alias
 import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.jdbc.Query
+import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -51,19 +56,78 @@ class CurrencyRepositoryImpl : CurrencyRepository {
         getCurrencyById(id)
     }
 
-    override fun getYearlyExchangeRates(year: Int): List<CurrencyMonthlyExchange> = transaction {
-        val from = CurrenciesTable.alias("from")
-        val to = CurrenciesTable.alias("to")
+    override fun getYearlyExchangeRates(year: Int): List<CurrencyMonthlyExchange> =
+        getFullExchangeQuery { _, _, mapper ->
+            this.where { CurrencyMonthlyExchangesTable.year eq year }
+                .map {
+                    mapper(it)
+                }
+        }
 
-        CurrencyMonthlyExchangesTable
-            .join(from, JoinType.INNER) {
-                CurrencyMonthlyExchangesTable.currencyFromId eq from[CurrenciesTable.id]
-            }.join(to, JoinType.INNER) {
-                CurrencyMonthlyExchangesTable.currencyToId eq to[CurrenciesTable.id]
+    override fun getExchange(
+        currencyFromId: Long,
+        currencyToId: Long,
+        year: Int,
+        month: Int
+    ): CurrencyMonthlyExchange? = getFullExchangeQuery { _, _, mapper ->
+        this.where {
+            (CurrencyMonthlyExchangesTable.currencyFromId eq currencyFromId) and
+                    (CurrencyMonthlyExchangesTable.currencyToId eq currencyToId) and
+                    (CurrencyMonthlyExchangesTable.year eq year) and
+                    (CurrencyMonthlyExchangesTable.month eq month)
+        }
+            .singleOrNull()
+            ?.let {
+                mapper(it)
             }
-            .selectAll()
-            .where { CurrencyMonthlyExchangesTable.year eq year }
-            .map {
+    }
+
+    override fun saveExchange(
+        currencyFromId: Long,
+        currencyToId: Long,
+        year: Int,
+        month: Int,
+        value: Double
+    ): CurrencyMonthlyExchange = transaction {
+        CurrencyMonthlyExchangesTable.insert {
+            it[CurrencyMonthlyExchangesTable.currencyFromId] = currencyFromId
+            it[CurrencyMonthlyExchangesTable.currencyToId] = currencyToId
+            it[CurrencyMonthlyExchangesTable.year] = year
+            it[CurrencyMonthlyExchangesTable.month] = month
+            it[CurrencyMonthlyExchangesTable.value] = value
+        }
+
+        getExchange(currencyFromId, currencyToId, year, month)!!
+    }
+
+    override fun deleteExchange(
+        currencyFromId: Long,
+        currencyToId: Long,
+        year: Int,
+        month: Int
+    ): Boolean = transaction {
+        CurrencyMonthlyExchangesTable.deleteWhere {
+            (CurrencyMonthlyExchangesTable.currencyFromId eq currencyFromId) and
+                    (CurrencyMonthlyExchangesTable.currencyToId eq currencyToId) and
+                    (CurrencyMonthlyExchangesTable.year eq year) and
+                    (CurrencyMonthlyExchangesTable.month eq month)
+        } > 0
+    }
+
+    private fun <T> getFullExchangeQuery(fn: Query.(from: Alias<CurrenciesTable>, to: Alias<CurrenciesTable>, mapper: (row: ResultRow) -> CurrencyMonthlyExchange) -> T): T =
+        transaction {
+            val from = CurrenciesTable.alias("from")
+            val to = CurrenciesTable.alias("to")
+
+            val query = CurrencyMonthlyExchangesTable
+                .join(from, JoinType.INNER) {
+                    CurrencyMonthlyExchangesTable.currencyFromId eq from[CurrenciesTable.id]
+                }.join(to, JoinType.INNER) {
+                    CurrencyMonthlyExchangesTable.currencyToId eq to[CurrenciesTable.id]
+                }
+                .selectAll()
+
+            fn(query, from, to) {
                 val fromCurrency = Currency(
                     id = it[from[CurrenciesTable.id]],
                     name = it[from[CurrenciesTable.name]],
@@ -80,5 +144,5 @@ class CurrencyRepositoryImpl : CurrencyRepository {
                 )
                 it.toExchange(fromCurrency, toCurrency)
             }
-    }
+        }
 }

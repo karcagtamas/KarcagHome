@@ -126,5 +126,23 @@ fun Route.currencyRoutes(repository: CurrencyRepository) {
             }
             call.respond(tree)
         }
+
+        route("/exchanges") {
+            post {
+                val body = call.receive<CurrencyExchangeDTO>()
+                repository.deleteExchange(body.currencyFromId, body.currencyToId, body.year, body.month)
+                call.requireAndSend(
+                    repository.saveExchange(
+                        body.currencyFromId,
+                        body.currencyToId,
+                        body.year,
+                        body.month,
+                        body.value
+                    )
+                ) {
+                    it.toDTO()
+                }
+            }
+        }
     }
 }

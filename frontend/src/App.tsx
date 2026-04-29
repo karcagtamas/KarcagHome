@@ -1,22 +1,13 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { HomePage } from './pages/HomePage';
-import {
-  Dropdown,
-  Option,
-  FluentProvider,
-  makeStyles,
-  tokens,
-  webDarkTheme,
-  webLightTheme,
-} from '@fluentui/react-components';
+import { Dropdown, Option, FluentProvider, makeStyles, tokens } from '@fluentui/react-components';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ExpensesPage } from './modules/expenses/pages/ExpensesPage';
 import { CurrenciesPage } from './modules/expenses/pages/CurrenciesPage';
 import { MeasurementPage } from './modules/measurements/pages/MeasurementPage';
 import { AppBar } from './components/common/AppBar';
-import { useState } from 'react';
-
-type ThemeMode = 'light' | 'dark';
+import { useEffect, useState } from 'react';
+import { getInitialTheme, THEME_STORAGE_KEY, THEMES, type ThemeKey } from './common/theme';
 
 const useStyles = makeStyles({
   provider: {
@@ -36,12 +27,15 @@ const useStyles = makeStyles({
 function App() {
   const styles = useStyles();
 
-  const [themeMode, setThemeMode] = useState<ThemeMode>('light');
+  const [themeKey, setThemeKey] = useState<ThemeKey>(getInitialTheme());
+  const current = THEMES[themeKey];
 
-  const theme = themeMode === 'dark' ? webDarkTheme : webLightTheme;
+  useEffect(() => {
+    localStorage.setItem(THEME_STORAGE_KEY, themeKey);
+  }, [themeKey]);
 
   return (
-    <FluentProvider className={styles.provider} theme={theme}>
+    <FluentProvider className={styles.provider} theme={current.theme}>
       <QueryClientProvider client={new QueryClient()}>
         <BrowserRouter>
           <div className={styles.frame}>
@@ -50,14 +44,17 @@ function App() {
               route="/"
               right={
                 <Dropdown
-                  value={themeMode === 'dark' ? 'Dark' : 'Light'}
-                  selectedOptions={[themeMode]}
+                  value={current.caption}
+                  selectedOptions={[themeKey]}
                   onOptionSelect={(_, data) => {
-                    setThemeMode(data.optionValue as ThemeMode);
+                    setThemeKey(data.optionValue as ThemeKey);
                   }}
                 >
-                  <Option value="light">Light</Option>
-                  <Option value="dark">Dark</Option>
+                  {Object.entries(THEMES).map(([key, value]) => (
+                    <Option key={key} value={key}>
+                      {value.caption}
+                    </Option>
+                  ))}
                 </Dropdown>
               }
             ></AppBar>

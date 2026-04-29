@@ -1,17 +1,18 @@
-import { Button, Dropdown, Label, Option, Switch } from "@fluentui/react-components";
-import { PageFrame } from "../../../components/common/PageFrame";
-import { PageHeader } from "../../../components/common/PageHeader";
-import { AddRegular } from "@fluentui/react-icons";
-import { useState } from "react";
-import type { CurrencyDTO, CurrencyExchangeDTO, MonthNode, RateNode } from "../models/currency";
-import { CurrencyDialog } from "../dialogs/CurrencyDialog";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { currencyApi } from "../../../api/currency.api";
-import { currencyKeys } from "../../../keys/currencyKeys";
-import { useCurrencyTree } from "../../../hooks/useCurrencyTree";
-import { CurrencyTable } from "../components/CurrencyTable";
-import { CurrencyExchangeDialog } from "../dialogs/CurrencyExchangeDialog";
-import { MONTHS } from "../../../common/month";
+import { Button, Dropdown, Label, Option, Switch } from '@fluentui/react-components';
+import { PageFrame } from '../../../components/common/PageFrame';
+import { PageHeader } from '../../../components/common/PageHeader';
+import { AddRegular } from '@fluentui/react-icons';
+import { useState } from 'react';
+import type { CurrencyDTO, CurrencyExchangeDTO, MonthNode, RateNode } from '../models/currency';
+import { CurrencyDialog } from '../dialogs/CurrencyDialog';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { currencyApi } from '../../../api/currency.api';
+import { currencyKeys } from '../../../keys/currencyKeys';
+import { useCurrencyTree } from '../../../hooks/useCurrencyTree';
+import { CurrencyTable } from '../components/CurrencyTable';
+import { CurrencyExchangeDialog } from '../dialogs/CurrencyExchangeDialog';
+import { MONTHS } from '../../../common/month';
+import { LoadingBox } from '../../../components/common/LoadingBox';
 
 export const CurrenciesPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -32,7 +33,7 @@ export const CurrenciesPage: React.FC = () => {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: Omit<CurrencyDTO, "id"> }) => currencyApi.update(id, data),
+    mutationFn: ({ id, data }: { id: number; data: Omit<CurrencyDTO, 'id'> }) => currencyApi.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: currencyKeys.all });
     },
@@ -92,7 +93,7 @@ export const CurrenciesPage: React.FC = () => {
 
   const loading = createMutation.isPending || updateMutation.isPending || exchangeSaveMutation.isPending;
 
-  const handleSubmit = async (data: Omit<CurrencyDTO, "id">, id: number | undefined) => {
+  const handleSubmit = async (data: Omit<CurrencyDTO, 'id'>, id: number | undefined) => {
     if (id) {
       await updateMutation.mutateAsync({ id, data });
     } else {
@@ -116,7 +117,7 @@ export const CurrenciesPage: React.FC = () => {
   return (
     <PageFrame>
       <PageHeader
-        title={"Currencies"}
+        title={'Currencies'}
         actions={
           <>
             <Label htmlFor="show-disabled-toggle">Show Disabled</Label>
@@ -137,9 +138,7 @@ export const CurrenciesPage: React.FC = () => {
         }
       ></PageHeader>
 
-      {isLoading ? (
-        <div>Loading...</div>
-      ) : (
+      <LoadingBox isLoading={isLoading}>
         <CurrencyTable
           data={data}
           onEdit={handleEdit}
@@ -147,7 +146,7 @@ export const CurrenciesPage: React.FC = () => {
           onExchangeEdit={handleExchangeEdit}
           onExchangeRemove={handleExchangeRemove}
         />
-      )}
+      </LoadingBox>
 
       <CurrencyDialog
         open={currencyDialogOpen}

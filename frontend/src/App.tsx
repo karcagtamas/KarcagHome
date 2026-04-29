@@ -8,6 +8,7 @@ import { MeasurementPage } from './modules/measurements/pages/MeasurementPage';
 import { AppBar } from './components/common/AppBar';
 import { useEffect, useState } from 'react';
 import { getInitialTheme, THEME_STORAGE_KEY, THEMES, type ThemeKey } from './common/theme';
+import { AccountsPage } from './modules/expenses/pages/AccountsPage';
 
 const useStyles = makeStyles({
   provider: {
@@ -64,6 +65,7 @@ function App() {
               <Route path="/measurements" element={<MeasurementPage />} />
               <Route path="/tasks" element={<MeasurementPage />} />
               <Route path="/expenses" element={<ExpensesPage />} />
+              <Route path="/accounts" element={<AccountsPage />} />
               <Route path="/currencies" element={<CurrenciesPage />} />
             </Routes>
           </div>

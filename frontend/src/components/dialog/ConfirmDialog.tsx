@@ -1,13 +1,6 @@
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogBody,
-  DialogContent,
-  DialogSurface,
-  DialogTitle,
-  Spinner,
-} from "@fluentui/react-components";
+import { Button, Checkbox, Spinner, type CheckboxProps } from '@fluentui/react-components';
+import { AppDialog } from './AppDialog';
+import { useState } from 'react';
 
 type Props = {
   open: boolean;
@@ -18,6 +11,7 @@ type Props = {
   cancelText?: string;
 
   danger?: boolean;
+  checkbox?: boolean;
   loading?: boolean;
 
   onConfirm: () => Promise<void> | void;
@@ -28,44 +22,55 @@ export const ConfirmDialog: React.FC<Props> = ({
   open,
   title,
   message,
-  confirmText = "Confirm",
-  cancelText = "Cancel",
+  confirmText = 'Confirm',
+  cancelText = 'Cancel',
   danger = false,
+  checkbox = false,
   loading = false,
   onConfirm,
   onClose,
 }) => {
+  const [checkboxConfirmed, setCheckboxConfirmed] = useState<CheckboxProps["checked"]>(false);
+
+  const isCheckboxConfirmed = checkbox && checkboxConfirmed === true;
+
   const handleConfirm = async () => {
     if (loading) return;
     await onConfirm();
   };
 
   return (
-    <Dialog
+    <AppDialog
       open={open}
-      onOpenChange={(_, data) => {
-        if (!data.open && !loading) {
-          onClose();
-        }
-      }}
+      onOpenChange={(o) => !o && !loading && isCheckboxConfirmed && onClose()}
+      footer={
+        <>
+          {checkbox ? (
+            <Checkbox
+              checked={checkboxConfirmed}
+              onChange={(_, data) => setCheckboxConfirmed(data.checked)}
+              label="Are you sure want to confirm it?"
+              labelPosition='after'
+            />
+          ) : (
+            <></>
+          )}
+          <Button appearance="secondary" onClick={onClose} disabled={loading && !isCheckboxConfirmed}>
+            {cancelText}
+          </Button>
+
+          <Button
+            appearance={danger ? 'primary' : 'secondary'}
+            onClick={handleConfirm}
+            disabled={loading && !isCheckboxConfirmed}
+          >
+            {loading ? <Spinner size="tiny" /> : confirmText}
+          </Button>
+        </>
+      }
+      title={title}
     >
-      <DialogSurface>
-        <DialogBody>
-          <DialogTitle>{title}</DialogTitle>
-
-          <DialogContent>{message}</DialogContent>
-
-          <DialogActions>
-            <Button appearance="secondary" onClick={onClose} disabled={loading}>
-              {cancelText}
-            </Button>
-
-            <Button appearance={danger ? "primary" : "secondary"} onClick={handleConfirm} disabled={loading}>
-              {loading ? <Spinner size="tiny" /> : confirmText}
-            </Button>
-          </DialogActions>
-        </DialogBody>
-      </DialogSurface>
-    </Dialog>
+      {message}
+    </AppDialog>
   );
 };

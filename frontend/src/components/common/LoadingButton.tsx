@@ -9,7 +9,9 @@ type Props = {
 };
 
 export const LoadingButton: React.FC<Props> = ({ isLoading, children, disabled, onClick, appearance }) => {
-  <Button appearance={appearance} onClick={onClick} disabled={disabled}>
-    {isLoading ? <Spinner size="tiny" /> : { children }}
-  </Button>;
+  return (
+    <Button appearance={appearance} onClick={onClick} disabled={disabled}>
+      {isLoading ? <Spinner size="tiny" /> : children}
+    </Button>
+  );
 };

@@ -91,7 +91,11 @@ export const CurrenciesPage: React.FC = () => {
     setCurrencyExchangeDialogOpen(true);
   };
 
-  const loading = createMutation.isPending || updateMutation.isPending || exchangeSaveMutation.isPending;
+  const apiLoading =
+    createMutation.isPending ||
+    updateMutation.isPending ||
+    exchangeSaveMutation.isPending ||
+    exchangeRemoveMutation.isPending;
 
   const handleSubmit = async (data: Omit<CurrencyDTO, 'id'>, id: number | undefined) => {
     if (id) {
@@ -153,7 +157,7 @@ export const CurrenciesPage: React.FC = () => {
         currency={selectedCurrency}
         onClose={() => setCurrencyDialogOpen(false)}
         onSubmit={handleSubmit}
-        loading={loading}
+        loading={apiLoading}
       />
 
       <CurrencyExchangeEditDialog
@@ -162,7 +166,7 @@ export const CurrenciesPage: React.FC = () => {
         year={year}
         defaultCurrencyFromId={selectedCurrency?.id}
         defaultMonth={MONTHS.january.value}
-        loading={loading}
+        loading={apiLoading}
         onClose={() => setCurrencyExchangeDialogOpen(false)}
         onSubmit={handleExchangeSubmit}
       />

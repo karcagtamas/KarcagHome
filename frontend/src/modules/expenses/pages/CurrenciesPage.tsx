@@ -4,13 +4,13 @@ import { PageHeader } from '../../../components/common/PageHeader';
 import { AddRegular } from '@fluentui/react-icons';
 import { useState } from 'react';
 import type { CurrencyDTO, CurrencyExchangeDTO, MonthNode, RateNode } from '../models/currency';
-import { CurrencyDialog } from '../dialogs/CurrencyDialog';
+import { CurrencyEditDialog } from '../dialogs/CurrencyEditDialog';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { currencyApi } from '../../../api/currency.api';
 import { currencyKeys } from '../../../keys/currencyKeys';
 import { useCurrencyTree } from '../../../hooks/useCurrencyTree';
 import { CurrencyTable } from '../components/CurrencyTable';
-import { CurrencyExchangeDialog } from '../dialogs/CurrencyExchangeDialog';
+import { CurrencyExchangeEditDialog } from '../dialogs/CurrencyExchangeEditDialog';
 import { MONTHS } from '../../../common/month';
 import { LoadingBox } from '../../../components/common/LoadingBox';
 
@@ -148,7 +148,7 @@ export const CurrenciesPage: React.FC = () => {
         />
       </LoadingBox>
 
-      <CurrencyDialog
+      <CurrencyEditDialog
         open={currencyDialogOpen}
         currency={selectedCurrency}
         onClose={() => setCurrencyDialogOpen(false)}
@@ -156,7 +156,7 @@ export const CurrenciesPage: React.FC = () => {
         loading={loading}
       />
 
-      <CurrencyExchangeDialog
+      <CurrencyExchangeEditDialog
         open={currencyExchangeDialogOpen}
         exchange={selectedExchange}
         year={year}

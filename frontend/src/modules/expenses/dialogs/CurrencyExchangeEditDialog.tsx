@@ -1,17 +1,17 @@
-import { Button, Dropdown, Field, makeStyles, Spinner, tokens, Option, Input } from "@fluentui/react-components";
-import type { CurrencyExchangeDTO } from "../models/currency";
-import type React from "react";
-import { useEffect, useState } from "react";
-import { AppDialog } from "../../../components/dialog/AppDialog";
-import { MONTHS } from "../../../common/month";
-import { useCurrencies } from "../../../hooks/useCurrencies";
+import { Dropdown, Field, makeStyles, tokens, Option, Input } from '@fluentui/react-components';
+import type { CurrencyExchangeDTO } from '../models/currency';
+import type React from 'react';
+import { useEffect, useState } from 'react';
+import { MONTHS } from '../../../common/month';
+import { useCurrencies } from '../../../hooks/useCurrencies';
+import { EditDialog } from '../../../components/dialog/EditDialog';
 
 const useStyles = makeStyles({
   content: {
-    display: "flex",
-    flexDirection: "column",
+    display: 'flex',
+    flexDirection: 'column',
     gap: tokens.spacingVerticalM,
-    minWidth: "420px",
+    minWidth: '420px',
   },
 });
 
@@ -28,7 +28,7 @@ type Props = {
   onSubmit: (data: CurrencyExchangeDTO) => Promise<void>;
 };
 
-export const CurrencyExchangeDialog: React.FC<Props> = ({
+export const CurrencyExchangeEditDialog: React.FC<Props> = ({
   open,
   exchange,
   year,
@@ -46,7 +46,7 @@ export const CurrencyExchangeDialog: React.FC<Props> = ({
   const [currencyFromId, setCurrencyFromId] = useState<number>();
   const [currencyToId, setCurrencyToId] = useState<number>();
   const [month, setMonth] = useState<number>();
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState('');
 
   useEffect(() => {
     if (!open) return;
@@ -54,7 +54,7 @@ export const CurrencyExchangeDialog: React.FC<Props> = ({
     setCurrencyFromId(exchange?.currencyFromId ?? defaultCurrencyFromId);
     setCurrencyToId(exchange?.currencyToId);
     setMonth(exchange?.month ?? defaultMonth);
-    setValue(exchange?.value?.toString() ?? "");
+    setValue(exchange?.value?.toString() ?? '');
   }, [exchange, open, defaultCurrencyFromId, defaultMonth]);
 
   const parsedValue = Number(value);
@@ -83,25 +83,14 @@ export const CurrencyExchangeDialog: React.FC<Props> = ({
   };
 
   return (
-    <AppDialog
+    <EditDialog
       open={open}
-      onOpenChange={(o) => {
-        if (!o && !loading) {
-          onClose();
-        }
-      }}
-      title={isEdit ? "Edit Exchange Rate" : "Add Exchange Rate"}
-      footer={
-        <>
-          <Button appearance="secondary" onClick={onClose} disabled={loading}>
-            Cancel
-          </Button>
-
-          <Button appearance="primary" onClick={handleSubmit} disabled={!isValid || loading}>
-            {loading ? <Spinner size="tiny" /> : isEdit ? "Save" : "Create"}
-          </Button>
-        </>
-      }
+      title={isEdit ? 'Edit Exchange Rate' : 'Add Exchange Rate'}
+      isEdit={isEdit}
+      isValid={isValid}
+      onClose={onClose}
+      onSubmit={handleSubmit}
+      loading={loading}
     >
       <div className={styles.content}>
         <Field label="From Currency" required>
@@ -163,6 +152,6 @@ export const CurrencyExchangeDialog: React.FC<Props> = ({
           />
         </Field>
       </div>
-    </AppDialog>
+    </EditDialog>
   );
 };

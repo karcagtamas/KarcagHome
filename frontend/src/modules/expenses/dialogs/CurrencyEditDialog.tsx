@@ -1,23 +1,13 @@
-import { useEffect, useState } from "react";
-import type { CurrencyDTO } from "../models/currency";
-import { AppDialog } from "../../../components/dialog/AppDialog";
-import {
-  Button,
-  Field,
-  Input,
-  Label,
-  makeStyles,
-  MessageBar,
-  Spinner,
-  Switch,
-  tokens,
-} from "@fluentui/react-components";
-import { ConfirmDialog } from "../../../components/dialog/ConfirmDialog";
+import { useEffect, useState } from 'react';
+import type { CurrencyDTO } from '../models/currency';
+import { Field, Input, Label, makeStyles, MessageBar, Switch, tokens } from '@fluentui/react-components';
+import { ConfirmDialog } from '../../../components/dialog/ConfirmDialog';
+import { EditDialog } from '../../../components/dialog/EditDialog';
 
 const useStyles = makeStyles({
   switchRow: {
-    display: "flex",
-    alignItems: "center",
+    display: 'flex',
+    alignItems: 'center',
     gap: tokens.spacingHorizontalS,
     marginTop: tokens.spacingVerticalM,
   },
@@ -27,25 +17,25 @@ type Props = {
   open: boolean;
   currency?: CurrencyDTO | null;
   onClose: () => void;
-  onSubmit: (data: Omit<CurrencyDTO, "id">, id?: number) => Promise<void>;
+  onSubmit: (data: Omit<CurrencyDTO, 'id'>, id?: number) => Promise<void>;
   loading?: boolean;
 };
 
-export const CurrencyDialog: React.FC<Props> = ({ open, currency, onClose, onSubmit, loading }) => {
+export const CurrencyEditDialog: React.FC<Props> = ({ open, currency, onClose, onSubmit, loading }) => {
   const styles = useStyles();
 
   const isEdit = !!currency;
 
-  const [name, setName] = useState("");
-  const [abbreviation, setAbbreviation] = useState("");
+  const [name, setName] = useState('');
+  const [abbreviation, setAbbreviation] = useState('');
   const [disabled, setDisabled] = useState(false);
 
   const [confirmDisableOpen, setConfirmDisableOpen] = useState(false);
 
   useEffect(() => {
     if (open) {
-      setName(currency?.name ?? "");
-      setAbbreviation(currency?.abbreviation ?? "");
+      setName(currency?.name ?? '');
+      setAbbreviation(currency?.abbreviation ?? '');
       setDisabled(currency?.disabled ?? false);
     }
   }, [currency, open]);
@@ -60,7 +50,7 @@ export const CurrencyDialog: React.FC<Props> = ({ open, currency, onClose, onSub
 
       onClose();
     } catch (err) {
-      console.error("Save failed", err);
+      console.error('Save failed', err);
     }
   };
 
@@ -79,20 +69,14 @@ export const CurrencyDialog: React.FC<Props> = ({ open, currency, onClose, onSub
 
   return (
     <>
-      <AppDialog
+      <EditDialog
         open={open}
-        onOpenChange={(o) => !o && !loading && onClose()}
-        title={isEdit ? "Edit Currency" : "Create Currency"}
-        footer={
-          <>
-            <Button appearance="secondary" onClick={onClose} disabled={loading}>
-              Cancel
-            </Button>
-            <Button appearance="primary" onClick={handleSubmit} disabled={!isValid || loading}>
-              {loading ? <Spinner size="tiny" /> : isEdit ? "Save" : "Create"}
-            </Button>
-          </>
-        }
+        title={isEdit ? 'Edit Currency' : 'Create Currency'}
+        isEdit={isEdit}
+        isValid={isValid}
+        onClose={onClose}
+        onSubmit={handleSubmit}
+        loading={loading}
       >
         <Field label="Name" required>
           <Input
@@ -133,13 +117,13 @@ export const CurrencyDialog: React.FC<Props> = ({ open, currency, onClose, onSub
             Disabled currencies will be hidden from exchange lists unless "Show Disabled" is enabled.
           </MessageBar>
         )}
-      </AppDialog>
+      </EditDialog>
       <ConfirmDialog
         open={confirmDisableOpen}
         title="Disable Currency"
         message={
           <>
-            Are you sure you want to disable <strong>{name}</strong>?{" "}
+            Are you sure you want to disable <strong>{name}</strong>?{' '}
           </>
         }
         confirmText="Disable"

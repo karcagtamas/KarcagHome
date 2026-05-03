@@ -2,7 +2,7 @@ import { AddRegular, BookmarkRegular, CurrencyDollarEuroRegular } from '@fluentu
 import { PageFrame } from '../../../components/common/PageFrame';
 import { PageHeader } from '../../../components/common/PageHeader';
 import { useAccounts } from '../../../hooks/useAccounts';
-import { Button } from '@fluentui/react-components';
+import { Button, makeStyles } from '@fluentui/react-components';
 import { LoadingBox } from '../../../components/common/LoadingBox';
 import { AccountEditDialog } from '../dialogs/AccountEditDialog';
 import { useState } from 'react';
@@ -11,10 +11,27 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { accountApi } from '../../../api/account.api';
 import { accountKeys } from '../../../keys/accountKeys';
 import { useNavigate } from 'react-router-dom';
+import { AccountTile } from '../components/AccountTile';
+
+const useStyles = makeStyles({
+  accountsBox: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+    gap: '16px',
+    alignItems: 'stretch',
+    padding: '1rem',
+  },
+  accountTile: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+});
 
 export const AccountsPage: React.FC = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const styles = useStyles();
+
   const [accountDialogOpen, setAccountDialogOpen] = useState(false);
   const { data, isLoading } = useAccounts();
 
@@ -46,9 +63,16 @@ export const AccountsPage: React.FC = () => {
       ></PageHeader>
 
       <LoadingBox isLoading={isLoading}>
-        {data?.map((d) => (
-          <div key={d.id}>{d.id}</div>
-        ))}
+        <div className={styles.accountsBox}>
+          {data?.map((account) => (
+            <AccountTile
+              className={styles.accountTile}
+              key={account.id}
+              account={account}
+              onClick={() => navigate(`/accounts/${account.id}`)}
+            />
+          ))}
+        </div>
       </LoadingBox>
 
       <AccountEditDialog

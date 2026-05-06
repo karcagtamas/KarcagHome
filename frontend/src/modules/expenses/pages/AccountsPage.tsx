@@ -44,7 +44,7 @@ export const AccountsPage: React.FC = () => {
 
   const apiLoading = createMutation.isPending;
 
-  const handleSubmit = async (data: AccountEditDTO, _: number | undefined) => {
+  const handleSubmit = async (data: AccountEditDTO) => {
     await createMutation.mutateAsync(data);
   };
 

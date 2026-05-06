@@ -1,16 +1,17 @@
-import type { CurrencyDTO, CurrencyExchangeDTO, CurrencyTreeDTO } from "../modules/expenses/models/currency";
-import { api } from "./client";
+import type { CurrencyDTO, CurrencyExchangeDTO, CurrencyTreeDTO } from '../modules/expenses/models/currency';
+import { api } from './client';
 
 export const currencyApi = {
-  getAll: () => api.get<CurrencyDTO[]>("/currencies").then((res) => res.data),
+  getAll: () => api.get<CurrencyDTO[]>('/currencies').then((res) => res.data),
   get: (id: number) => api.get<CurrencyDTO>(`/currencies/${id}`).then((res) => res.data),
-  create: (data: Omit<CurrencyDTO, "id">) => api.post<CurrencyDTO>("/currencies", data).then((res) => res.data),
-  update: (id: number, data: Omit<CurrencyDTO, "id">) =>
+  create: (data: Omit<CurrencyDTO, 'id'>) => api.post<CurrencyDTO>('/currencies', data).then((res) => res.data),
+  update: (id: number, data: Omit<CurrencyDTO, 'id'>) =>
     api.put<CurrencyDTO>(`/currencies/${id}`, data).then((res) => res.data),
   getTree: (year: number, showDisabled: boolean) =>
-    api.get<CurrencyTreeDTO[]>("/currencies/tree", { params: { year, showDisabled } }).then((res) => res.data),
+    api.get<CurrencyTreeDTO[]>('/currencies/tree', { params: { year, showDisabled } }).then((res) => res.data),
+  getExchangeYears: () => api.get<number[]>('/currencies/exchanges/years').then((res) => res.data),
   saveExchange: (data: CurrencyExchangeDTO) =>
     api.post<CurrencyExchangeDTO>(`/currencies/exchanges`, data).then((res) => res.data),
   deleteExchange: (currencyFromId: number, currencyToId: number, year: number, month: number) =>
-    api.delete("/currencies/exchanges", { params: { currencyFromId, currencyToId, year, month } }),
+    api.delete('/currencies/exchanges', { params: { currencyFromId, currencyToId, year, month } }),
 };

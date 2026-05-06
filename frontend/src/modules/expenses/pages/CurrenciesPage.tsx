@@ -13,6 +13,7 @@ import { CurrencyTable } from '../components/CurrencyTable';
 import { CurrencyExchangeEditDialog } from '../dialogs/CurrencyExchangeEditDialog';
 import { MONTHS } from '../../../common/month';
 import { LoadingBox } from '../../../components/common/LoadingBox';
+import { useExchangeYears } from '../../../hooks/useExchangeYears';
 
 export const CurrenciesPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -24,6 +25,7 @@ export const CurrenciesPage: React.FC = () => {
   const [selectedExchange, setSelectedExchange] = useState<CurrencyExchangeDTO | null>(null);
 
   const { data, isLoading } = useCurrencyTree(year, showDisabled);
+  const years = useExchangeYears();
 
   const createMutation = useMutation({
     mutationFn: currencyApi.create,
@@ -43,6 +45,7 @@ export const CurrenciesPage: React.FC = () => {
     mutationFn: currencyApi.saveExchange,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: currencyKeys.all });
+      queryClient.invalidateQueries({ queryKey: currencyKeys.exchangeYears() });
     },
   });
 
@@ -60,6 +63,7 @@ export const CurrenciesPage: React.FC = () => {
     }) => currencyApi.deleteExchange(currencyFromId, currencyToId, year, month),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: currencyKeys.all });
+      queryClient.invalidateQueries({ queryKey: currencyKeys.exchangeYears() });
     },
   });
 
@@ -131,7 +135,7 @@ export const CurrenciesPage: React.FC = () => {
               onChange={(_, data) => setShowDisabled(data.checked)}
             />
             <Dropdown value={year.toString()} onOptionSelect={(_, data) => setYear(Number(data.optionValue))}>
-              {[2023, 2024, 2025, 2026].map((y) => (
+              {years.map((y) => (
                 <Option key={y} value={y.toString()} text={y.toString()}>
                   {y}
                 </Option>

@@ -3,4 +3,5 @@ export const currencyKeys = {
   lists: () => [...currencyKeys.all, 'list'] as const,
   tree: (year: number, showDisabled: boolean) => [...currencyKeys.all, 'tree', year, showDisabled] as const,
   detail: (id: number) => [...currencyKeys.all, id] as const,
+  exchangeYears: () => ['exchange-years'] as const,
 };

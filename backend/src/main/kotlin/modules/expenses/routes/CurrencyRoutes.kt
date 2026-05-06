@@ -8,6 +8,8 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.getOrFail
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import modules.expenses.data.CurrenciesTable
 import modules.expenses.data.CurrencyMonthlyExchangesTable
 import modules.expenses.data.toDTO
@@ -17,8 +19,10 @@ import org.jetbrains.exposed.v1.core.alias
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.andWhere
+import org.jetbrains.exposed.v1.jdbc.select
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import kotlin.time.Clock
 
 fun Route.currencyRoutes(repository: CurrencyRepository) {
 
@@ -137,6 +141,19 @@ fun Route.currencyRoutes(repository: CurrencyRepository) {
         }
 
         route("/exchanges") {
+            get("/years") {
+                val minYear: Int? = transaction {
+                    CurrencyMonthlyExchangesTable
+                        .select(CurrencyMonthlyExchangesTable.year)
+                        .minOfOrNull { it[CurrencyMonthlyExchangesTable.year] }
+                }
+
+                val currentYear = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).year
+                val years = (minYear ?: currentYear)..currentYear
+
+                call.respond(years.toList())
+            }
+
             post {
                 val body = call.receive<CurrencyExchangeDTO>()
                 repository.deleteExchange(body.currencyFromId, body.currencyToId, body.year, body.month)

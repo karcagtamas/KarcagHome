@@ -6,4 +6,5 @@ import kotlinx.serialization.Serializable
 data class CurrencyEditDTO(
     val name: String,
     val abbreviation: String,
+    val disabled: Boolean,
 )

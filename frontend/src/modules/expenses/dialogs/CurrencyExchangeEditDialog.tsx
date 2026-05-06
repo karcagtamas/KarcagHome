@@ -1,10 +1,11 @@
-import { Dropdown, Field, makeStyles, tokens, Option, Input } from '@fluentui/react-components';
+import { Field, makeStyles, tokens, Input } from '@fluentui/react-components';
 import type { CurrencyExchangeDTO } from '../models/currency';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import { MONTHS } from '../../../common/month';
 import { useCurrencies } from '../../../hooks/useCurrencies';
 import { EditDialog } from '../../../components/dialog/EditDialog';
+import { ComboBox } from '../../../components/common/ComboBox';
 
 const useStyles = makeStyles({
   content: {
@@ -94,52 +95,38 @@ export const CurrencyExchangeEditDialog: React.FC<Props> = ({
     >
       <div className={styles.content}>
         <Field label="From Currency" required>
-          <Dropdown
-            value={currencies.find((x) => x.id === currencyFromId)?.name}
-            selectedOptions={currencyFromId ? [currencyFromId.toString()] : []}
-            onOptionSelect={(_, data) => setCurrencyFromId(Number(data.optionValue))}
+          <ComboBox
+            data={currencies}
+            value={currencyFromId?.toString()}
+            identifierProvider={(d) => d.id.toString()}
+            displayTextProvider={(d) => `${d.name} [${d.abbreviation}]`}
+            optionFilter={(d) => d.id !== currencyToId}
+            onValueChange={(v) => setCurrencyFromId(Number(v))}
             disabled={loading || isEdit}
-          >
-            {currencies
-              .filter((x) => x.id !== currencyToId)
-              .map((c) => (
-                <Option key={c.id} value={c.id.toString()} text={`${c.name} [${c.abbreviation}]`}>
-                  {c.name} [{c.abbreviation}]
-                </Option>
-              ))}
-          </Dropdown>
+          />
         </Field>
 
         <Field label="To Currency" required>
-          <Dropdown
-            value={currencies.find((x) => x.id === currencyToId)?.name}
-            selectedOptions={currencyToId ? [currencyToId.toString()] : []}
-            onOptionSelect={(_, data) => setCurrencyToId(Number(data.optionValue))}
+          <ComboBox
+            data={currencies}
+            value={currencyToId?.toString()}
+            identifierProvider={(d) => d.id.toString()}
+            displayTextProvider={(d) => `${d.name} [${d.abbreviation}]`}
+            optionFilter={(d) => d.id !== currencyFromId}
+            onValueChange={(v) => setCurrencyToId(Number(v))}
             disabled={loading || isEdit}
-          >
-            {currencies
-              .filter((x) => x.id !== currencyFromId)
-              .map((c) => (
-                <Option key={c.id} value={c.id.toString()} text={`${c.name} [${c.abbreviation}]`}>
-                  {c.name} [{c.abbreviation}]
-                </Option>
-              ))}
-          </Dropdown>
+          />
         </Field>
 
         <Field label="Month" required>
-          <Dropdown
-            value={Object.values(MONTHS).find((x) => x.value === month)?.displayText}
-            selectedOptions={month ? [month.toString()] : []}
-            onOptionSelect={(_, data) => setMonth(Number(data.optionValue))}
-            disabled={loading}
-          >
-            {Object.values(MONTHS).map((m) => (
-              <Option key={m.value} value={m.value.toString()}>
-                {m.displayText}
-              </Option>
-            ))}
-          </Dropdown>
+          <ComboBox
+            data={Object.values(MONTHS)}
+            value={month?.toString()}
+            identifierProvider={(d) => d.value.toString()}
+            displayTextProvider={(d) => d.displayText}
+            onValueChange={(v) => setMonth(Number(v))}
+            disabled={loading || isEdit}
+          />
         </Field>
 
         <Field label={`Exchange Value (${year})`} required>

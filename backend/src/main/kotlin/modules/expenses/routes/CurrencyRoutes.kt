@@ -43,7 +43,14 @@ fun Route.currencyRoutes(repository: CurrencyRepository) {
             val id = call.idLong()
             val body = call.receive<CurrencyEditDTO>()
 
-            call.requireAndSend(repository.updateCurrency(id, body.name, body.abbreviation)) { it.toDTO() }
+            call.requireAndSend(
+                repository.updateCurrency(
+                    id,
+                    body.name,
+                    body.abbreviation,
+                    body.disabled,
+                )
+            ) { it.toDTO() }
         }
 
         get("/tree") {

@@ -1,8 +1,9 @@
-import { Dropdown, Option, Field, Input } from '@fluentui/react-components';
+import { Field, Input } from '@fluentui/react-components';
 import type { AccountDTO, AccountEditDTO } from '../models/account';
 import { EditDialog } from '../../../components/dialog/EditDialog';
 import { useEffect, useState } from 'react';
 import { useCurrencies } from '../../../hooks/useCurrencies';
+import { ComboBox } from '../../../components/common/ComboBox';
 
 type Props = {
   open: boolean;
@@ -69,18 +70,14 @@ export const AccountEditDialog: React.FC<Props> = ({ open, account, onClose, onS
         </Field>
 
         <Field label="Currency" required>
-          <Dropdown
-            value={currencies.find((x) => x.id === currencyId)?.name}
-            selectedOptions={currencyId ? [currencyId.toString()] : []}
-            onOptionSelect={(_, data) => setCurrencyId(Number(data.optionValue))}
+          <ComboBox
+            data={currencies}
+            value={currencyId?.toString()}
+            identifierProvider={(d) => d.id.toString()}
+            displayTextProvider={(d) => `${d.name} [${d.abbreviation}]`}
+            onValueChange={(v) => setCurrencyId(Number(v))}
             disabled={loading || isEdit}
-          >
-            {currencies.map((c) => (
-              <Option key={c.id} value={c.id.toString()} text={`${c.name} [${c.abbreviation}]`}>
-                {c.name} [{c.abbreviation}]
-              </Option>
-            ))}
-          </Dropdown>
+          />
         </Field>
 
         <Field label="Base Value" required>

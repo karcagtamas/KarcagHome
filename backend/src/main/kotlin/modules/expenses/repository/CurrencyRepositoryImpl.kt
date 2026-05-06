@@ -45,11 +45,13 @@ class CurrencyRepositoryImpl : CurrencyRepository {
     override fun updateCurrency(
         id: Long,
         name: String,
-        abbreviation: String
+        abbreviation: String,
+        disabled: Boolean,
     ): Currency? = transaction {
         val updated = CurrenciesTable.update({ CurrenciesTable.id eq id }) {
             it[CurrenciesTable.name] = name
             it[CurrenciesTable.abbreviation] = abbreviation
+            it[CurrenciesTable.disabled] = disabled
         }
 
         if (updated == 0) return@transaction null

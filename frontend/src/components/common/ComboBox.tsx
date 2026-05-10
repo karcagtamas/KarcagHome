@@ -29,7 +29,7 @@ export const ComboBox = <T,>({
       disabled={disabled}
     >
       {data
-        .filter((d) => optionFilter && optionFilter(d))
+        .filter((d) => !optionFilter || optionFilter(d))
         .map((d) => (
           <Option key={identifierProvider(d)} value={identifierProvider(d)}>
             {displayTextProvider(d)}

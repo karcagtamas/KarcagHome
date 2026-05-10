@@ -74,8 +74,14 @@ class ExpenseRepositoryImpl : ExpenseRepository {
         ExpenseCategoriesTable.deleteWhere { ExpenseCategoriesTable.id eq id } > 0
     }
 
-    override fun getExpenses(): List<Expense> = transaction {
+    override fun getExpenses(accountId: Long? = null): List<Expense> = transaction {
         ExpensesTable.fullQuery()
+            .let {
+                if (accountId != null)
+                    it.where { ExpensesTable.accountId eq accountId }
+                else
+                    it
+            }
             .map {
                 val category = it.toExpenseCategory(it.toExpenseCategoryType())
                 val currency = it.toCurrency()
@@ -99,16 +105,18 @@ class ExpenseRepositoryImpl : ExpenseRepository {
     override fun createExpense(
         amount: Double,
         description: String?,
+        date: LocalDate,
         categoryId: Long,
-        date: LocalDate
+        accountId: Long,
     ): Expense = transaction {
         val now = Clock.System.now()
 
         val row = ExpensesTable.insert {
             it[ExpensesTable.amount] = amount
             it[ExpensesTable.description] = description
-            it[ExpensesTable.categoryId] = categoryId
             it[ExpensesTable.date] = date
+            it[ExpensesTable.categoryId] = categoryId
+            it[ExpensesTable.accountId] = accountId
             it[createdAt] = now
         }
 
@@ -119,14 +127,16 @@ class ExpenseRepositoryImpl : ExpenseRepository {
         id: Long,
         amount: Double,
         description: String?,
+        date: LocalDate,
         categoryId: Long,
-        date: LocalDate
+        accountId: Long,
     ): Expense? = transaction {
         val updated = ExpenseCategoriesTable.update({ ExpenseCategoriesTable.id eq id }) {
             it[ExpensesTable.amount] = amount
             it[ExpensesTable.description] = description
-            it[ExpensesTable.categoryId] = categoryId
             it[ExpensesTable.date] = date
+            it[ExpensesTable.categoryId] = categoryId
+            it[ExpensesTable.accountId] = accountId
         }
 
         if (updated == 0) return@transaction null

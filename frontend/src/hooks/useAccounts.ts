@@ -4,7 +4,7 @@ import { accountKeys } from '../keys/accountKeys';
 
 export const useAccounts = () => {
   return useQuery({
-    queryKey: accountKeys.lists(),
+    queryKey: accountKeys.list(),
     queryFn: accountApi.getAll,
   });
 };

@@ -9,4 +9,5 @@ data class ExpenseEditDTO(
     val description: String?,
     val date: LocalDate,
     val categoryId: Long,
+    val accountId: Long,
 )

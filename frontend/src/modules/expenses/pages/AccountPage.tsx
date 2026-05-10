@@ -3,7 +3,7 @@ import { PageFrame } from '../../../components/common/PageFrame';
 import { PageHeader } from '../../../components/common/PageHeader';
 import { useAccount } from '../../../hooks/useAccount';
 import { LoadingBox } from '../../../components/common/LoadingBox';
-import { Button } from '@fluentui/react-components';
+import { Button, makeStyles, tokens } from '@fluentui/react-components';
 import { DeleteRegular, EditRegular } from '@fluentui/react-icons';
 import { AccountEditDialog } from '../dialogs/AccountEditDialog';
 import { useState } from 'react';
@@ -12,12 +12,24 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { accountApi } from '../../../api/account.api';
 import { accountKeys } from '../../../keys/accountKeys';
 import { ConfirmDialog } from '../../../components/dialog/ConfirmDialog';
+import { AccountSummary } from '../components/AccountSummary';
+import { Expenses } from '../components/Expenses';
+
+const useStyles = makeStyles({
+  content: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: tokens.spacingVerticalM,
+    padding: '8px',
+  },
+});
 
 export const AccountPage: React.FC = () => {
   const { id } = useParams();
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const styles = useStyles();
   const accountId = id ? parseInt(id) : undefined;
   const { data, isLoading } = useAccount(accountId);
 
@@ -62,6 +74,11 @@ export const AccountPage: React.FC = () => {
             </>
           }
         />
+
+        <div className={styles.content}>
+          <AccountSummary accountId={accountId!} />
+          <Expenses accountId={accountId!} />
+        </div>
       </PageFrame>
 
       <AccountEditDialog
@@ -73,24 +90,24 @@ export const AccountPage: React.FC = () => {
       />
 
       <ConfirmDialog
-              open={confirmRemoveDialogOpen}
-              title="Remove Account"
-              message={
-                <>
-                  Are you sure you want to remove <strong>{data?.name}</strong> account?{' '}
-                </>
-              }
-              confirmText="Remove"
-              danger
-              onClose={() => setConfirmRemoveDialogOpen(false)}
-              onConfirm={async () => {
-                if (accountId !== undefined) {
-                  await removeMutation.mutateAsync(accountId);
-                  navigate("/accounts");
-                }
-                setConfirmRemoveDialogOpen(false);
-              }}
-            ></ConfirmDialog>
+        open={confirmRemoveDialogOpen}
+        title="Remove Account"
+        message={
+          <>
+            Are you sure you want to remove <strong>{data?.name}</strong> account?{' '}
+          </>
+        }
+        confirmText="Remove"
+        danger
+        onClose={() => setConfirmRemoveDialogOpen(false)}
+        onConfirm={async () => {
+          if (accountId !== undefined) {
+            await removeMutation.mutateAsync(accountId);
+            navigate('/accounts');
+          }
+          setConfirmRemoveDialogOpen(false);
+        }}
+      ></ConfirmDialog>
     </LoadingBox>
   );
 };

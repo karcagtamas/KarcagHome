@@ -35,7 +35,7 @@ fun Route.expensesRoutes(repository: ExpenseRepository) {
             }
 
             get {
-                call.respond(repository.getExpenses().map { it.toDTO() })
+                call.respond(repository.getCategories().map { it.toDTO() })
             }
 
             get("/{id}") {
@@ -70,7 +70,8 @@ fun Route.expensesRoutes(repository: ExpenseRepository) {
         }
 
         get {
-            call.respond(repository.getExpenses().map { it.toDTO() })
+            val accountId = call.queryParameters["accountId"]?.toLong()
+            call.respond(repository.getExpenses(accountId).map { it.toDTO() })
         }
 
         get("/{id}") {
@@ -85,8 +86,9 @@ fun Route.expensesRoutes(repository: ExpenseRepository) {
                 repository.createExpense(
                     body.amount,
                     body.description,
-                    body.categoryId,
                     body.date,
+                    body.categoryId,
+                    body.accountId,
                 )
             )
         }
@@ -100,8 +102,9 @@ fun Route.expensesRoutes(repository: ExpenseRepository) {
                     id,
                     body.amount,
                     body.description,
-                    body.categoryId,
                     body.date,
+                    body.categoryId,
+                    body.accountId,
                 )
             ) { it.toDTO() }
         }

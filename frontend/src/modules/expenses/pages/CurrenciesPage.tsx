@@ -14,6 +14,7 @@ import { CurrencyExchangeEditDialog } from '../dialogs/CurrencyExchangeEditDialo
 import { MONTHS } from '../../../common/month';
 import { LoadingBox } from '../../../components/common/LoadingBox';
 import { useExchangeYears } from '../../../hooks/useExchangeYears';
+import { currencyExchangeApi } from '../../../api/currency-exchange.api';
 
 export const CurrenciesPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -42,7 +43,7 @@ export const CurrenciesPage: React.FC = () => {
   });
 
   const exchangeSaveMutation = useMutation({
-    mutationFn: currencyApi.saveExchange,
+    mutationFn: currencyExchangeApi.save,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: currencyKeys.all });
       queryClient.invalidateQueries({ queryKey: currencyKeys.exchangeYears() });
@@ -60,7 +61,7 @@ export const CurrenciesPage: React.FC = () => {
       currencyToId: number;
       year: number;
       month: number;
-    }) => currencyApi.deleteExchange(currencyFromId, currencyToId, year, month),
+    }) => currencyExchangeApi.delete(currencyFromId, currencyToId, year, month),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: currencyKeys.all });
       queryClient.invalidateQueries({ queryKey: currencyKeys.exchangeYears() });

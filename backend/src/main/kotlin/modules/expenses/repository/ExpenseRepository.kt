@@ -16,9 +16,17 @@ interface ExpenseRepository {
     fun updateCategory(id: Long, name: String, color: String, typeId: Long): ExpenseCategory?
     fun deleteCategory(id: Long): Boolean
 
-    fun getExpenses(): List<Expense>
+    fun getExpenses(accountId: Long? = null): List<Expense>
     fun getExpenseById(id: Long): Expense?
-    fun createExpense(amount: Double, description: String?, categoryId: Long, date: LocalDate): Expense
-    fun updateExpense(id: Long, amount: Double, description: String?, categoryId: Long, date: LocalDate): Expense?
+    fun createExpense(amount: Double, description: String?, date: LocalDate, categoryId: Long, accountId: Long): Expense
+    fun updateExpense(
+        id: Long,
+        amount: Double,
+        description: String?,
+        date: LocalDate,
+        categoryId: Long,
+        accountId: Long,
+    ): Expense?
+
     fun deleteExpense(id: Long): Boolean
 }

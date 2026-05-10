@@ -3,9 +3,7 @@ package dto.expenses
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ExpenseCategoryDTO(
+data class ExpenseCategoryTypeDTO(
     val id: Long,
     val name: String,
-    val color: String,
-    val type: ExpenseCategoryTypeDTO,
 )

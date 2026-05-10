@@ -4,6 +4,7 @@ import dto.expenses.AccountDTO
 import dto.expenses.CurrencyDTO
 import dto.expenses.CurrencyExchangeDTO
 import dto.expenses.ExpenseCategoryDTO
+import dto.expenses.ExpenseCategoryTypeDTO
 import dto.expenses.ExpenseDTO
 import org.jetbrains.exposed.v1.core.ResultRow
 
@@ -41,10 +42,17 @@ fun ResultRow.toCurrencyMonthlyExchange(currencyFrom: Currency, currencyTo: Curr
         value = this[CurrencyMonthlyExchangesTable.value],
     )
 
-fun ResultRow.toExpenseCategory(): ExpenseCategory = ExpenseCategory(
+fun ResultRow.toExpenseCategoryType(): ExpenseCategoryType = ExpenseCategoryType(
+    id = this[ExpenseCategoryTypesTable.id],
+    name = this[ExpenseCategoryTypesTable.name],
+    createdAt = this[ExpenseCategoryTypesTable.createdAt],
+)
+
+fun ResultRow.toExpenseCategory(type: ExpenseCategoryType): ExpenseCategory = ExpenseCategory(
     id = this[ExpenseCategoriesTable.id],
     name = this[ExpenseCategoriesTable.name],
     color = this[ExpenseCategoriesTable.color],
+    type = type,
     createdAt = this[ExpenseCategoriesTable.createdAt],
 )
 
@@ -80,10 +88,16 @@ fun Account.toDTO(): AccountDTO = AccountDTO(
     baseValue = this.baseValue,
 )
 
+fun ExpenseCategoryType.toDTO(): ExpenseCategoryTypeDTO = ExpenseCategoryTypeDTO(
+    id = this.id,
+    name = this.name,
+)
+
 fun ExpenseCategory.toDTO(): ExpenseCategoryDTO = ExpenseCategoryDTO(
     id = this.id,
     name = this.name,
     color = this.color,
+    type = this.type.toDTO(),
 )
 
 fun Expense.toDTO(): ExpenseDTO = ExpenseDTO(

@@ -18,43 +18,56 @@ import modules.expenses.repository.ExpenseRepository
 
 fun Route.expensesRoutes(repository: ExpenseRepository) {
 
-    route("/expense-categories") {
-
-        get {
-            call.respond(repository.getExpenses().map { it.toDTO() })
-        }
-
-        get("/{id}") {
-            val id = call.idLong()
-
-            call.requireAndSend(repository.getCategoryById(id)) { it.toDTO() }
-        }
-
-        post {
-            val body = call.receive<ExpenseCategoryEditDTO>()
-            call.respond(
-                repository.createCategory(
-                    body.name,
-                    body.color,
-                )
-            )
-        }
-
-        put {
-            val id = call.idLong()
-            val body = call.receive<ExpenseCategoryEditDTO>()
-
-            call.requireAndSend(repository.updateCategory(id, body.name, body.color)) { it.toDTO() }
-        }
-
-        delete("/{id}") {
-            val id = call.idLong()
-
-            call.sendDeleted(repository.deleteCategory(id))
-        }
-    }
-
     route("/expenses") {
+
+        route("/categories") {
+
+            route("/types") {
+                get {
+                    call.respond(repository.getCategoryTypes().map { it.toDTO() })
+                }
+
+                get("/{id}") {
+                    val id = call.idLong()
+
+                    call.requireAndSend(repository.getCategoryTypeById(id)) { it.toDTO() }
+                }
+            }
+
+            get {
+                call.respond(repository.getExpenses().map { it.toDTO() })
+            }
+
+            get("/{id}") {
+                val id = call.idLong()
+
+                call.requireAndSend(repository.getCategoryById(id)) { it.toDTO() }
+            }
+
+            post {
+                val body = call.receive<ExpenseCategoryEditDTO>()
+                call.respond(
+                    repository.createCategory(
+                        body.name,
+                        body.color,
+                        body.typeId,
+                    )
+                )
+            }
+
+            put {
+                val id = call.idLong()
+                val body = call.receive<ExpenseCategoryEditDTO>()
+
+                call.requireAndSend(repository.updateCategory(id, body.name, body.color, body.typeId)) { it.toDTO() }
+            }
+
+            delete("/{id}") {
+                val id = call.idLong()
+
+                call.sendDeleted(repository.deleteCategory(id))
+            }
+        }
 
         get {
             call.respond(repository.getExpenses().map { it.toDTO() })

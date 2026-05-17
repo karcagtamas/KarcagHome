@@ -8,7 +8,6 @@ import {
   Popover,
   PopoverSurface,
   PopoverTrigger,
-  tokens,
   type ColorPickerProps,
 } from '@fluentui/react-components';
 import { tinycolor } from '@ctrl/tinycolor';
@@ -53,8 +52,6 @@ type Props = {
   color: string;
   onColorChange: (color: string) => void;
 };
-
-const DEFAULT_COLOR_HSV = { h: 109, s: 1, v: 0.9, a: 1 };
 
 export const ColorPickerPopup: React.FC<Props> = ({ color, onColorChange }) => {
   const styles = useStyles();

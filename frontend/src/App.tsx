@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { getInitialTheme, THEME_STORAGE_KEY, THEMES, type ThemeKey } from './common/theme';
 import { AccountsPage } from './modules/expenses/pages/AccountsPage';
 import { AccountPage } from './modules/expenses/pages/AccountPage';
+import { ExpenseCategoriesPage } from './modules/expenses/pages/ExpenseCategoriesPage';
 
 const useStyles = makeStyles({
   provider: {
@@ -67,6 +68,7 @@ function App() {
               <Route path="/accounts" element={<AccountsPage />} />
               <Route path="/accounts/:id" element={<AccountPage />} />
               <Route path="/currencies" element={<CurrenciesPage />} />
+              <Route path="/expense-categories" element={<ExpenseCategoriesPage />} />
             </Routes>
           </div>
         </BrowserRouter>

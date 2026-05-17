@@ -17,7 +17,7 @@ type Props = {
 
 export const ExpenseEditDialog: React.FC<Props> = ({ open, expense, accountId, onClose, onSubmit, loading }) => {
   const isEdit = !!expense;
-  const categories = useExpenseCategories();
+  const { data: categories } = useExpenseCategories();
 
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState<string>();
@@ -84,9 +84,9 @@ export const ExpenseEditDialog: React.FC<Props> = ({ open, expense, accountId, o
           <DatePicker value={date} onSelectDate={(d) => setDate(d ?? null)} disabled={loading} />
         </Field>
 
-        <Field label="Categories" required>
+        <Field label="Category" required>
           <ComboBox
-            data={categories}
+            data={categories ?? []}
             value={categoryId?.toString()}
             identifierProvider={(d) => d.id.toString()}
             displayTextProvider={(d) => `${d.name} (${d.type.name})`}

@@ -51,7 +51,7 @@ fun Route.expensesRoutes(repository: ExpenseRepository) {
                         body.name,
                         body.color,
                         body.typeId,
-                    )
+                    ).toDTO()
                 )
             }
 
@@ -89,7 +89,7 @@ fun Route.expensesRoutes(repository: ExpenseRepository) {
                     body.date,
                     body.categoryId,
                     body.accountId,
-                )
+                ).toDTO()
             )
         }
 

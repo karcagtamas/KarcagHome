@@ -6,5 +6,5 @@ export const useExpenseCategories = () => {
   return useQuery({
     queryKey: expenseKeys.categories(),
     queryFn: () => expenseCategoryApi.getAll(),
-  }).data ?? [];
+  });
 };

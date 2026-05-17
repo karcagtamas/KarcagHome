@@ -176,8 +176,8 @@ class ExpenseRepositoryImpl : ExpenseRepository {
         return this
             .innerJoin(
                 ExpenseCategoryTypesTable,
-                { ExpenseCategoriesTable.typeId eq id },
-                { ExpenseCategoryTypesTable.id eq id }
+                { ExpenseCategoriesTable.typeId },
+                { ExpenseCategoryTypesTable.id }
             )
             .selectAll()
     }

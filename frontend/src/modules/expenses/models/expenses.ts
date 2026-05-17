@@ -16,7 +16,7 @@ export interface ExpenseDTO {
   id: number;
   amount: number;
   description?: string;
-  date: string;
+  date: Date;
   category: ExpenseCategoryDTO;
   account: AccountDTO;
 }
@@ -30,7 +30,7 @@ export interface ExpenseCategoryEditDTO {
 export interface ExpenseEditDTO {
   amount: number;
   description?: string;
-  date: string;
+  date: Date;
   categoryId: number;
   accountId: number;
 }

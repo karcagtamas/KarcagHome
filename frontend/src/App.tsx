@@ -2,7 +2,6 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { HomePage } from './pages/HomePage';
 import { Dropdown, Option, FluentProvider, makeStyles, tokens } from '@fluentui/react-components';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ExpensesPage } from './modules/expenses/pages/ExpensesPage';
 import { CurrenciesPage } from './modules/expenses/pages/CurrenciesPage';
 import { MeasurementPage } from './modules/measurements/pages/MeasurementPage';
 import { AppBar } from './components/common/AppBar';
@@ -65,7 +64,6 @@ function App() {
               <Route path="/dashboard" element={<MeasurementPage />} />
               <Route path="/measurements" element={<MeasurementPage />} />
               <Route path="/tasks" element={<MeasurementPage />} />
-              <Route path="/expenses" element={<ExpensesPage />} />
               <Route path="/accounts" element={<AccountsPage />} />
               <Route path="/accounts/:id" element={<AccountPage />} />
               <Route path="/currencies" element={<CurrenciesPage />} />

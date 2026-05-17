@@ -74,7 +74,7 @@ class ExpenseRepositoryImpl : ExpenseRepository {
         ExpenseCategoriesTable.deleteWhere { ExpenseCategoriesTable.id eq id } > 0
     }
 
-    override fun getExpenses(accountId: Long? = null): List<Expense> = transaction {
+    override fun getExpenses(accountId: Long?): List<Expense> = transaction {
         ExpensesTable.fullQuery()
             .let {
                 if (accountId != null)
@@ -156,8 +156,8 @@ class ExpenseRepositoryImpl : ExpenseRepository {
             )
             .innerJoin(
                 ExpenseCategoryTypesTable,
-                { ExpenseCategoriesTable.typeId eq ExpensesTable.id },
-                { ExpenseCategoryTypesTable.id eq ExpensesTable.id },
+                { ExpenseCategoriesTable.typeId },
+                { ExpenseCategoryTypesTable.id },
             )
             .innerJoin(
                 AccountsTable,

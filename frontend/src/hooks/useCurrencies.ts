@@ -5,7 +5,7 @@ import { currencyKeys } from "../keys/currencyKeys";
 export const useCurrencies = () => {
   return (
     useQuery({
-      queryKey: currencyKeys.lists(),
+      queryKey: currencyKeys.list(),
       queryFn: currencyApi.getAll,
     }).data ?? []
   );

@@ -2,10 +2,8 @@ package modules.expenses.data
 
 import kotlin.time.Instant
 
-data class ExpenseCategory(
+data class ExpenseCategoryType(
     val id: Long,
     val name: String,
-    val color: String,
-    val type: ExpenseCategoryType,
     val createdAt: Instant,
 )

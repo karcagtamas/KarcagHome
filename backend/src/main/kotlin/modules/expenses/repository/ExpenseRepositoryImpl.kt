@@ -4,6 +4,7 @@ import kotlinx.datetime.LocalDate
 import modules.expenses.data.*
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.innerJoin
+import org.jetbrains.exposed.v1.jdbc.Query
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
@@ -13,42 +14,56 @@ import kotlin.time.Clock
 
 class ExpenseRepositoryImpl : ExpenseRepository {
 
+    override fun getCategoryTypes(): List<ExpenseCategoryType> = transaction {
+        ExpenseCategoryTypesTable.selectAll().map { it.toExpenseCategoryType() }
+    }
+
+    override fun getCategoryTypeById(id: Long): ExpenseCategoryType? = transaction {
+        ExpenseCategoryTypesTable.selectAll()
+            .where { ExpenseCategoryTypesTable.id eq id }
+            .singleOrNull()
+            ?.toExpenseCategoryType()
+    }
+
     override fun getCategories(): List<ExpenseCategory> = transaction {
-        ExpenseCategoriesTable.selectAll().map { it.toExpenseCategory() }
+        ExpenseCategoriesTable.fullQuery()
+            .map {
+                it.toExpenseCategory(it.toExpenseCategoryType())
+            }
     }
 
     override fun getCategoryById(id: Long): ExpenseCategory? = transaction {
-        ExpenseCategoriesTable.selectAll()
+        ExpenseCategoriesTable.fullQuery()
             .where { ExpenseCategoriesTable.id eq id }
             .singleOrNull()
-            ?.toExpenseCategory()
+            ?.let {
+                it.toExpenseCategory(it.toExpenseCategoryType())
+            }
     }
 
-    override fun createCategory(name: String, color: String): ExpenseCategory = transaction {
+    override fun createCategory(name: String, color: String, typeId: Long): ExpenseCategory = transaction {
         val now = Clock.System.now()
 
         val row = ExpenseCategoriesTable.insert {
             it[ExpenseCategoriesTable.name] = name
             it[ExpenseCategoriesTable.color] = color
+            it[ExpenseCategoriesTable.typeId] = typeId
             it[createdAt] = now
         }
 
-        ExpenseCategory(
-            row[ExpenseCategoriesTable.id],
-            name,
-            color,
-            now,
-        )
+        getCategoryById(row[ExpenseCategoriesTable.id])!!
     }
 
     override fun updateCategory(
         id: Long,
         name: String,
-        color: String
+        color: String,
+        typeId: Long,
     ): ExpenseCategory? = transaction {
         val updated = ExpenseCategoriesTable.update({ ExpenseCategoriesTable.id eq id }) {
             it[ExpenseCategoriesTable.name] = name
             it[ExpenseCategoriesTable.color] = color
+            it[ExpenseCategoriesTable.typeId] = typeId
         }
 
         if (updated == 0) return@transaction null
@@ -59,50 +74,28 @@ class ExpenseRepositoryImpl : ExpenseRepository {
         ExpenseCategoriesTable.deleteWhere { ExpenseCategoriesTable.id eq id } > 0
     }
 
-    override fun getExpenses(): List<Expense> = transaction {
-        val join = ExpensesTable.innerJoin(
-            ExpenseCategoriesTable,
-            { ExpensesTable.categoryId },
-            { ExpenseCategoriesTable.id },
-        ).innerJoin(
-            AccountsTable,
-            { ExpensesTable.accountId },
-            { AccountsTable.id }
-        ).innerJoin(
-            CurrenciesTable,
-            { AccountsTable.currencyId },
-            { CurrenciesTable.id }
-        )
-
-        join.selectAll().map {
-            val category = it.toExpenseCategory()
-            val currency = it.toCurrency()
-            val account = it.toAccount(currency)
-            it.toExpense(category, account)
-        }
+    override fun getExpenses(accountId: Long?): List<Expense> = transaction {
+        ExpensesTable.fullQuery()
+            .let {
+                if (accountId != null)
+                    it.where { ExpensesTable.accountId eq accountId }
+                else
+                    it
+            }
+            .map {
+                val category = it.toExpenseCategory(it.toExpenseCategoryType())
+                val currency = it.toCurrency()
+                val account = it.toAccount(currency)
+                it.toExpense(category, account)
+            }
     }
 
     override fun getExpenseById(id: Long): Expense? = transaction {
-        val join = ExpensesTable.innerJoin(
-            ExpenseCategoriesTable,
-            { ExpensesTable.categoryId },
-            { ExpenseCategoriesTable.id },
-        ).innerJoin(
-            AccountsTable,
-            { ExpensesTable.accountId },
-            { AccountsTable.id }
-        ).innerJoin(
-            CurrenciesTable,
-            { AccountsTable.currencyId },
-            { CurrenciesTable.id }
-        )
-
-        join
-            .selectAll()
+        ExpensesTable.fullQuery()
             .where { ExpenseCategoriesTable.id eq id }
             .singleOrNull()
             ?.let {
-                val category = it.toExpenseCategory()
+                val category = it.toExpenseCategory(it.toExpenseCategoryType())
                 val currency = it.toCurrency()
                 val account = it.toAccount(currency)
                 it.toExpense(category, account)
@@ -112,34 +105,38 @@ class ExpenseRepositoryImpl : ExpenseRepository {
     override fun createExpense(
         amount: Double,
         description: String?,
+        date: LocalDate,
         categoryId: Long,
-        date: LocalDate
+        accountId: Long,
     ): Expense = transaction {
         val now = Clock.System.now()
 
         val row = ExpensesTable.insert {
             it[ExpensesTable.amount] = amount
             it[ExpensesTable.description] = description
-            it[ExpensesTable.categoryId] = categoryId
             it[ExpensesTable.date] = date
+            it[ExpensesTable.categoryId] = categoryId
+            it[ExpensesTable.accountId] = accountId
             it[createdAt] = now
         }
 
-        getExpenseById(row[ExpenseCategoriesTable.id])!!
+        getExpenseById(row[ExpensesTable.id])!!
     }
 
     override fun updateExpense(
         id: Long,
         amount: Double,
         description: String?,
+        date: LocalDate,
         categoryId: Long,
-        date: LocalDate
+        accountId: Long,
     ): Expense? = transaction {
-        val updated = ExpenseCategoriesTable.update({ ExpenseCategoriesTable.id eq id }) {
+        val updated = ExpensesTable.update({ ExpensesTable.id eq id }) {
             it[ExpensesTable.amount] = amount
             it[ExpensesTable.description] = description
-            it[ExpensesTable.categoryId] = categoryId
             it[ExpensesTable.date] = date
+            it[ExpensesTable.categoryId] = categoryId
+            it[ExpensesTable.accountId] = accountId
         }
 
         if (updated == 0) return@transaction null
@@ -148,5 +145,40 @@ class ExpenseRepositoryImpl : ExpenseRepository {
 
     override fun deleteExpense(id: Long): Boolean = transaction {
         ExpensesTable.deleteWhere { ExpensesTable.id eq id } > 0
+    }
+
+    private fun ExpensesTable.fullQuery(): Query {
+        return this
+            .innerJoin(
+                ExpenseCategoriesTable,
+                { ExpensesTable.categoryId },
+                { ExpenseCategoriesTable.id },
+            )
+            .innerJoin(
+                ExpenseCategoryTypesTable,
+                { ExpenseCategoriesTable.typeId },
+                { ExpenseCategoryTypesTable.id },
+            )
+            .innerJoin(
+                AccountsTable,
+                { ExpensesTable.accountId },
+                { AccountsTable.id }
+            )
+            .innerJoin(
+                CurrenciesTable,
+                { AccountsTable.currencyId },
+                { CurrenciesTable.id }
+            )
+            .selectAll()
+    }
+
+    private fun ExpenseCategoriesTable.fullQuery(): Query {
+        return this
+            .innerJoin(
+                ExpenseCategoryTypesTable,
+                { ExpenseCategoriesTable.typeId },
+                { ExpenseCategoryTypesTable.id }
+            )
+            .selectAll()
     }
 }

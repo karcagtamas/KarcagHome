@@ -1,5 +1,5 @@
-import { useState } from "react";
-import type { CurrencyDTO, CurrencyTreeDTO, MonthNode, RateNode } from "../models/currency";
+import { useState } from 'react';
+import type { CurrencyDTO, CurrencyTreeDTO, MonthNode, RateNode } from '../models/currency';
 import {
   Button,
   Table,
@@ -8,10 +8,10 @@ import {
   TableHeader,
   TableHeaderCell,
   TableRow,
-} from "@fluentui/react-components";
-import React from "react";
-import { AddRegular, ChevronDownRegular, ChevronRightRegular, DeleteRegular, EditRegular } from "@fluentui/react-icons";
-import { MONTHS } from "../../../common/month";
+} from '@fluentui/react-components';
+import React from 'react';
+import { AddRegular, ChevronDownRegular, ChevronRightRegular, DeleteRegular, EditRegular } from '@fluentui/react-icons';
+import { MONTHS } from '../../../common/month';
 
 type Props = {
   data?: CurrencyTreeDTO[];

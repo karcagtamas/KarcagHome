@@ -7,4 +7,5 @@ data class ExpenseCategoryDTO(
     val id: Long,
     val name: String,
     val color: String,
+    val type: ExpenseCategoryTypeDTO,
 )

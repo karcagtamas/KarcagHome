@@ -40,13 +40,16 @@ export const ExpenseEditDialog: React.FC<Props> = ({ open, expense, accountId, o
     if (!isValid || loading) return;
 
     try {
-      await onSubmit({
-        amount: parsedAmountValue,
-        description,
-        date,
-        categoryId,
-        accountId,
-      });
+      await onSubmit(
+        {
+          amount: parsedAmountValue,
+          description,
+          date,
+          categoryId,
+          accountId,
+        },
+        expense?.id,
+      );
 
       onClose();
     } catch (err) {

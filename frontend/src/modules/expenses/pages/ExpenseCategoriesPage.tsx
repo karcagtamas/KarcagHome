@@ -1,7 +1,15 @@
-import { Button } from '@fluentui/react-components';
+import {
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableHeaderCell,
+  TableRow,
+} from '@fluentui/react-components';
 import { PageFrame } from '../../../components/common/PageFrame';
 import { PageHeader } from '../../../components/common/PageHeader';
-import { AddRegular } from '@fluentui/react-icons';
+import { AddRegular, DeleteRegular, EditRegular } from '@fluentui/react-icons';
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { expenseCategoryApi } from '../../../api/expense-category.api';
@@ -32,6 +40,13 @@ export const ExpenseCategoriesPage: React.FC = () => {
     },
   });
 
+  const removeMutation = useMutation({
+    mutationFn: (id: number) => expenseCategoryApi.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: expenseKeys.categories() });
+    },
+  });
+
   const handleCreate = () => {
     setSelectedExpenseCategory(null);
     setExpenseCategoryDialogOpen(true);
@@ -40,6 +55,10 @@ export const ExpenseCategoriesPage: React.FC = () => {
   const handleEdit = (expenseCategory: ExpenseCategoryDTO) => {
     setSelectedExpenseCategory(expenseCategory);
     setExpenseCategoryDialogOpen(true);
+  };
+
+  const handleRemove = async (expenseCategory: ExpenseCategoryDTO) => {
+    await removeMutation.mutateAsync(expenseCategory.id);
   };
 
   const apiLoading = createMutation.isPending || updateMutation.isPending;
@@ -60,7 +79,30 @@ export const ExpenseCategoriesPage: React.FC = () => {
       ></PageHeader>
 
       <LoadingBox isLoading={isLoading}>
-        <div></div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHeaderCell>Name</TableHeaderCell>
+              <TableHeaderCell>Color</TableHeaderCell>
+              <TableHeaderCell>Type</TableHeaderCell>
+              <TableHeaderCell>Actions</TableHeaderCell>
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>
+            {data?.map((e) => (
+              <TableRow key={e.id}>
+                <TableCell>{e.name}</TableCell>
+                <TableCell>{e.color}</TableCell>
+                <TableCell>{e.type.name}</TableCell>
+                <TableCell>
+                  <Button icon={<EditRegular />} appearance="subtle" onClick={() => handleEdit(e)} />
+                  <Button icon={<DeleteRegular />} appearance="subtle" onClick={async () => await handleRemove(e)} />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </LoadingBox>
 
       <ExpenseCategoryEditDialog

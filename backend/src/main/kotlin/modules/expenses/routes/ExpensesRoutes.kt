@@ -55,7 +55,7 @@ fun Route.expensesRoutes(repository: ExpenseRepository) {
                 )
             }
 
-            put {
+            put("/{id}") {
                 val id = call.idLong()
                 val body = call.receive<ExpenseCategoryEditDTO>()
 
@@ -93,7 +93,7 @@ fun Route.expensesRoutes(repository: ExpenseRepository) {
             )
         }
 
-        put {
+        put("/{id}") {
             val id = call.idLong()
             val body = call.receive<ExpenseEditDTO>()
 

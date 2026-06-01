@@ -36,11 +36,14 @@ export const ExpenseCategoryEditDialog: React.FC<Props> = ({ open, expenseCatego
     if (!isValid || loading) return;
 
     try {
-      await onSubmit({
-        name,
-        color,
-        typeId,
-      });
+      await onSubmit(
+        {
+          name,
+          color,
+          typeId,
+        },
+        expenseCategory?.id,
+      );
 
       onClose();
     } catch (err) {

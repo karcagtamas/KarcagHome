@@ -15,8 +15,8 @@ export interface ExpenseCategoryDTO {
 export interface ExpenseDTO {
   id: number;
   amount: number;
-  description?: string;
-  date: Date;
+  description: string | null;
+  date: string;
   category: ExpenseCategoryDTO;
   account: AccountDTO;
 }
@@ -29,8 +29,8 @@ export interface ExpenseCategoryEditDTO {
 
 export interface ExpenseEditDTO {
   amount: number;
-  description?: string;
-  date: Date;
+  description: string | null;
+  date: string;
   categoryId: number;
   accountId: number;
 }

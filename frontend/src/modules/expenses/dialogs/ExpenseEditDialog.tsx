@@ -5,6 +5,7 @@ import { ComboBox } from '../../../components/common/ComboBox';
 import type { ExpenseDTO, ExpenseEditDTO } from '../models/expenses';
 import { useExpenseCategories } from '../../../hooks/useExpenseCategories';
 import { DatePicker } from '@fluentui/react-datepicker-compat';
+import { fromLocalDate, toLocalDate } from '../../../common/helpers';
 
 type Props = {
   open: boolean;
@@ -20,15 +21,15 @@ export const ExpenseEditDialog: React.FC<Props> = ({ open, expense, accountId, o
   const { data: categories } = useExpenseCategories();
 
   const [amount, setAmount] = useState('');
-  const [description, setDescription] = useState<string>();
-  const [date, setDate] = useState<Date | null>(null);
+  const [description, setDescription] = useState<string | null>(null);
+  const [date, setDate] = useState<string | null>(null);
   const [categoryId, setCategoryId] = useState<number>();
 
   useEffect(() => {
     if (open) {
       setAmount(expense?.amount.toString() ?? '');
-      setDescription(expense?.description);
-      setDate(expense?.date ?? new Date());
+      setDescription(expense?.description ?? null);
+      setDate(expense?.date ?? '');
       setCategoryId(expense?.category.id);
     }
   }, [expense, open]);
@@ -79,12 +80,16 @@ export const ExpenseEditDialog: React.FC<Props> = ({ open, expense, accountId, o
           />
         </Field>
 
-        <Field label="Description" required>
-          <Textarea value={description} onChange={(_, d) => setDescription(d.value)} disabled={loading} />
+        <Field label="Description">
+          <Textarea value={description ?? undefined} onChange={(_, d) => setDescription(d.value)} disabled={loading} />
         </Field>
 
         <Field label="Date" required>
-          <DatePicker value={date} onSelectDate={(d) => setDate(d ?? null)} disabled={loading} />
+          <DatePicker
+            value={date ? fromLocalDate(date) : undefined}
+            onSelectDate={(d) => setDate(d ? toLocalDate(d) : null)}
+            disabled={loading}
+          />
         </Field>
 
         <Field label="Category" required>

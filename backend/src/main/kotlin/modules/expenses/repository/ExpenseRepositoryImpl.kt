@@ -120,7 +120,7 @@ class ExpenseRepositoryImpl : ExpenseRepository {
             it[createdAt] = now
         }
 
-        getExpenseById(row[ExpenseCategoriesTable.id])!!
+        getExpenseById(row[ExpensesTable.id])!!
     }
 
     override fun updateExpense(
@@ -131,7 +131,7 @@ class ExpenseRepositoryImpl : ExpenseRepository {
         categoryId: Long,
         accountId: Long,
     ): Expense? = transaction {
-        val updated = ExpenseCategoriesTable.update({ ExpenseCategoriesTable.id eq id }) {
+        val updated = ExpensesTable.update({ ExpensesTable.id eq id }) {
             it[ExpensesTable.amount] = amount
             it[ExpensesTable.description] = description
             it[ExpensesTable.date] = date

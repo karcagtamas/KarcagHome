@@ -41,7 +41,7 @@ export const ExpenseCategoriesPage: React.FC = () => {
   });
 
   const removeMutation = useMutation({
-    mutationFn: (id: number) => expenseCategoryApi.delete(id),
+    mutationFn: expenseCategoryApi.delete,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: expenseKeys.categories() });
     },
@@ -61,7 +61,7 @@ export const ExpenseCategoriesPage: React.FC = () => {
     await removeMutation.mutateAsync(expenseCategory.id);
   };
 
-  const apiLoading = createMutation.isPending || updateMutation.isPending;
+  const apiLoading = createMutation.isPending || updateMutation.isPending || removeMutation.isPending;
 
   const handleSubmit = async (data: ExpenseCategoryEditDTO, id: number | undefined) => {
     if (id) {

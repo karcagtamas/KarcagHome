@@ -1,7 +1,15 @@
 import { useExpenses } from '../../../hooks/useExpenses';
 import { Box } from '../../../components/common/Box';
-import { Button } from '@fluentui/react-components';
-import { AddRegular } from '@fluentui/react-icons';
+import {
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableHeaderCell,
+  TableRow,
+} from '@fluentui/react-components';
+import { AddRegular, DeleteRegular, EditRegular } from '@fluentui/react-icons';
 import { useState } from 'react';
 import { ExpenseEditDialog } from '../dialogs/ExpenseEditDialog';
 import type { ExpenseDTO, ExpenseEditDTO } from '../models/expenses';
@@ -34,6 +42,13 @@ export const Expenses: React.FC<Props> = ({ accountId }) => {
     },
   });
 
+  const removeMutation = useMutation({
+    mutationFn: expenseApi.delete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: expenseKeys.all });
+    },
+  });
+
   const handleCreate = () => {
     setSelectedExpense(null);
     setExpenseDialogOpen(true);
@@ -44,7 +59,11 @@ export const Expenses: React.FC<Props> = ({ accountId }) => {
     setExpenseDialogOpen(true);
   };
 
-  const apiLoading = createMutation.isPending || updateMutation.isPending;
+  const handleRemove = async (expense: ExpenseDTO) => {
+    await removeMutation.mutateAsync(expense.id);
+  };
+
+  const apiLoading = createMutation.isPending || updateMutation.isPending || removeMutation.isPending;
 
   const handleSubmit = async (data: Omit<ExpenseEditDTO, 'id'>, id: number | undefined) => {
     if (id) {
@@ -63,7 +82,32 @@ export const Expenses: React.FC<Props> = ({ accountId }) => {
             <Button appearance="subtle" icon={<AddRegular />} onClick={handleCreate} />
           </>
         }
-      ></Box>
+      >
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHeaderCell>Category</TableHeaderCell>
+              <TableHeaderCell>Date</TableHeaderCell>
+              <TableHeaderCell>Amount</TableHeaderCell>
+              <TableHeaderCell>Actions</TableHeaderCell>
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>
+            {data?.map((e) => (
+              <TableRow key={e.id}>
+                <TableCell>{e.category.name}</TableCell>
+                <TableCell>{e.date}</TableCell>
+                <TableCell>{e.amount}</TableCell>
+                <TableCell>
+                  <Button icon={<EditRegular />} appearance="subtle" onClick={() => handleEdit(e)} />
+                  <Button icon={<DeleteRegular />} appearance="subtle" onClick={async () => await handleRemove(e)} />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Box>
 
       <ExpenseEditDialog
         open={expenseDialogOpen}

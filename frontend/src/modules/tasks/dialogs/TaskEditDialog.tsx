@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { EditDialog } from '../../../components/dialog/EditDialog';
-import type { TaskDTO } from '../models/task';
+import type { TaskDTO, TaskEditDTO } from '../models/task';
 import { Field, Input, Textarea } from '@fluentui/react-components';
 
 type Props = {
   open: boolean;
   task?: TaskDTO | null;
   onClose: () => void;
-  onSubmit: (data: Omit<TaskDTO, 'id'>, id?: number) => Promise<void>;
+  onSubmit: (data: TaskEditDTO, id?: number) => Promise<void>;
   loading?: boolean;
 };
 

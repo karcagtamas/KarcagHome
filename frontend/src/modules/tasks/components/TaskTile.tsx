@@ -1,15 +1,16 @@
-import { Button, Card, CardHeader } from '@fluentui/react-components';
+import { Button, Card, CardFooter, CardHeader } from '@fluentui/react-components';
 import type { TaskDTO } from '../models/task';
-import { DeleteRegular, EditRegular } from '@fluentui/react-icons';
+import { DeleteRegular, EditRegular, EyeFilled, EyeOffRegular } from '@fluentui/react-icons';
 
 type Props = {
   task: TaskDTO;
   onEdit?: () => void;
   onRemove?: () => void;
   className?: string | undefined;
+  onToggle?: () => void;
 };
 
-export const TaskTile: React.FC<Props> = ({ task, onEdit, onRemove, className }) => {
+export const TaskTile: React.FC<Props> = ({ task, onEdit, onRemove, className, onToggle }) => {
   return (
     <Card className={className}>
       <CardHeader
@@ -27,6 +28,15 @@ export const TaskTile: React.FC<Props> = ({ task, onEdit, onRemove, className })
       />
 
       <div>{task.description}</div>
+
+      <CardFooter>
+        <Button
+          icon={task.completed ? <EyeOffRegular color="darkblue" /> : <EyeFilled color="darkblue" />}
+          onClick={() => onToggle && onToggle()}
+        >
+          {task.completed ? 'Unsolve' : 'Solve'}
+        </Button>
+      </CardFooter>
     </Card>
   );
 };

@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { useTasks } from '../hooks/useTasks';
 import { taskApi } from '../api/task.api';
 import { taskKeys } from '../../../keys/taskKeys';
-import type { TaskDTO } from '../models/task';
+import type { TaskDTO, TaskEditDTO } from '../models/task';
 import { LoadingBox } from '../../../components/common/LoadingBox';
 import { TaskEditDialog } from '../dialogs/TaskEditDialog';
 import { TaskTile } from '../components/TaskTile';
@@ -42,7 +42,7 @@ export const TasksPage: React.FC = () => {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: Omit<TaskDTO, 'id'> }) => taskApi.update(id, data),
+    mutationFn: ({ id, data }: { id: number; data: TaskEditDTO }) => taskApi.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: taskKeys.all });
     },
@@ -50,6 +50,13 @@ export const TasksPage: React.FC = () => {
 
   const removeMutation = useMutation({
     mutationFn: taskApi.delete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: taskKeys.all });
+    },
+  });
+
+  const toggleMutation = useMutation({
+    mutationFn: taskApi.toggle,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: taskKeys.all });
     },
@@ -65,9 +72,10 @@ export const TasksPage: React.FC = () => {
     setTaskDialogOpen(true);
   };
 
-  const apiLoading = createMutation.isPending || updateMutation.isPending || removeMutation.isPending;
+  const apiLoading =
+    createMutation.isPending || updateMutation.isPending || removeMutation.isPending || toggleMutation.isPending;
 
-  const handleSubmit = async (data: Omit<TaskDTO, 'id'>, id?: number) => {
+  const handleSubmit = async (data: TaskEditDTO, id?: number) => {
     if (id) {
       await updateMutation.mutateAsync({ id, data });
     } else {
@@ -97,6 +105,7 @@ export const TasksPage: React.FC = () => {
               task={task}
               onEdit={() => handleEdit(task)}
               onRemove={async () => await removeMutation.mutateAsync(task.id)}
+              onToggle={async () => await toggleMutation.mutateAsync(task.id)}
             />
           ))}
         </div>

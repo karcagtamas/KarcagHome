@@ -7,6 +7,7 @@ object TasksTable : Table("tasks") {
     val title = varchar("title", 255)
     val description = varchar("description", 1000).nullable()
     val completed = bool("completed").default(false)
+    val importance = integer("importance").default(0)
 
     override val primaryKey = PrimaryKey(id)
 }

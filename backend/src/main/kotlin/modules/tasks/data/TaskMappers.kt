@@ -8,6 +8,7 @@ fun ResultRow.toTask() = Task(
     title = this[TasksTable.title],
     description = this[TasksTable.description],
     completed = this[TasksTable.completed],
+    importance = this[TasksTable.importance],
 )
 
 fun Task.toDTO(): TaskDTO = TaskDTO(
@@ -15,4 +16,5 @@ fun Task.toDTO(): TaskDTO = TaskDTO(
     title = title,
     description = description,
     completed = completed,
+    importance = importance,
 )

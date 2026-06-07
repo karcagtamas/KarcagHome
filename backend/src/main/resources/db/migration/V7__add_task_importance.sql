@@ -1,0 +1,2 @@
+ALTER TABLE tasks
+    ADD COLUMN importance INTEGER NOT NULL DEFAULT 0;

@@ -1,4 +1,4 @@
-import { Button } from '@fluentui/react-components';
+import { Button, makeStyles } from '@fluentui/react-components';
 import { PageFrame } from '../../../components/common/PageFrame';
 import { PageHeader } from '../../../components/common/PageHeader';
 import { AddRegular } from '@fluentui/react-icons';
@@ -10,9 +10,25 @@ import { taskKeys } from '../../../keys/taskKeys';
 import type { TaskDTO } from '../models/task';
 import { LoadingBox } from '../../../components/common/LoadingBox';
 import { TaskEditDialog } from '../dialogs/TaskEditDialog';
+import { TaskTile } from '../components/TaskTile';
+
+const useStyles = makeStyles({
+  tasksBox: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+    gap: '16px',
+    alignItems: 'stretch',
+    padding: '1rem',
+  },
+  taskTile: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+});
 
 export const TasksPage: React.FC = () => {
   const queryClient = useQueryClient();
+  const styles = useStyles();
 
   const [taskDialogOpen, setTaskDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<TaskDTO | null>(null);
@@ -73,9 +89,15 @@ export const TasksPage: React.FC = () => {
       ></PageHeader>
 
       <LoadingBox isLoading={isLoading}>
-        <div>
+        <div className={styles.tasksBox}>
           {data?.map((task) => (
-            <div key={task.id}>{task.title}</div>
+            <TaskTile
+              className={styles.taskTile}
+              key={task.id}
+              task={task}
+              onEdit={() => handleEdit(task)}
+              onRemove={async () => await removeMutation.mutateAsync(task.id)}
+            />
           ))}
         </div>
       </LoadingBox>

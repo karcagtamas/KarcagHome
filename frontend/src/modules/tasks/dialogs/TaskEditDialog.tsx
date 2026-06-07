@@ -30,10 +30,13 @@ export const TaskEditDialog: React.FC<Props> = ({ open, task, onClose, onSubmit,
     if (!isValid || loading) return;
 
     try {
-      await onSubmit({
-        title,
-        description,
-      });
+      await onSubmit(
+        {
+          title,
+          description,
+        },
+        task?.id,
+      );
 
       onClose();
     } catch (err) {

@@ -30,14 +30,14 @@ fun Route.taskRoutes(repository: TaskRepository) {
             call.respond(task)
         }
 
-        put {
+        put("/{id}") {
             val id = call.idLong()
             val body = call.receive<TaskEditDTO>()
 
             call.requireAndSend(repository.update(id, body.title, body.description)) { it.toDTO() }
         }
 
-        delete {
+        delete("/{id}") {
             val id = call.idLong()
 
             call.sendDeleted(repository.delete(id))

@@ -1,0 +1,92 @@
+import { Button } from '@fluentui/react-components';
+import { PageFrame } from '../../../components/common/PageFrame';
+import { PageHeader } from '../../../components/common/PageHeader';
+import { AddRegular } from '@fluentui/react-icons';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useTasks } from '../hooks/useTasks';
+import { taskApi } from '../api/task.api';
+import { taskKeys } from '../../../keys/taskKeys';
+import type { TaskDTO } from '../models/task';
+import { LoadingBox } from '../../../components/common/LoadingBox';
+import { TaskEditDialog } from '../dialogs/TaskEditDialog';
+
+export const TasksPage: React.FC = () => {
+  const queryClient = useQueryClient();
+
+  const [taskDialogOpen, setTaskDialogOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<TaskDTO | null>(null);
+  const { data, isLoading } = useTasks();
+
+  const createMutation = useMutation({
+    mutationFn: taskApi.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: taskKeys.all });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Omit<TaskDTO, 'id'> }) => taskApi.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: taskKeys.all });
+    },
+  });
+
+  const removeMutation = useMutation({
+    mutationFn: taskApi.delete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: taskKeys.all });
+    },
+  });
+
+  const handleCreate = () => {
+    setSelectedTask(null);
+    setTaskDialogOpen(true);
+  };
+
+  const handleEdit = (task: TaskDTO) => {
+    setSelectedTask(task);
+    setTaskDialogOpen(true);
+  };
+
+  const apiLoading = createMutation.isPending || updateMutation.isPending || removeMutation.isPending;
+
+  const handleSubmit = async (data: Omit<TaskDTO, 'id'>, id?: number) => {
+    if (id) {
+      await updateMutation.mutateAsync({ id, data });
+    } else {
+      await createMutation.mutateAsync(data);
+    }
+  };
+
+  return (
+    <PageFrame>
+      <PageHeader
+        title="Tasks"
+        actions={
+          <>
+            <Button icon={<AddRegular />} onClick={handleCreate}>
+              Create
+            </Button>
+          </>
+        }
+      ></PageHeader>
+
+      <LoadingBox isLoading={isLoading}>
+        <div>
+          {data?.map((task) => (
+            <div key={task.id}>{task.title}</div>
+          ))}
+        </div>
+      </LoadingBox>
+
+      <TaskEditDialog
+        open={taskDialogOpen}
+        task={selectedTask}
+        onClose={() => setTaskDialogOpen(false)}
+        onSubmit={handleSubmit}
+        loading={apiLoading}
+      />
+    </PageFrame>
+  );
+};

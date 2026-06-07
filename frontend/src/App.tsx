@@ -10,6 +10,7 @@ import { getInitialTheme, THEME_STORAGE_KEY, THEMES, type ThemeKey } from './com
 import { AccountsPage } from './modules/expenses/pages/AccountsPage';
 import { AccountPage } from './modules/expenses/pages/AccountPage';
 import { ExpenseCategoriesPage } from './modules/expenses/pages/ExpenseCategoriesPage';
+import { TasksPage } from './modules/tasks/pages/TasksPage';
 
 const useStyles = makeStyles({
   provider: {
@@ -64,7 +65,7 @@ function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/dashboard" element={<MeasurementPage />} />
               <Route path="/measurements" element={<MeasurementPage />} />
-              <Route path="/tasks" element={<MeasurementPage />} />
+              <Route path="/tasks" element={<TasksPage />} />
               <Route path="/accounts" element={<AccountsPage />} />
               <Route path="/accounts/:id" element={<AccountPage />} />
               <Route path="/currencies" element={<CurrenciesPage />} />

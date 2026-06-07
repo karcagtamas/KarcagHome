@@ -8,6 +8,7 @@ type Props<T> = {
   optionFilter?: (d: T) => boolean;
   onValueChange: (v: string | undefined) => void;
   disabled?: boolean;
+  clearable?: boolean;
 };
 
 export const ComboBox = <T,>({
@@ -18,6 +19,7 @@ export const ComboBox = <T,>({
   optionFilter,
   onValueChange,
   disabled = false,
+  clearable = false,
 }: Props<T>) => {
   const selected = data.find((d) => identifierProvider(d) === value);
 
@@ -27,6 +29,7 @@ export const ComboBox = <T,>({
       selectedOptions={value ? [value] : []}
       onOptionSelect={(_, data) => onValueChange(data.optionValue)}
       disabled={disabled}
+      clearable={clearable}
     >
       {data
         .filter((d) => !optionFilter || optionFilter(d))

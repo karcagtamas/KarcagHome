@@ -29,7 +29,7 @@ class TaskRepositoryImpl : TaskRepository {
                     checks.add((TasksTable.completed eq false))
                 }
 
-                it.where { checks.compoundAnd() }
+                if (checks.isEmpty()) it else it.where { checks.compoundAnd() }
             }
             .map { it.toTask() }
     }

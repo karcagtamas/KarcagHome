@@ -1,4 +1,4 @@
-import { Button, makeStyles } from '@fluentui/react-components';
+import { Button, Label, makeStyles, Switch } from '@fluentui/react-components';
 import { PageFrame } from '../../../components/common/PageFrame';
 import { PageHeader } from '../../../components/common/PageHeader';
 import { AddRegular } from '@fluentui/react-icons';
@@ -7,10 +7,11 @@ import { useState } from 'react';
 import { useTasks } from '../hooks/useTasks';
 import { taskApi } from '../api/task.api';
 import { taskKeys } from '../../../keys/taskKeys';
-import type { TaskDTO, TaskEditDTO } from '../models/task';
+import { IMPORTANCE_LEVELS, type TaskDTO, type TaskEditDTO } from '../models/task';
 import { LoadingBox } from '../../../components/common/LoadingBox';
 import { TaskEditDialog } from '../dialogs/TaskEditDialog';
 import { TaskTile } from '../components/TaskTile';
+import { ComboBox } from '../../../components/common/ComboBox';
 
 const useStyles = makeStyles({
   tasksBox: {
@@ -30,9 +31,12 @@ export const TasksPage: React.FC = () => {
   const queryClient = useQueryClient();
   const styles = useStyles();
 
+  const [showAll, setShowAll] = useState(false);
+  const [importance, setImportance] = useState<number | null>(null);
+
   const [taskDialogOpen, setTaskDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<TaskDTO | null>(null);
-  const { data, isLoading } = useTasks();
+  const { data, isLoading } = useTasks(showAll, importance);
 
   const createMutation = useMutation({
     mutationFn: taskApi.create,
@@ -89,6 +93,16 @@ export const TasksPage: React.FC = () => {
         title="Tasks"
         actions={
           <>
+            <Label htmlFor="show-all-toggle">Show All</Label>
+            <Switch id="show-all-toggle" checked={showAll} onChange={(_, data) => setShowAll(data.checked)} />
+            <ComboBox
+              data={Object.values(IMPORTANCE_LEVELS)}
+              value={importance?.toString()}
+              identifierProvider={(d) => d.value.toString()}
+              displayTextProvider={(d) => d.displayText}
+              onValueChange={(v) => (v ? setImportance(Number(v)) : setImportance(null))}
+              clearable={true}
+            />
             <Button icon={<AddRegular />} onClick={handleCreate}>
               Create
             </Button>

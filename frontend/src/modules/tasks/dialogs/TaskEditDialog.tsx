@@ -27,7 +27,7 @@ export const TaskEditDialog: React.FC<Props> = ({ open, task, onClose, onSubmit,
     }
   }, [task, open]);
 
-  const isValid = title.trim().length > 0 && !!importance;
+  const isValid = title.trim().length > 0 && importance !== undefined && importance !== null;
 
   const handleSubmit = async () => {
     if (!isValid || loading) return;

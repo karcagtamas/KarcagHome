@@ -1,6 +1,7 @@
 import { Button, Card, CardFooter, CardHeader } from '@fluentui/react-components';
-import type { TaskDTO } from '../models/task';
+import { IMPORTANCE_LEVELS, type TaskDTO } from '../models/task';
 import { DeleteRegular, EditRegular, EyeFilled, EyeOffRegular } from '@fluentui/react-icons';
+import { useMemo } from 'react';
 
 type Props = {
   task: TaskDTO;
@@ -11,10 +12,13 @@ type Props = {
 };
 
 export const TaskTile: React.FC<Props> = ({ task, onEdit, onRemove, className, onToggle }) => {
+  const importance = useMemo(() => {
+    return IMPORTANCE_LEVELS[task.importance];
+  }, [task.importance]);
   return (
-    <Card className={className}>
+    <Card className={className} style={{ backgroundColor: importance.bgColor }}>
       <CardHeader
-        header={<>{task.title}</>}
+        header={<strong>{task.title}</strong>}
         action={
           <>
             <Button icon={<EditRegular color="darkorange" />} onClick={() => onEdit && onEdit()}>
@@ -27,7 +31,11 @@ export const TaskTile: React.FC<Props> = ({ task, onEdit, onRemove, className, o
         }
       />
 
-      <div>{task.description}</div>
+      <div style={{color: importance.fgColor}}><strong>{importance.displayText}</strong></div>
+
+      <div>
+        <em>{task.description}</em>
+      </div>
 
       <CardFooter>
         <Button

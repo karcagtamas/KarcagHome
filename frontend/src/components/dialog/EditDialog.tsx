@@ -1,6 +1,6 @@
-import { Button } from '@fluentui/react-components';
 import { AppDialog } from './AppDialog';
 import { LoadingButton } from '../common/LoadingButton';
+import { Button } from '@mui/material';
 
 type Props = {
   open: boolean;
@@ -26,19 +26,25 @@ export const EditDialog: React.FC<Props> = ({ open, title, isEdit, isValid, onCl
     }
   };
 
+  const handleClose = () => {
+    if (!loading) {
+      onClose();
+    }
+  };
+
   return (
     <>
       <AppDialog
         open={open}
-        onOpenChange={(o) => !o && !loading && onClose()}
+        onClose={handleClose}
         title={title}
         footer={
           <>
-            <Button appearance="secondary" onClick={onClose} disabled={loading}>
+            <Button variant="text" onClick={onClose} disabled={loading}>
               Cancel
             </Button>
             <LoadingButton
-              appearance="primary"
+              variant="contained"
               onClick={handleSubmit}
               disabled={!isValid || loading}
               isLoading={loading}

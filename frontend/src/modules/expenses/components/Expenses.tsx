@@ -1,5 +1,5 @@
 import { useExpenses } from '../../../hooks/useExpenses';
-import { Box } from '../../../components/common/Box';
+import { ContentCard } from '../../../components/common/ContentCard';
 import {
   Button,
   Table,
@@ -75,7 +75,7 @@ export const Expenses: React.FC<Props> = ({ accountId }) => {
 
   return (
     <>
-      <Box
+      <ContentCard
         caption="Expenses"
         actions={
           <>
@@ -107,7 +107,7 @@ export const Expenses: React.FC<Props> = ({ accountId }) => {
             ))}
           </TableBody>
         </Table>
-      </Box>
+      </ContentCard>
 
       <ExpenseEditDialog
         open={expenseDialogOpen}

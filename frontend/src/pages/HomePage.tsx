@@ -1,55 +1,86 @@
-import { Caption1, Card, CardHeader, makeStyles, Text } from '@fluentui/react-components';
-import { DataLineRegular, HomeRegular, MoneyRegular, TasksAppRegular } from '@fluentui/react-icons';
 import { useNavigate } from 'react-router-dom';
-
-const useStyles = makeStyles({
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-    gap: '24px',
-    padding: '40px',
-    maxWidth: '1200px',
-    margin: '0 auto',
-    flex: 1,
-    alignItems: 'center',
-  },
-  card: {
-    height: '180px',
-    cursor: 'pointer',
-    transition: 'all 0.2s ease',
-    ':hover': {
-      transform: 'translateY(-4px)',
-      backgroundColor: 'var(--colorNeutralBackground1Hover)',
-    },
-  },
-});
+import { AssessmentOutlined, AssignmentTurnedInOutlined, AttachMoneyOutlined, HomeOutlined } from '@mui/icons-material';
+import { Box, Card, CardHeader, Typography } from '@mui/material';
 
 export const HomePage: React.FC = () => {
-  const styles = useStyles();
   const navigate = useNavigate();
 
   const menuItems = [
-    { title: 'Measurements', desc: 'Data tracking', icon: <DataLineRegular fontSize={40} />, path: '/measurements' },
-    { title: 'Smart Home', desc: 'IoT Device Control', icon: <HomeRegular fontSize={40} />, path: '/smart-home' },
-    { title: 'Expenses', desc: 'Financial Analytics', icon: <MoneyRegular fontSize={40} />, path: '/accounts' },
-    { title: 'Tasks', desc: '', icon: <TasksAppRegular fontSize={40} />, path: '/tasks' },
+    {
+      title: 'Measurements',
+      desc: 'Data tracking',
+      icon: <AssessmentOutlined sx={{ fontSize: 40, color: 'primary.main' }} />,
+      path: '/measurements',
+    },
+    {
+      title: 'Smart Home',
+      desc: 'IoT Device Control',
+      icon: <HomeOutlined sx={{ fontSize: 40, color: 'primary.main' }} />,
+      path: '/smart-home',
+    },
+    {
+      title: 'Expenses',
+      desc: 'Financial Analytics',
+      icon: <AttachMoneyOutlined sx={{ fontSize: 40, color: 'primary.main' }} />,
+      path: '/accounts',
+    },
+    {
+      title: 'Tasks',
+      desc: '',
+      icon: <AssignmentTurnedInOutlined sx={{ fontSize: 40, color: 'primary.main' }} />,
+      path: '/tasks',
+    },
   ];
 
   return (
-    <div className={styles.grid}>
+    <Box
+      sx={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+        gap: '24px',
+        padding: '40px',
+        maxWidth: '1200px',
+        margin: '0 auto',
+        flex: 1,
+        alignItems: 'center',
+        width: '100%',
+        boxSizing: 'border-box',
+      }}
+    >
       {menuItems.map((item) => (
-        <Card key={item.title} className={styles.card} onClick={() => navigate(item.path)}>
+        <Card
+          key={item.title}
+          onClick={() => navigate(item.path)}
+          sx={{
+            height: '180px',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            display: 'flex',
+            alignItems: 'center',
+            '&:hover': {
+              transform: 'translateY(-4px)',
+              bgcolor: 'action.hover',
+              boxShadow: 4,
+            },
+          }}
+        >
           <CardHeader
-            image={item.icon}
-            header={
-              <Text weight="bold" size={500}>
+            avatar={item.icon}
+            title={
+              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
                 {item.title}
-              </Text>
+              </Typography>
             }
-            description={<Caption1>{item.desc}</Caption1>}
+            subheader={
+              item.desc ? (
+                <Typography variant="body2" color="text.secondary">
+                  {item.desc}
+                </Typography>
+              ) : null
+            }
           />
         </Card>
       ))}
-    </div>
+    </Box>
   );
 };

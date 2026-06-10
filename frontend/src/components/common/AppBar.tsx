@@ -1,53 +1,5 @@
-import { makeStyles, tokens } from '@fluentui/react-components';
+import { Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-
-const useStyles = makeStyles({
-  root: {
-    height: '48px',
-    display: 'flex',
-    flexDirection: 'row',
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-
-    backgroundColor: tokens.colorNeutralBackground1,
-    borderBottom: `1px solid ${tokens.colorNeutralStroke2}`,
-  },
-
-  left: {
-    display: 'flex',
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'left',
-    gap: tokens.spacingHorizontalS,
-    height: '48px',
-    padding: `0 ${tokens.spacingHorizontalM}`,
-  },
-
-  title: {
-    display: 'flex',
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '48px',
-    padding: `0 ${tokens.spacingHorizontalM}`,
-    fontSize: tokens.fontSizeBase500,
-    fontWeight: tokens.fontWeightSemibold,
-    ':hover': {
-      cursor: 'pointer',
-    },
-  },
-
-  right: {
-    display: 'flex',
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'right',
-    padding: `0 ${tokens.spacingHorizontalM}`,
-    gap: tokens.spacingHorizontalS,
-    height: '48px',
-  },
-});
 
 type Props = {
   title: string;
@@ -57,16 +9,66 @@ type Props = {
 };
 
 export const AppBar: React.FC<Props> = ({ title, route, left, right }) => {
-  const styles = useStyles();
   const navigate = useNavigate();
 
   return (
-    <div className={styles.root}>
-      <div className={styles.left}>{left}</div>
-      <div className={styles.title} onClick={() => navigate(route)}>
+    <Box
+      sx={{
+        height: '48px',
+        display: 'flex',
+        flexDirection: 'row',
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        bgcolor: 'background.default',
+        borderBottom: 1,
+        borderColor: 'divider',
+        boxSizing: 'border-box',
+      }}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          gap: 1,
+          height: '48px',
+          paddingX: 2,
+        }}
+      >
+        {left}
+      </Box>
+      <Typography
+        onClick={() => navigate(route)}
+        variant="h6"
+        sx={{
+          display: 'flex',
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '48px',
+          paddingX: 2,
+          fontWeight: 600,
+          cursor: 'pointer',
+          userSelect: 'none',
+        }}
+      >
         {title}
-      </div>
-      <div className={styles.right}>{right}</div>
-    </div>
+      </Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          paddingX: 2,
+          gap: 1,
+          height: '48px',
+        }}
+      >
+        {right}
+      </Box>
+    </Box>
   );
 };

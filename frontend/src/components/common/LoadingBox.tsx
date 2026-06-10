@@ -1,4 +1,4 @@
-import { Spinner } from '@fluentui/react-components';
+import { Box, CircularProgress } from '@mui/material';
 
 type Props = {
   isLoading: boolean;
@@ -6,5 +6,22 @@ type Props = {
 };
 
 export const LoadingBox: React.FC<Props> = ({ isLoading, children }) => {
-  return isLoading ? <Spinner /> : <>{children}</>;
+  if (isLoading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '100%',
+          padding: 4,
+          boxSizing: 'border-box',
+        }}
+      >
+        <CircularProgress color="primary" />
+      </Box>
+    );
+  }
+
+  return <>{children}</>;
 };

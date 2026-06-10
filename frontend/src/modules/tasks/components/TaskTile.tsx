@@ -1,7 +1,7 @@
-import { Button, Card, CardFooter, CardHeader } from '@fluentui/react-components';
+import { Box, Button, Card, CardActions, CardContent, CardHeader, Typography } from '@mui/material';
 import { IMPORTANCE_LEVELS, type TaskDTO } from '../models/task';
-import { DeleteRegular, EditRegular, EyeFilled, EyeOffRegular } from '@fluentui/react-icons';
 import { useMemo } from 'react';
+import { DeleteOutlined, EditOutlined, VisibilityOffOutlined, VisibilityOutlined } from '@mui/icons-material';
 
 type Props = {
   task: TaskDTO;
@@ -15,36 +15,73 @@ export const TaskTile: React.FC<Props> = ({ task, onEdit, onRemove, className, o
   const importance = useMemo(() => {
     return IMPORTANCE_LEVELS[task.importance];
   }, [task.importance]);
+
   return (
-    <Card className={className} style={{ backgroundColor: importance.bgColor }}>
+    <Card
+      className={className}
+      sx={{
+        backgroundColor: importance.bgColor,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        height: '100%',
+        boxSizing: 'border-box',
+      }}
+    >
       <CardHeader
-        header={<strong>{task.title}</strong>}
+        title={
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+            {task.title}
+          </Typography>
+        }
         action={
-          <>
-            <Button icon={<EditRegular color="darkorange" />} onClick={() => onEdit && onEdit()}>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button
+              variant="text"
+              startIcon={<EditOutlined sx={{ color: 'darkorange' }} />}
+              onClick={() => onEdit && onEdit()}
+              sx={{ color: 'text.primary' }}
+            >
               Edit
-            </Button>{' '}
-            <Button icon={<DeleteRegular color="red" />} onClick={() => onRemove && onRemove()}>
+            </Button>
+            <Button
+              variant="text"
+              startIcon={<DeleteOutlined sx={{ color: 'red' }} />}
+              onClick={() => onRemove && onRemove()}
+              sx={{ color: 'text.primary' }}
+            >
               Delete
             </Button>
-          </>
+          </Box>
         }
       />
 
-      <div style={{color: importance.fgColor}}><strong>{importance.displayText}</strong></div>
+      <CardContent sx={{ pt: 0, pb: 1, flexGrow: 1 }}>
+        <Typography variant="body2" sx={{ color: importance.fgColor, fontWeight: 'bold', mb: 1 }}>
+          {importance.displayText}
+        </Typography>
 
-      <div>
-        <em>{task.description}</em>
-      </div>
+        <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
+          {task.description}
+        </Typography>
+      </CardContent>
 
-      <CardFooter>
+      <CardActions sx={{ justifySelf: 'flex-end', p: 2, pt: 0 }}>
         <Button
-          icon={task.completed ? <EyeOffRegular color="darkblue" /> : <EyeFilled color="darkblue" />}
+          variant="outlined"
+          startIcon={
+            task.completed ? (
+              <VisibilityOffOutlined sx={{ color: 'darkblue' }} />
+            ) : (
+              <VisibilityOutlined sx={{ color: 'darkblue' }} />
+            )
+          }
           onClick={() => onToggle && onToggle()}
+          sx={{ borderColor: 'darkblue', color: 'darkblue' }}
         >
           {task.completed ? 'Unsolve' : 'Solve'}
         </Button>
-      </CardFooter>
+      </CardActions>
     </Card>
   );
 };

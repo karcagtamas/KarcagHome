@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { EditDialog } from '../../../components/dialog/EditDialog';
 import { IMPORTANCE_LEVELS, type TaskDTO, type TaskEditDTO } from '../models/task';
-import { Field, Input, Textarea } from '@fluentui/react-components';
-import { ComboBox } from '../../../components/common/ComboBox';
+import { Box, MenuItem, TextField } from '@mui/material';
 
 type Props = {
   open: boolean;
@@ -59,24 +58,49 @@ export const TaskEditDialog: React.FC<Props> = ({ open, task, onClose, onSubmit,
         onSubmit={handleSubmit}
         loading={loading}
       >
-        <Field label="Title" required>
-          <Input autoFocus value={title} onChange={(_, d) => setTitle(d.value)} disabled={loading} />
-        </Field>
-
-        <Field label="Description">
-          <Textarea value={description ?? undefined} onChange={(_, d) => setDescription(d.value)} disabled={loading} />
-        </Field>
-
-        <Field label="Importance" required>
-          <ComboBox
-            data={Object.values(IMPORTANCE_LEVELS)}
-            value={importance?.toString()}
-            identifierProvider={(d) => d.value.toString()}
-            displayTextProvider={(d) => d.displayText}
-            onValueChange={(v) => setImportance(Number(v))}
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 1 }}>
+          <TextField
+            label="Title"
+            required
+            fullWidth
+            autoFocus
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             disabled={loading}
+            variant="outlined"
+            size="small"
           />
-        </Field>
+
+          <TextField
+            label="Description"
+            fullWidth
+            multiline
+            rows={3}
+            value={description}
+            onChange={(e) => setDescription(e.target.value || null)}
+            disabled={loading}
+            variant="outlined"
+            size="small"
+          />
+
+          <TextField
+            select
+            label="Importance"
+            required
+            fullWidth
+            value={importance}
+            onChange={(e) => setImportance(Number(e.target.value))}
+            disabled={loading}
+            variant="outlined"
+            size="small"
+          >
+            {Object.values(IMPORTANCE_LEVELS).map((level) => (
+              <MenuItem key={level.value} value={level.value}>
+                {level.displayText}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Box>
       </EditDialog>
     </>
   );

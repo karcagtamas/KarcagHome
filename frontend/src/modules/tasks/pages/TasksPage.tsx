@@ -1,7 +1,5 @@
-import { Button, Label, makeStyles, Switch } from '@fluentui/react-components';
 import { PageFrame } from '../../../components/common/PageFrame';
 import { PageHeader } from '../../../components/common/PageHeader';
-import { AddRegular } from '@fluentui/react-icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTasks } from '../hooks/useTasks';
@@ -11,25 +9,11 @@ import { IMPORTANCE_LEVELS, type TaskDTO, type TaskEditDTO } from '../models/tas
 import { LoadingBox } from '../../../components/common/LoadingBox';
 import { TaskEditDialog } from '../dialogs/TaskEditDialog';
 import { TaskTile } from '../components/TaskTile';
-import { ComboBox } from '../../../components/common/ComboBox';
-
-const useStyles = makeStyles({
-  tasksBox: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-    gap: '16px',
-    alignItems: 'stretch',
-    padding: '1rem',
-  },
-  taskTile: {
-    display: 'flex',
-    flexDirection: 'column',
-  },
-});
+import { Box, Button, FormControlLabel, MenuItem, Switch, TextField } from '@mui/material';
+import { AddOutlined } from '@mui/icons-material';
 
 export const TasksPage: React.FC = () => {
   const queryClient = useQueryClient();
-  const styles = useStyles();
 
   const [showAll, setShowAll] = useState(false);
   const [importance, setImportance] = useState<number | null>(null);
@@ -92,29 +76,50 @@ export const TasksPage: React.FC = () => {
       <PageHeader
         title="Tasks"
         actions={
-          <>
-            <Label htmlFor="show-all-toggle">Show All</Label>
-            <Switch id="show-all-toggle" checked={showAll} onChange={(_, data) => setShowAll(data.checked)} />
-            <ComboBox
-              data={Object.values(IMPORTANCE_LEVELS)}
-              value={importance?.toString()}
-              identifierProvider={(d) => d.value.toString()}
-              displayTextProvider={(d) => d.displayText}
-              onValueChange={(v) => (v ? setImportance(Number(v)) : setImportance(null))}
-              clearable={true}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <FormControlLabel
+              control={<Switch id="show-all-toggle" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} />}
+              label="Show All"
             />
-            <Button icon={<AddRegular />} onClick={handleCreate}>
+            <TextField
+              select
+              size="small"
+              label="Importance"
+              value={importance}
+              onChange={(e) => {
+                const val = e.target.value;
+                setImportance(val === '' ? null : Number(val));
+              }}
+              sx={{ minWidth: 150 }}
+            >
+              <MenuItem value="">All Levels</MenuItem>
+              {Object.values(IMPORTANCE_LEVELS).map((level) => (
+                <MenuItem key={level.value} value={level.value}>
+                  {level.displayText}
+                </MenuItem>
+              ))}
+            </TextField>
+            <Button variant="contained" startIcon={<AddOutlined />} onClick={handleCreate}>
               Create
             </Button>
-          </>
+          </Box>
         }
       ></PageHeader>
 
       <LoadingBox isLoading={isLoading}>
-        <div className={styles.tasksBox}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+            gap: '16px',
+            alignItems: 'stretch',
+            padding: '1rem',
+            boxSizing: 'border-box',
+            width: '100%',
+          }}
+        >
           {data?.map((task) => (
             <TaskTile
-              className={styles.taskTile}
               key={task.id}
               task={task}
               onEdit={() => handleEdit(task)}
@@ -122,7 +127,7 @@ export const TasksPage: React.FC = () => {
               onToggle={async () => await toggleMutation.mutateAsync(task.id)}
             />
           ))}
-        </div>
+        </Box>
       </LoadingBox>
 
       <TaskEditDialog

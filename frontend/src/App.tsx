@@ -1,6 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { HomePage } from './pages/HomePage';
-import { Dropdown, Option, FluentProvider, makeStyles, tokens } from '@fluentui/react-components';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CurrenciesPage } from './modules/expenses/pages/CurrenciesPage';
 import { MeasurementPage } from './modules/measurements/pages/MeasurementPage';
@@ -11,25 +10,9 @@ import { AccountsPage } from './modules/expenses/pages/AccountsPage';
 import { AccountPage } from './modules/expenses/pages/AccountPage';
 import { ExpenseCategoriesPage } from './modules/expenses/pages/ExpenseCategoriesPage';
 import { TasksPage } from './modules/tasks/pages/TasksPage';
-
-const useStyles = makeStyles({
-  provider: {
-    display: 'flex',
-    flex: 1,
-    width: '100%',
-  },
-  frame: {
-    display: 'flex',
-    flex: 1,
-    flexDirection: 'column',
-    backgroundColor: tokens.colorNeutralBackground1,
-    color: tokens.colorNeutralForeground1,
-  },
-});
+import { Box, FormControl, MenuItem, Select, ThemeProvider, type SelectChangeEvent } from '@mui/material';
 
 function App() {
-  const styles = useStyles();
-
   const [themeKey, setThemeKey] = useState<ThemeKey>(getInitialTheme());
   const current = THEMES[themeKey];
 
@@ -37,28 +20,43 @@ function App() {
     localStorage.setItem(THEME_STORAGE_KEY, themeKey);
   }, [themeKey]);
 
+  const handleThemeChange = (event: SelectChangeEvent) => {
+    setThemeKey(event.target.value as ThemeKey);
+  };
+
   return (
-    <FluentProvider className={styles.provider} theme={current.theme}>
+    <ThemeProvider theme={current.theme}>
       <QueryClientProvider client={new QueryClient()}>
         <BrowserRouter>
-          <div className={styles.frame}>
+          <Box
+            sx={{
+              display: 'flex',
+              flex: 1,
+              flexDirection: 'column',
+              width: '100%',
+              minHeight: '100vh',
+              bgcolor: 'background.default',
+              color: 'text.primary',
+            }}
+          >
             <AppBar
               title="KarcagHome"
               route="/"
               right={
-                <Dropdown
-                  value={current.caption}
-                  selectedOptions={[themeKey]}
-                  onOptionSelect={(_, data) => {
-                    setThemeKey(data.optionValue as ThemeKey);
-                  }}
-                >
-                  {Object.entries(THEMES).map(([key, value]) => (
-                    <Option key={key} value={key}>
-                      {value.caption}
-                    </Option>
-                  ))}
-                </Dropdown>
+                <FormControl size="small">
+                  <Select
+                    value={themeKey}
+                    onChange={handleThemeChange}
+                    variant="outlined"
+                    sx={{ bgcolor: 'background.paper', minWidth: 120 }}
+                  >
+                    {Object.entries(THEMES).map(([key, value]) => (
+                      <MenuItem key={key} value={key}>
+                        {value.caption}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               }
             ></AppBar>
             <Routes>
@@ -71,10 +69,10 @@ function App() {
               <Route path="/currencies" element={<CurrenciesPage />} />
               <Route path="/expense-categories" element={<ExpenseCategoriesPage />} />
             </Routes>
-          </div>
+          </Box>
         </BrowserRouter>
       </QueryClientProvider>
-    </FluentProvider>
+    </ThemeProvider>
   );
 }
 

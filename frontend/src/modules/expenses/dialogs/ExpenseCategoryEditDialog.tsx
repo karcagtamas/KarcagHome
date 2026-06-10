@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react';
 import { EditDialog } from '../../../components/dialog/EditDialog';
 import { useExpenseCategoryTypes } from '../../../hooks/useExpenseCategoryTypes';
 import type { ExpenseCategoryDTO, ExpenseCategoryEditDTO } from '../models/expenses';
-import { Field, Input } from '@fluentui/react-components';
-import { ComboBox } from '../../../components/common/ComboBox';
 import { ColorPickerPopup } from '../../../components/common/ColorPickerPopup';
+import { Box, MenuItem, TextField } from '@mui/material';
 
 type Props = {
   open: boolean;
@@ -62,24 +61,44 @@ export const ExpenseCategoryEditDialog: React.FC<Props> = ({ open, expenseCatego
         onSubmit={handleSubmit}
         loading={loading}
       >
-        <Field label="Name" required>
-          <Input autoFocus value={name} onChange={(_, d) => setName(d.value)} disabled={loading} />
-        </Field>
-
-        <Field label="Color" required>
-          <ColorPickerPopup color={color} onColorChange={(d) => setColor(d)} />
-        </Field>
-
-        <Field label="Type" required>
-          <ComboBox
-            data={types ?? []}
-            value={typeId?.toString()}
-            identifierProvider={(d) => d.id.toString()}
-            displayTextProvider={(d) => d.name}
-            onValueChange={(v) => setTypeId(Number(v))}
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 1 }}>
+          <TextField
+            label="Name"
+            required
+            fullWidth
+            autoFocus
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             disabled={loading}
+            variant="outlined"
+            size="small"
           />
-        </Field>
+
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <Box component="span" sx={{ fontSize: '0.85rem', fontWeight: 500, color: 'text.secondary' }}>
+              Color *
+            </Box>
+            <ColorPickerPopup color={color} onColorChange={(d) => setColor(d)} />
+          </Box>
+
+          <TextField
+            select
+            label="Type"
+            required
+            fullWidth
+            value={typeId}
+            onChange={(e) => setTypeId(Number(e.target.value))}
+            disabled={loading}
+            variant="outlined"
+            size="small"
+          >
+            {types?.map((type) => (
+              <MenuItem key={type.id} value={type.id}>
+                {type.name}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Box>
       </EditDialog>
     </>
   );

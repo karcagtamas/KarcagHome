@@ -1,17 +1,8 @@
 import { useEffect, useState } from 'react';
 import type { CurrencyDTO } from '../models/currency';
-import { Field, Input, Label, makeStyles, MessageBar, Switch, tokens } from '@fluentui/react-components';
 import { ConfirmDialog } from '../../../components/dialog/ConfirmDialog';
 import { EditDialog } from '../../../components/dialog/EditDialog';
-
-const useStyles = makeStyles({
-  switchRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: tokens.spacingHorizontalS,
-    marginTop: tokens.spacingVerticalM,
-  },
-});
+import { Alert, Box, FormControlLabel, Switch, TextField } from '@mui/material';
 
 type Props = {
   open: boolean;
@@ -22,8 +13,6 @@ type Props = {
 };
 
 export const CurrencyEditDialog: React.FC<Props> = ({ open, currency, onClose, onSubmit, loading }) => {
-  const styles = useStyles();
-
   const isEdit = !!currency;
 
   const [name, setName] = useState('');
@@ -78,45 +67,54 @@ export const CurrencyEditDialog: React.FC<Props> = ({ open, currency, onClose, o
         onSubmit={handleSubmit}
         loading={loading}
       >
-        <Field label="Name" required>
-          <Input
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 1 }}>
+          <TextField
+            label="Name"
+            required
+            fullWidth
             autoFocus
             value={name}
-            onChange={(_, d) => setName(d.value)}
+            onChange={(e) => setName(e.target.value)}
             disabled={loading}
             placeholder="e.g. Euro"
+            variant="outlined"
+            size="small"
           />
-        </Field>
 
-        <Field label="Abbreviation" required>
-          <Input
+          <TextField
+            label="Abbreviation"
+            required
+            fullWidth
             value={abbreviation}
-            onChange={(_, d) => setAbbreviation(d.value)}
+            onChange={(e) => setAbbreviation(e.target.value)}
             disabled={loading}
             placeholder="e.g. EUR"
+            variant="outlined"
+            size="small"
           />
-        </Field>
 
-        {isEdit ? (
-          <div className={styles.switchRow}>
-            <Label htmlFor="currency-disabled">Disabled</Label>
+          {isEdit && (
+            <Box sx={{ mt: 1 }}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    id="currency-disabled"
+                    checked={disabled}
+                    onChange={(e) => handleDisabledChange(e.target.checked)}
+                    disabled={loading}
+                  />
+                }
+                label="Disabled"
+              />
+            </Box>
+          )}
 
-            <Switch
-              id="currency-disabled"
-              checked={disabled}
-              onChange={(_, data) => handleDisabledChange(data.checked)}
-              disabled={loading}
-            />
-          </div>
-        ) : (
-          <></>
-        )}
-
-        {disabled && (
-          <MessageBar intent="warning">
-            Disabled currencies will be hidden from exchange lists unless "Show Disabled" is enabled.
-          </MessageBar>
-        )}
+          {disabled && (
+            <Alert severity="warning" sx={{ mt: 1 }}>
+              Disabled currencies will be hidden from exchange lists unless "Show Disabled" is enabled.
+            </Alert>
+          )}
+        </Box>
       </EditDialog>
       <ConfirmDialog
         open={confirmDisableOpen}

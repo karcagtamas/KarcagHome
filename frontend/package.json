@@ -23,6 +23,7 @@
     "axios": "^1.17.0",
     "date-fns": "^4.4.0",
     "react": "^19.2.7",
+    "react-best-gradient-color-picker": "^3.0.14",
     "react-dom": "^19.2.7",
     "react-hook-form": "^7.78.0",
     "react-is": "^19.2.7",

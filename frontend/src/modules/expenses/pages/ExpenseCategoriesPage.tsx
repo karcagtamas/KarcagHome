@@ -1,15 +1,5 @@
-import {
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableHeaderCell,
-  TableRow,
-} from '@fluentui/react-components';
 import { PageFrame } from '../../../components/common/PageFrame';
 import { PageHeader } from '../../../components/common/PageHeader';
-import { AddRegular, DeleteRegular, EditRegular } from '@fluentui/react-icons';
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { expenseCategoryApi } from '../../../api/expense-category.api';
@@ -18,6 +8,9 @@ import { useExpenseCategories } from '../../../hooks/useExpenseCategories';
 import { LoadingBox } from '../../../components/common/LoadingBox';
 import type { ExpenseCategoryDTO, ExpenseCategoryEditDTO } from '../models/expenses';
 import { ExpenseCategoryEditDialog } from '../dialogs/ExpenseCategoryEditDialog';
+import { Box, Button, IconButton } from '@mui/material';
+import { DataGrid, type GridColDef } from '@mui/x-data-grid';
+import { AddOutlined, DeleteOutlined, EditOutlined } from '@mui/icons-material';
 
 export const ExpenseCategoriesPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -71,38 +64,86 @@ export const ExpenseCategoriesPage: React.FC = () => {
     }
   };
 
+  const columns: GridColDef<ExpenseCategoryDTO>[] = [
+    {
+      field: 'name',
+      headerName: 'Name',
+      flex: 1,
+    },
+    {
+      field: 'color',
+      headerName: 'Color',
+      flex: 1,
+      renderCell: (params) => (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, height: '100%' }}>
+          {/* Circular color dot preview element */}
+          <Box
+            sx={{
+              width: 16,
+              height: 16,
+              borderRadius: '50%',
+              backgroundColor: params.value,
+              border: '1px solid',
+              borderColor: 'divider',
+            }}
+          />
+          <code>{params.value}</code>
+        </Box>
+      ),
+    },
+    {
+      field: 'type',
+      headerName: 'Type',
+      flex: 1,
+      valueGetter: (_, row) => row.type?.name ?? '',
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 120,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => (
+        <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center', height: '100%' }}>
+          <IconButton size="small" onClick={() => handleEdit(params.row)} disabled={apiLoading}>
+            <EditOutlined fontSize="small" />
+          </IconButton>
+          <IconButton size="small" color="error" onClick={() => handleRemove(params.row)} disabled={apiLoading}>
+            <DeleteOutlined fontSize="small" />
+          </IconButton>
+        </Box>
+      ),
+    },
+  ];
+
   return (
     <PageFrame>
       <PageHeader
-        title={'Expense Categories'}
-        actions={<Button icon={<AddRegular />} onClick={handleCreate} />}
+        title="Expense Categories"
+        actions={
+          <Button variant="contained" startIcon={<AddOutlined />} onClick={handleCreate} size="small">
+            Create
+          </Button>
+        }
       ></PageHeader>
 
       <LoadingBox isLoading={isLoading}>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHeaderCell>Name</TableHeaderCell>
-              <TableHeaderCell>Color</TableHeaderCell>
-              <TableHeaderCell>Type</TableHeaderCell>
-              <TableHeaderCell>Actions</TableHeaderCell>
-            </TableRow>
-          </TableHeader>
-
-          <TableBody>
-            {data?.map((e) => (
-              <TableRow key={e.id}>
-                <TableCell>{e.name}</TableCell>
-                <TableCell>{e.color}</TableCell>
-                <TableCell>{e.type.name}</TableCell>
-                <TableCell>
-                  <Button icon={<EditRegular />} appearance="subtle" onClick={() => handleEdit(e)} />
-                  <Button icon={<DeleteRegular />} appearance="subtle" onClick={async () => await handleRemove(e)} />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <Box sx={{ padding: '1rem', width: '100%', height: 500, boxSizing: 'border-box' }}>
+          <DataGrid
+            rows={data ?? []}
+            columns={columns}
+            loading={isLoading}
+            getRowId={(row) => row.id}
+            disableRowSelectionOnClick
+            initialState={{
+              pagination: { paginationModel: { pageSize: 10 } },
+            }}
+            pageSizeOptions={[5, 10, 20]}
+            sx={{
+              '& .MuiDataGrid-cell:focus': { outline: 'none' },
+            }}
+          />
+        </Box>
       </LoadingBox>
 
       <ExpenseCategoryEditDialog

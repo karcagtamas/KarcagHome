@@ -3,8 +3,6 @@ import { PageFrame } from '../../../components/common/PageFrame';
 import { PageHeader } from '../../../components/common/PageHeader';
 import { useAccount } from '../../../hooks/useAccount';
 import { LoadingBox } from '../../../components/common/LoadingBox';
-import { Button, makeStyles, tokens } from '@fluentui/react-components';
-import { DeleteRegular, EditRegular } from '@fluentui/react-icons';
 import { AccountEditDialog } from '../dialogs/AccountEditDialog';
 import { useState } from 'react';
 import type { AccountEditDTO } from '../models/account';
@@ -14,22 +12,14 @@ import { accountKeys } from '../../../keys/accountKeys';
 import { ConfirmDialog } from '../../../components/dialog/ConfirmDialog';
 import { AccountSummary } from '../components/AccountSummary';
 import { Expenses } from '../components/Expenses';
-
-const useStyles = makeStyles({
-  content: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: tokens.spacingVerticalM,
-    padding: '8px',
-  },
-});
+import { Box, IconButton } from '@mui/material';
+import { DeleteOutlined, EditOutlined } from '@mui/icons-material';
 
 export const AccountPage: React.FC = () => {
   const { id } = useParams();
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const styles = useStyles();
   const accountId = id ? parseInt(id) : undefined;
   const { data, isLoading } = useAccount(accountId);
 
@@ -68,17 +58,35 @@ export const AccountPage: React.FC = () => {
         <PageHeader
           title={data?.name}
           actions={
-            <>
-              <Button icon={<EditRegular />} onClick={() => setAccountDialogOpen(true)} />
-              <Button icon={<DeleteRegular />} onClick={() => setConfirmRemoveDialogOpen(true)} />
-            </>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <IconButton size="small" onClick={() => setAccountDialogOpen(true)} disabled={apiLoading}>
+                <EditOutlined fontSize="small" />
+              </IconButton>
+              <IconButton
+                size="small"
+                color="error"
+                onClick={() => setConfirmRemoveDialogOpen(true)}
+                disabled={apiLoading}
+              >
+                <DeleteOutlined fontSize="small" />
+              </IconButton>
+            </Box>
           }
         />
 
-        <div className={styles.content}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            padding: '8px',
+            boxSizing: 'border-box',
+            width: '100%',
+          }}
+        >
           <AccountSummary accountId={accountId!} />
           <Expenses accountId={accountId!} />
-        </div>
+        </Box>
       </PageFrame>
 
       <AccountEditDialog

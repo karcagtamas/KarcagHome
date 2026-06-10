@@ -12,7 +12,10 @@ export interface TaskEditDTO {
   importance: number;
 }
 
-export const IMPORTANCE_LEVELS: Record<number, { value: number; displayText: string; bgColor: string, fgColor: string, }> = {
+export const IMPORTANCE_LEVELS: Record<
+  number,
+  { value: number; displayText: string; bgColor: string; fgColor: string }
+> = {
   [0]: {
     value: 0,
     displayText: 'Not Important',
@@ -32,3 +35,13 @@ export const IMPORTANCE_LEVELS: Record<number, { value: number; displayText: str
     fgColor: '#ff6730',
   },
 };
+
+export interface TaskCompletedChartDTO {
+  completed: boolean;
+  count: number;
+}
+
+export interface TaskImportanceChartDTO {
+  importance: number;
+  count: number;
+}

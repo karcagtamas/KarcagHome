@@ -3,7 +3,9 @@ package modules.tasks.routes
 import core.idLong
 import core.requireAndSend
 import core.sendDeleted
+import dto.tasks.TaskCompletedChartDTO
 import dto.tasks.TaskEditDTO
+import dto.tasks.TaskImportanceChartDTO
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -50,6 +52,29 @@ fun Route.taskRoutes(repository: TaskRepository) {
             val id = call.idLong()
 
             call.requireAndSend(repository.toggle(id)) { it.toDTO() }
+        }
+
+        route("/charts") {
+
+            get("/completed") {
+                val importance = call.queryParameters["importance"]?.toIntOrNull()
+                val showAll = call.queryParameters["showAll"]?.toBoolean() ?: false
+
+                val data = repository.getAll(importance, showAll)
+                val dataDTO = data.groupBy { it.completed }
+                    .map { TaskCompletedChartDTO(it.key, it.value.size) }
+                call.respond(dataDTO)
+            }
+
+            get("/importance") {
+                val importance = call.queryParameters["importance"]?.toIntOrNull()
+                val showAll = call.queryParameters["showAll"]?.toBoolean() ?: false
+
+                val data = repository.getAll(importance, showAll)
+                val dataDTO = data.groupBy { it.importance }
+                    .map { TaskImportanceChartDTO(it.key, it.value.size) }
+                call.respond(dataDTO)
+            }
         }
     }
 }

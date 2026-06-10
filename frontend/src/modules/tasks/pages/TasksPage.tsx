@@ -11,6 +11,8 @@ import { TaskEditDialog } from '../dialogs/TaskEditDialog';
 import { TaskTile } from '../components/TaskTile';
 import { Box, Button, FormControlLabel, MenuItem, Switch, TextField } from '@mui/material';
 import { AddOutlined } from '@mui/icons-material';
+import { ContentCard } from '../../../components/common/ContentCard';
+import { TasksCharts } from '../components/TasksCharts';
 
 export const TasksPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -106,29 +108,42 @@ export const TasksPage: React.FC = () => {
         }
       ></PageHeader>
 
-      <LoadingBox isLoading={isLoading}>
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-            gap: '16px',
-            alignItems: 'stretch',
-            padding: '1rem',
-            boxSizing: 'border-box',
-            width: '100%',
-          }}
-        >
-          {data?.map((task) => (
-            <TaskTile
-              key={task.id}
-              task={task}
-              onEdit={() => handleEdit(task)}
-              onRemove={async () => await removeMutation.mutateAsync(task.id)}
-              onToggle={async () => await toggleMutation.mutateAsync(task.id)}
-            />
-          ))}
-        </Box>
-      </LoadingBox>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 1,
+          padding: '8px',
+        }}
+      >
+        <LoadingBox isLoading={isLoading}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+              gap: '16px',
+              alignItems: 'stretch',
+              padding: '1rem',
+              boxSizing: 'border-box',
+              width: '100%',
+            }}
+          >
+            {data?.map((task) => (
+              <TaskTile
+                key={task.id}
+                task={task}
+                onEdit={() => handleEdit(task)}
+                onRemove={async () => await removeMutation.mutateAsync(task.id)}
+                onToggle={async () => await toggleMutation.mutateAsync(task.id)}
+              />
+            ))}
+          </Box>
+        </LoadingBox>
+
+        <ContentCard caption="Charts">
+          <TasksCharts showAll={showAll} importance={importance} />
+        </ContentCard>
+      </Box>
 
       <TaskEditDialog
         open={taskDialogOpen}

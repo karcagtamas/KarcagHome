@@ -1,94 +1,83 @@
-import { Button, createTableColumn, DataGrid, DataGridBody, DataGridCell, DataGridHeader, DataGridHeaderCell, DataGridRow, makeStyles, tokens, type TableColumnDefinition, Text } from "@fluentui/react-components";
-import type { Measurement } from "../models/measurement";
-import { AddRegular, DeleteRegular, EditRegular } from "@fluentui/react-icons";
-
-const useStyles = makeStyles({
-    container: {
-        display: 'flex',
-        flexDirection: 'column',
-        gap: tokens.spacingVerticalM,
-        width: '100%',
-    },
-    actionCell: {
-        display: 'flex',
-        gap: tokens.spacingHorizontalS,
-    },
-});
+import { DataGrid, type GridColDef } from '@mui/x-data-grid';
+import type { Measurement } from '../models/measurement';
+import { Box, Button, IconButton } from '@mui/material';
+import { AddOutlined, DeleteOutlined, EditOutlined } from '@mui/icons-material';
 
 type Props = {
-    measurements: Measurement[];
-    onEdit: (m: Measurement) => void;
-    onDelete: (id: string) => void;
-    onAdd: () => void;
-}
+  measurements: Measurement[];
+  onEdit: (m: Measurement) => void;
+  onDelete: (id: string) => void;
+  onAdd: () => void;
+};
 
-export const MeasurementList: React.FC<Props> = ({
-    measurements,
-    onEdit,
-    onDelete,
-    onAdd,
-}) => {
-    const styles = useStyles();
+export const MeasurementList: React.FC<Props> = ({ measurements, onEdit, onDelete, onAdd }) => {
+  const columns: GridColDef<Measurement>[] = [
+    {
+      field: 'date',
+      headerName: 'Date',
+      flex: 1,
+      valueFormatter: (value) => (value ? new Date(value).toLocaleDateString() : ''),
+    },
+    {
+      field: 'value',
+      headerName: 'Value',
+      type: 'number',
+      flex: 1,
+      headerAlign: 'left',
+      align: 'left',
+      cellClassName: 'mui-grid-font-semibold',
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 120,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => (
+        <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center', height: '100%' }}>
+          <IconButton size="small" onClick={() => onEdit(params.row)}>
+            <EditOutlined fontSize="small" />
+          </IconButton>
+          <IconButton size="small" color="error" onClick={() => onDelete(params.row.id)}>
+            <DeleteOutlined fontSize="small" />
+          </IconButton>
+        </Box>
+      ),
+    },
+  ];
 
-    const columns: TableColumnDefinition<Measurement>[] = [
-        createTableColumn<Measurement>({
-            columnId: 'date',
-            compare: (a, b) => a.date.localeCompare(b.date),
-            renderHeaderCell: () => <b>Date</b>,
-            renderCell: (item) => <Text>{new Date(item.date).toLocaleDateString()}</Text>,
-        }),
-        createTableColumn<Measurement>({
-            columnId: 'value',
-            compare: (a, b) => a.value - b.value,
-            renderHeaderCell: () => <b>Value</b>,
-            renderCell: (item) => <Text weight="semibold">{item.value}</Text>,
-        }),
-        createTableColumn<Measurement>({
-            columnId: 'actions',
-            renderHeaderCell: () => <b>Actions</b>,
-            renderCell: (item) => (
-                <div className={styles.actionCell}>
-                    <Button
-                        appearance="subtle"
-                        icon={<EditRegular />}
-                        onClick={() => onEdit(item)}
-                    />
-                    <Button 
-                        appearance="subtle"
-                        icon={<DeleteRegular />}
-                        onClick={() => onDelete(item.id)}
-                    />
-                </div>
-            ),
-        }),
-    ];
-
-    return <div className={styles.container}>
-        <Button appearance="primary" icon={<AddRegular />} onClick={onAdd}>
-            Add Measurement
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 2,
+        width: '100%',
+        boxSizing: 'border-box',
+      }}
+    >
+      <Box sx={{ alignSelf: 'flex-start' }}>
+        <Button variant="contained" startIcon={<AddOutlined />} onClick={onAdd} size="small">
+          Add Measurement
         </Button>
+      </Box>
 
+      <Box sx={{ width: '100%', height: 400 }}>
         <DataGrid
-            items={measurements}
-            columns={columns}
-            sortable
-            selectionMode="single"
-            getRowId={(item) => item.id}
-        >
-            <DataGridHeader>
-                <DataGridRow>
-                    {({ renderHeaderCell }) => (<DataGridHeaderCell>{renderHeaderCell()}</DataGridHeaderCell>)}
-                </DataGridRow>
-            </DataGridHeader>
-            <DataGridBody<Measurement>>
-                {({ item, rowId }) => (
-                    <DataGridRow<Measurement>>
-                        {({ renderCell }) => (
-                            <DataGridCell>{renderCell(item)}</DataGridCell>
-                        )}
-                    </DataGridRow>
-                )}
-            </DataGridBody>
-        </DataGrid>
-    </div>
+          rows={measurements}
+          columns={columns}
+          getRowId={(row) => row.id}
+          disableRowSelectionOnClick
+          initialState={{
+            pagination: { paginationModel: { pageSize: 5 } },
+          }}
+          pageSizeOptions={[5, 10, 20]}
+          sx={{
+            '& .MuiDataGrid-cell:focus': { outline: 'none' },
+            '& .mui-grid-font-semibold': { fontWeight: 600 },
+          }}
+        />
+      </Box>
+    </Box>
+  );
 };

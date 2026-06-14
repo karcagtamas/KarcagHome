@@ -32,7 +32,7 @@ fun Route.measurementRoutes(repository: MeasurementRepository) {
                     body.value,
                     body.categoryId,
                     body.date,
-                )
+                ).toDTO()
             )
         }
 
@@ -77,7 +77,7 @@ fun Route.measurementRoutes(repository: MeasurementRepository) {
                     body.name,
                     body.color,
                     body.unit,
-                )
+                ).toDTO()
             )
         }
 

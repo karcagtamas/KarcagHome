@@ -41,13 +41,7 @@ class MeasurementRepositoryImpl : MeasurementRepository {
             it[createdAt] = now
         }
 
-        MeasurementCategory(
-            id = row[MeasurementCategoriesTable.id],
-            name = name,
-            color = color,
-            unit = unit,
-            createdAt = now,
-        )
+        getCategoryById(row[MeasurementCategoriesTable.id])!!
     }
 
     override fun updateCategory(

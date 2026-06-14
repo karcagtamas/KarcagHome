@@ -11,6 +11,7 @@ import { measurementCategoryApi } from '../api/measurement-category.api';
 import { measurementKeys } from '../../../keys/measurementKeys';
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 import { LoadingBox } from '../../../components/common/LoadingBox';
+import { MeasurementCategoryEditDialog } from '../dialogs/MeasurementCategoryEditDialog';
 
 export const MeasurementCategoriesPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -92,7 +93,7 @@ export const MeasurementCategoriesPage: React.FC = () => {
       ),
     },
     {
-      field: 'unity',
+      field: 'unit',
       headerName: 'Unit',
       flex: 1,
     },
@@ -144,6 +145,14 @@ export const MeasurementCategoriesPage: React.FC = () => {
           />
         </Box>
       </LoadingBox>
+
+      <MeasurementCategoryEditDialog
+        open={measurementCategoryDialogOpen}
+        measurementCategory={selectedMeasurementCategory}
+        loading={apiLoading}
+        onClose={() => setMeasurementCategoryDialogOpen(false)}
+        onSubmit={handleSubmit}
+      />
     </PageFrame>
   );
 };

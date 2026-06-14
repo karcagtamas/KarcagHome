@@ -22,7 +22,7 @@ export const TaskCompletedChart: React.FC<Props> = ({ showAll, importance }) => 
     }) ?? [];
 
   return (
-    <Box sx={{ flex: 1, width: '100%', boxSizing: 'border-box' }}>
+    <Box sx={{ flex: 1, width: '100%' }}>
       <LoadingBox isLoading={isLoading}>
         <PieChart
           series={[

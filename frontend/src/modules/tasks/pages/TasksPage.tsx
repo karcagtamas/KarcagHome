@@ -112,37 +112,51 @@ export const TasksPage: React.FC = () => {
         sx={{
           display: 'flex',
           flexDirection: 'column',
-          gap: 1,
+          flex: 1,
+          minHeight: 0,
+          overflow: 'hidden',
           padding: '8px',
+          gap: 2,
         }}
       >
-        <LoadingBox isLoading={isLoading}>
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-              gap: '16px',
-              alignItems: 'stretch',
-              padding: '1rem',
-              boxSizing: 'border-box',
-              width: '100%',
-            }}
-          >
-            {data?.map((task) => (
-              <TaskTile
-                key={task.id}
-                task={task}
-                onEdit={() => handleEdit(task)}
-                onRemove={async () => await removeMutation.mutateAsync(task.id)}
-                onToggle={async () => await toggleMutation.mutateAsync(task.id)}
-              />
-            ))}
-          </Box>
-        </LoadingBox>
+        <Box
+          sx={{
+            flex: 1,
+            minHeight: 0,
+            overflowY: 'auto',
+            borderRadius: '4px',
+          }}
+        >
+          <LoadingBox isLoading={isLoading}>
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                gap: '16px',
+                alignItems: 'stretch',
+                padding: '1rem',
+                boxSizing: 'border-box',
+                width: '100%',
+              }}
+            >
+              {data?.map((task) => (
+                <TaskTile
+                  key={task.id}
+                  task={task}
+                  onEdit={() => handleEdit(task)}
+                  onRemove={async () => await removeMutation.mutateAsync(task.id)}
+                  onToggle={async () => await toggleMutation.mutateAsync(task.id)}
+                />
+              ))}
+            </Box>
+          </LoadingBox>
+        </Box>
 
-        <ContentCard caption="Charts">
-          <TasksCharts showAll={showAll} importance={importance} />
-        </ContentCard>
+        <Box sx={{ flexShrink: 0 }}>
+          <ContentCard caption="Charts">
+            <TasksCharts showAll={showAll} importance={importance} />
+          </ContentCard>
+        </Box>
       </Box>
 
       <TaskEditDialog

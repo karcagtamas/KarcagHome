@@ -12,10 +12,9 @@ export const TasksCharts: React.FC<Props> = ({ showAll, importance }) => {
     <Box
       sx={{
         display: 'flex',
-        flexDirection: { xs: 'column', md: 'row' },
-        gap: 3,
+        flexDirection: 'row',
+        gap: 2,
         width: '100%',
-        boxSizing: 'border-box',
         alignItems: 'center',
         justifyContent: 'center',
         padding: 2,

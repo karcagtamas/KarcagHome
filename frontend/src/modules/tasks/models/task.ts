@@ -1,3 +1,5 @@
+import type { ThemeColors } from '../../../common/colors';
+
 export interface TaskDTO {
   id: number;
   title: string;
@@ -12,27 +14,48 @@ export interface TaskEditDTO {
   importance: number;
 }
 
-export const IMPORTANCE_LEVELS: Record<
-  number,
-  { value: number; displayText: string; bgColor: string; fgColor: string }
-> = {
+export const IMPORTANCE_LEVELS: Record<number, { value: number; displayText: string; colors: ThemeColors }> = {
   [0]: {
     value: 0,
     displayText: 'Not Important',
-    bgColor: '#def7ff',
-    fgColor: '#19beff',
+    colors: {
+      light: {
+        bgColor: '#c7ecf8',
+        fgColor: '#0c8dc0',
+      },
+      dark: {
+        bgColor: '#10698b',
+        fgColor: '#85c1d4',
+      },
+    },
   },
   [1]: {
     value: 1,
     displayText: 'Normal',
-    bgColor: '#ffe8c2',
-    fgColor: '#fcaf35',
+    colors: {
+      light: {
+        bgColor: '#ffecc2',
+        fgColor: '#be7909',
+      },
+      dark: {
+        bgColor: '#be7909',
+        fgColor: '#ffdd94',
+      },
+    },
   },
   [2]: {
     value: 2,
     displayText: 'Important',
-    bgColor: '#ffd1c0',
-    fgColor: '#ff6730',
+    colors: {
+      light: {
+        bgColor: '#fcdbd1',
+        fgColor: '#d64510',
+      },
+      dark: {
+        bgColor: '#b1390d',
+        fgColor: '#e2b3a4',
+      },
+    },
   },
 };
 

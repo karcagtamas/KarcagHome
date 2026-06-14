@@ -35,52 +35,57 @@ export const HomePage: React.FC = () => {
   return (
     <Box
       sx={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-        gap: '24px',
-        padding: '40px',
-        maxWidth: '1200px',
-        margin: '0 auto',
+        display: 'flex',
+        alignContent: 'center',
+        justifyContent: 'center',
         flex: 1,
-        alignItems: 'center',
-        width: '100%',
-        boxSizing: 'border-box',
+        padding: '1rem',
       }}
     >
-      {menuItems.map((item) => (
-        <Card
-          key={item.title}
-          onClick={() => navigate(item.path)}
-          sx={{
-            height: '180px',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            display: 'flex',
-            alignItems: 'center',
-            '&:hover': {
-              transform: 'translateY(-4px)',
-              bgcolor: 'action.hover',
-              boxShadow: 4,
-            },
-          }}
-        >
-          <CardHeader
-            avatar={item.icon}
-            title={
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                {item.title}
-              </Typography>
-            }
-            subheader={
-              item.desc ? (
-                <Typography variant="body2" color="text.secondary">
-                  {item.desc}
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, minmax(320px, 1fr))',
+          gap: '24px',
+          alignContent: 'center',
+        }}
+      >
+        {menuItems.map((item) => (
+          <Card
+            key={item.title}
+            onClick={() => navigate(item.path)}
+            sx={{
+              height: '180px',
+              width: '100%',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              display: 'flex',
+              alignItems: 'center',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                bgcolor: 'action.hover',
+                boxShadow: 4,
+              },
+            }}
+          >
+            <CardHeader
+              avatar={item.icon}
+              title={
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                  {item.title}
                 </Typography>
-              ) : null
-            }
-          />
-        </Card>
-      ))}
+              }
+              subheader={
+                item.desc ? (
+                  <Typography variant="body2" color="text.secondary">
+                    {item.desc}
+                  </Typography>
+                ) : null
+              }
+            />
+          </Card>
+        ))}
+      </Box>
     </Box>
   );
 };

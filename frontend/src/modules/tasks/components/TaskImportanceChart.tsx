@@ -1,8 +1,9 @@
-import { Box } from '@mui/material';
+import { Box, useTheme } from '@mui/material';
 import { LoadingBox } from '../../../components/common/LoadingBox';
 import { useImportanceChart } from '../hooks/useImportanceChart';
 import { IMPORTANCE_LEVELS } from '../models/task';
 import { PieChart } from '@mui/x-charts';
+import { getPaletteByTheme } from '../../../common/colors';
 
 type Props = {
   showAll: boolean;
@@ -10,22 +11,24 @@ type Props = {
 };
 
 export const TaskImportanceChart: React.FC<Props> = ({ showAll, importance }) => {
+  const theme = useTheme();
   const { data: importanceChart, isLoading } = useImportanceChart(showAll, importance);
 
   const seriesData =
     importanceChart?.map((e) => {
       const levelInfo = IMPORTANCE_LEVELS[e.importance];
+      const colors = getPaletteByTheme(levelInfo.colors, theme);
 
       return {
         id: `level-${e.importance}`,
         value: e.count,
         label: levelInfo.displayText,
-        color: levelInfo.bgColor || '#ccc',
+        color: colors.bgColor || '#ccc',
       };
     }) ?? [];
 
   return (
-    <Box sx={{ flex: 1, width: '100%', boxSizing: 'border-box' }}>
+    <Box sx={{ flex: 1, width: '100%' }}>
       <LoadingBox isLoading={isLoading}>
         <PieChart
           series={[

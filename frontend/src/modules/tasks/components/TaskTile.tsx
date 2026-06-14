@@ -1,7 +1,8 @@
-import { Box, Button, Card, CardActions, CardContent, CardHeader, Typography } from '@mui/material';
+import { Box, Button, Card, CardActions, CardContent, CardHeader, Typography, useTheme } from '@mui/material';
 import { IMPORTANCE_LEVELS, type TaskDTO } from '../models/task';
 import { useMemo } from 'react';
 import { DeleteOutlined, EditOutlined, VisibilityOffOutlined, VisibilityOutlined } from '@mui/icons-material';
+import { getPaletteByTheme } from '../../../common/colors';
 
 type Props = {
   task: TaskDTO;
@@ -12,15 +13,19 @@ type Props = {
 };
 
 export const TaskTile: React.FC<Props> = ({ task, onEdit, onRemove, className, onToggle }) => {
+  const theme = useTheme();
   const importance = useMemo(() => {
     return IMPORTANCE_LEVELS[task.importance];
   }, [task.importance]);
+
+  const bgColor = useMemo(() => getPaletteByTheme(importance.colors, theme).bgColor, [importance, theme]);
+  const fgColor = useMemo(() => getPaletteByTheme(importance.colors, theme).fgColor, [importance, theme]);
 
   return (
     <Card
       className={className}
       sx={{
-        backgroundColor: importance.bgColor,
+        backgroundColor: bgColor,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
@@ -30,7 +35,14 @@ export const TaskTile: React.FC<Props> = ({ task, onEdit, onRemove, className, o
     >
       <CardHeader
         title={
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+          <Typography
+            variant="subtitle1"
+            sx={{
+              fontWeight: 'bold',
+              textDecoration: task.completed ? 'line-through' : 'none',
+              textDecorationThickness: 3,
+            }}
+          >
             {task.title}
           </Typography>
         }
@@ -57,7 +69,7 @@ export const TaskTile: React.FC<Props> = ({ task, onEdit, onRemove, className, o
       />
 
       <CardContent sx={{ pt: 0, pb: 1, flexGrow: 1 }}>
-        <Typography variant="body2" sx={{ color: importance.fgColor, fontWeight: 'bold', mb: 1 }}>
+        <Typography variant="body2" sx={{ color: fgColor, fontWeight: 'bold', mb: 1 }}>
           {importance.displayText}
         </Typography>
 
@@ -77,7 +89,7 @@ export const TaskTile: React.FC<Props> = ({ task, onEdit, onRemove, className, o
             )
           }
           onClick={() => onToggle && onToggle()}
-          sx={{ borderColor: 'darkblue', color: 'darkblue' }}
+          sx={{ color: 'text.primary', borderColor: 'text.primary' }}
         >
           {task.completed ? 'Unsolve' : 'Solve'}
         </Button>

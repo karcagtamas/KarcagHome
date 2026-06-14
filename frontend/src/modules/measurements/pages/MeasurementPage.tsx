@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 import { MeasurementList } from '../components/MeasurementList';
-import { useMeasurements } from '../../../hooks/useMeasurements';
+import { useMeasurements } from '../hooks/useMeasurements';
 import { MeasurementCategoryList } from '../components/MeasurementCategoryList';
 import { Box, Button, CircularProgress, Drawer, IconButton, Typography } from '@mui/material';
 import { AddOutlined, CloseOutlined, HistoryOutlined, SettingsOutlined } from '@mui/icons-material';

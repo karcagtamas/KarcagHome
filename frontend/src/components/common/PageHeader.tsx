@@ -20,6 +20,7 @@ export const PageHeader: React.FC<Props> = ({ title, actions }) => {
         gap: '12px',
         boxSizing: 'border-box',
         width: '100%',
+        bgcolor: 'background.paper'
       }}
     >
       <Box

@@ -15,6 +15,7 @@ export const PageFrame: React.FC<Props> = ({ children }) => {
         width: '100%',
         overflow: 'hidden',
         boxSizing: 'border-box',
+        bgcolor: 'background.default'
       }}
     >
       {children}

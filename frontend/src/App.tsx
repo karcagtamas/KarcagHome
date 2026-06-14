@@ -11,6 +11,7 @@ import { AccountPage } from './modules/expenses/pages/AccountPage';
 import { ExpenseCategoriesPage } from './modules/expenses/pages/ExpenseCategoriesPage';
 import { TasksPage } from './modules/tasks/pages/TasksPage';
 import { Box, FormControl, MenuItem, Select, ThemeProvider, type SelectChangeEvent } from '@mui/material';
+import { MeasurementCategoriesPage } from './modules/measurements/pages/MeasurementCategoriesPage';
 
 function App() {
   const [themeKey, setThemeKey] = useState<ThemeKey>(getInitialTheme());
@@ -63,6 +64,7 @@ function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/dashboard" element={<MeasurementPage />} />
               <Route path="/measurements" element={<MeasurementPage />} />
+              <Route path="/measurement-categories" element={<MeasurementCategoriesPage />} />
               <Route path="/tasks" element={<TasksPage />} />
               <Route path="/accounts" element={<AccountsPage />} />
               <Route path="/accounts/:id" element={<AccountPage />} />

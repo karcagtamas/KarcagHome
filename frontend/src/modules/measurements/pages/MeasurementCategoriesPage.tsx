@@ -1,62 +1,63 @@
+import type React from 'react';
 import { PageFrame } from '../../../components/common/PageFrame';
 import { PageHeader } from '../../../components/common/PageHeader';
-import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { expenseCategoryApi } from '../../../api/expense-category.api';
-import { expenseKeys } from '../../../keys/expenseKeys';
-import { useExpenseCategories } from '../../../hooks/useExpenseCategories';
-import { LoadingBox } from '../../../components/common/LoadingBox';
-import type { ExpenseCategoryDTO, ExpenseCategoryEditDTO } from '../models/expenses';
-import { ExpenseCategoryEditDialog } from '../dialogs/ExpenseCategoryEditDialog';
 import { Box, Button, IconButton } from '@mui/material';
-import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 import { AddOutlined, DeleteOutlined, EditOutlined } from '@mui/icons-material';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+import type { MeasurementCategoryDTO, MeasurementCategoryEditDTO } from '../models/measurement';
+import { useMeasurementCategories } from '../hooks/useMeasurementCategories';
+import { measurementCategoryApi } from '../api/measurement-category.api';
+import { measurementKeys } from '../../../keys/measurementKeys';
+import { DataGrid, type GridColDef } from '@mui/x-data-grid';
+import { LoadingBox } from '../../../components/common/LoadingBox';
 
-export const ExpenseCategoriesPage: React.FC = () => {
+export const MeasurementCategoriesPage: React.FC = () => {
   const queryClient = useQueryClient();
-  const [expenseCategoryDialogOpen, setExpenseCategoryDialogOpen] = useState(false);
-  const [selectedExpenseCategory, setSelectedExpenseCategory] = useState<ExpenseCategoryDTO | null>(null);
 
-  const { data, isLoading } = useExpenseCategories();
+  const [measurementCategoryDialogOpen, setMeasurementCategoryDialogOpen] = useState(false);
+  const [selectedMeasurementCategory, setSelectedMeasurementCategory] = useState<MeasurementCategoryDTO | null>(null);
+  const { data, isLoading } = useMeasurementCategories();
 
   const createMutation = useMutation({
-    mutationFn: expenseCategoryApi.create,
+    mutationFn: measurementCategoryApi.create,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: expenseKeys.categories() });
+      queryClient.invalidateQueries({ queryKey: measurementKeys.categories() });
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: ExpenseCategoryEditDTO }) => expenseCategoryApi.update(id, data),
+    mutationFn: ({ id, data }: { id: number; data: MeasurementCategoryEditDTO }) =>
+      measurementCategoryApi.update(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: expenseKeys.categories() });
+      queryClient.invalidateQueries({ queryKey: measurementKeys.categories() });
     },
   });
 
   const removeMutation = useMutation({
-    mutationFn: expenseCategoryApi.delete,
+    mutationFn: measurementCategoryApi.delete,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: expenseKeys.categories() });
+      queryClient.invalidateQueries({ queryKey: measurementKeys.categories() });
     },
   });
 
   const handleCreate = () => {
-    setSelectedExpenseCategory(null);
-    setExpenseCategoryDialogOpen(true);
+    setSelectedMeasurementCategory(null);
+    setMeasurementCategoryDialogOpen(true);
   };
 
-  const handleEdit = (expenseCategory: ExpenseCategoryDTO) => {
-    setSelectedExpenseCategory(expenseCategory);
-    setExpenseCategoryDialogOpen(true);
+  const handleEdit = (measurementCategory: MeasurementCategoryDTO) => {
+    setSelectedMeasurementCategory(measurementCategory);
+    setMeasurementCategoryDialogOpen(true);
   };
 
-  const handleRemove = async (expenseCategory: ExpenseCategoryDTO) => {
-    await removeMutation.mutateAsync(expenseCategory.id);
+  const handleRemove = async (measurementCategory: MeasurementCategoryDTO) => {
+    await removeMutation.mutateAsync(measurementCategory.id);
   };
 
   const apiLoading = createMutation.isPending || updateMutation.isPending || removeMutation.isPending;
 
-  const handleSubmit = async (data: ExpenseCategoryEditDTO, id: number | undefined) => {
+  const handleSubmit = async (data: MeasurementCategoryEditDTO, id?: number) => {
     if (id) {
       await updateMutation.mutateAsync({ id, data });
     } else {
@@ -64,7 +65,7 @@ export const ExpenseCategoriesPage: React.FC = () => {
     }
   };
 
-  const columns: GridColDef<ExpenseCategoryDTO>[] = [
+  const columns: GridColDef<MeasurementCategoryDTO>[] = [
     {
       field: 'name',
       headerName: 'Name',
@@ -91,10 +92,9 @@ export const ExpenseCategoriesPage: React.FC = () => {
       ),
     },
     {
-      field: 'type',
-      headerName: 'Type',
+      field: 'unity',
+      headerName: 'Unit',
       flex: 1,
-      valueGetter: (_, row) => row.type?.name ?? '',
     },
     {
       field: 'actions',
@@ -118,9 +118,9 @@ export const ExpenseCategoriesPage: React.FC = () => {
   return (
     <PageFrame>
       <PageHeader
-        title="Expense Categories"
+        title="Measurement Categories"
         actions={
-          <Button variant="contained" startIcon={<AddOutlined />} onClick={handleCreate} size="small">
+          <Button variant="contained" startIcon={<AddOutlined />} onClick={handleCreate}>
             Create
           </Button>
         }
@@ -144,14 +144,6 @@ export const ExpenseCategoriesPage: React.FC = () => {
           />
         </Box>
       </LoadingBox>
-
-      <ExpenseCategoryEditDialog
-        open={expenseCategoryDialogOpen}
-        expenseCategory={selectedExpenseCategory}
-        loading={apiLoading}
-        onClose={() => setExpenseCategoryDialogOpen(false)}
-        onSubmit={handleSubmit}
-      />
     </PageFrame>
   );
 };

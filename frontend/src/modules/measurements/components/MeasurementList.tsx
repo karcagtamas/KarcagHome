@@ -1,17 +1,17 @@
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
-import type { Measurement } from '../models/measurement';
+import type { MeasurementDTO } from '../models/measurement';
 import { Box, Button, IconButton } from '@mui/material';
 import { AddOutlined, DeleteOutlined, EditOutlined } from '@mui/icons-material';
 
 type Props = {
-  measurements: Measurement[];
-  onEdit: (m: Measurement) => void;
-  onDelete: (id: string) => void;
+  measurements: MeasurementDTO[];
+  onEdit: (m: MeasurementDTO) => void;
+  onDelete: (id: number) => void;
   onAdd: () => void;
 };
 
 export const MeasurementList: React.FC<Props> = ({ measurements, onEdit, onDelete, onAdd }) => {
-  const columns: GridColDef<Measurement>[] = [
+  const columns: GridColDef<MeasurementDTO>[] = [
     {
       field: 'date',
       headerName: 'Date',

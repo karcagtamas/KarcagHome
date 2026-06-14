@@ -1,23 +1,10 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { MeasurementApi } from "../api/measurement.api";
-import { MeasurementCategoryApi } from "../api/measurement-category.api";
+import { useQuery } from '@tanstack/react-query';
+import { measurementKeys } from '../../../keys/measurementKeys';
+import { measurementApi } from '../api/measurement.api';
 
 export const useMeasurements = () => {
-    const queryClient = useQueryClient();
-
-    const measurementsQuery = useQuery({
-        queryKey: ['measurements'],
-        queryFn: MeasurementApi.list, 
-    });
-
-    const measurementCategoriesQuery = useQuery({
-        queryKey: ['measurement-categories'],
-        queryFn: MeasurementCategoryApi.list,
-    });
-
-    return {
-        measurements: measurementsQuery.data ?? [],
-        categories: measurementCategoriesQuery.data ?? [],
-        isLoading: measurementsQuery.isLoading || measurementCategoriesQuery.isLoading,
-    }
+  return useQuery({
+    queryKey: measurementKeys.all,
+    queryFn: () => measurementApi.getAll(),
+  });
 };

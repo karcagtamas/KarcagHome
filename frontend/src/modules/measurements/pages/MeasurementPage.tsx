@@ -5,13 +5,15 @@ import { useMeasurements } from '../hooks/useMeasurements';
 import { MeasurementCategoryList } from '../components/MeasurementCategoryList';
 import { Box, Button, CircularProgress, Drawer, IconButton, Typography } from '@mui/material';
 import { AddOutlined, CloseOutlined, HistoryOutlined, SettingsOutlined } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
 const DRAWER_WIDTH = 320;
 
 export const MeasurementPage: React.FC = () => {
+  const navigate = useNavigate();
   const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
-  const { measurements, isLoading } = useMeasurements();
+  const { data: measurements, isLoading } = useMeasurements();
 
   if (isLoading) {
     return (
@@ -71,7 +73,7 @@ export const MeasurementPage: React.FC = () => {
             <CloseOutlined fontSize="small" />
           </IconButton>
         </Box>
-        <MeasurementList measurements={measurements} onAdd={() => {}} onEdit={() => {}} onDelete={() => {}} />
+        <MeasurementList measurements={measurements ?? []} onAdd={() => {}} onEdit={() => {}} onDelete={() => {}} />
       </Drawer>
 
       <Box
@@ -99,7 +101,7 @@ export const MeasurementPage: React.FC = () => {
           <Button variant="text" startIcon={<HistoryOutlined />} onClick={() => setLeftDrawerOpen(!leftDrawerOpen)}>
             Measurements
           </Button>
-          <Button variant="text" startIcon={<SettingsOutlined />} onClick={() => setRightDrawerOpen(!rightDrawerOpen)}>
+          <Button variant="text" startIcon={<SettingsOutlined />} onClick={() => navigate('/measurement-categories')}>
             Categories
           </Button>
           <Button variant="contained" startIcon={<AddOutlined />}>

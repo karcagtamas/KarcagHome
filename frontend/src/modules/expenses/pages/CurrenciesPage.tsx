@@ -1,7 +1,5 @@
-import { Button, Dropdown, Label, Option, Switch } from '@fluentui/react-components';
 import { PageFrame } from '../../../components/common/PageFrame';
 import { PageHeader } from '../../../components/common/PageHeader';
-import { AddRegular } from '@fluentui/react-icons';
 import { useState } from 'react';
 import type { CurrencyDTO, CurrencyExchangeDTO, MonthNode, RateNode } from '../models/currency';
 import { CurrencyEditDialog } from '../dialogs/CurrencyEditDialog';
@@ -15,6 +13,8 @@ import { MONTHS } from '../../../common/month';
 import { LoadingBox } from '../../../components/common/LoadingBox';
 import { useExchangeYears } from '../../../hooks/useExchangeYears';
 import { currencyExchangeApi } from '../../../api/currency-exchange.api';
+import { Box, Button, FormControlLabel, MenuItem, Switch, TextField } from '@mui/material';
+import { AddOutlined } from '@mui/icons-material';
 
 export const CurrenciesPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -126,24 +126,39 @@ export const CurrenciesPage: React.FC = () => {
   return (
     <PageFrame>
       <PageHeader
-        title={'Currencies'}
+        title="Currencies"
         actions={
-          <>
-            <Label htmlFor="show-disabled-toggle">Show Disabled</Label>
-            <Switch
-              id="show-disabled-toggle"
-              checked={showDisabled}
-              onChange={(_, data) => setShowDisabled(data.checked)}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <FormControlLabel
+              control={
+                <Switch
+                  id="show-disabled-toggle"
+                  checked={showDisabled}
+                  onChange={(e) => setShowDisabled(e.target.checked)}
+                />
+              }
+              label="Show Disabled"
             />
-            <Dropdown value={year.toString()} onOptionSelect={(_, data) => setYear(Number(data.optionValue))}>
+
+            <TextField
+              select
+              size="small"
+              label="Year"
+              value={year}
+              onChange={(e) => setYear(Number(e.target.value))}
+              sx={{ minWidth: 100 }}
+            >
               {years.map((y) => (
-                <Option key={y} value={y.toString()} text={y.toString()}>
+                <MenuItem key={y} value={y}>
                   {y}
-                </Option>
+                </MenuItem>
               ))}
-            </Dropdown>
-            <Button icon={<AddRegular />} onClick={handleCreate} />
-          </>
+            </TextField>
+
+            <Button variant="contained" startIcon={<AddOutlined />} onClick={handleCreate} size="small">
+              Create
+            </Button>
+          </Box>
         }
       ></PageHeader>
 

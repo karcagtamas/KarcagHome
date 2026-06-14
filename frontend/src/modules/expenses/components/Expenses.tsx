@@ -1,21 +1,14 @@
 import { useExpenses } from '../../../hooks/useExpenses';
-import { Box } from '../../../components/common/Box';
-import {
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableHeaderCell,
-  TableRow,
-} from '@fluentui/react-components';
-import { AddRegular, DeleteRegular, EditRegular } from '@fluentui/react-icons';
+import { ContentCard } from '../../../components/common/ContentCard';
 import { useState } from 'react';
 import { ExpenseEditDialog } from '../dialogs/ExpenseEditDialog';
 import type { ExpenseDTO, ExpenseEditDTO } from '../models/expenses';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { expenseApi } from '../../../api/expense.api';
 import { expenseKeys } from '../../../keys/expenseKeys';
+import { Box, IconButton } from '@mui/material';
+import { AddOutlined, DeleteOutlined, EditOutlined } from '@mui/icons-material';
+import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 
 type Props = {
   accountId: number;
@@ -73,41 +66,73 @@ export const Expenses: React.FC<Props> = ({ accountId }) => {
     }
   };
 
+  const columns: GridColDef<ExpenseDTO>[] = [
+    {
+      field: 'category',
+      headerName: 'Category',
+      flex: 1,
+      valueGetter: (_, row) => row.category.name,
+    },
+    {
+      field: 'date',
+      headerName: 'Date',
+      flex: 1,
+    },
+    {
+      field: 'amount',
+      headerName: 'Amount',
+      type: 'number',
+      flex: 1,
+      headerAlign: 'left',
+      align: 'left',
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 120,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => (
+        <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center', height: '100%' }}>
+          <IconButton size="small" onClick={() => handleEdit(params.row)} disabled={apiLoading}>
+            <EditOutlined fontSize="small" />
+          </IconButton>
+          <IconButton size="small" color="error" onClick={() => handleRemove(params.row)} disabled={apiLoading}>
+            <DeleteOutlined fontSize="small" />
+          </IconButton>
+        </Box>
+      ),
+    },
+  ];
+
   return (
     <>
-      <Box
+      <ContentCard
         caption="Expenses"
         actions={
-          <>
-            <Button appearance="subtle" icon={<AddRegular />} onClick={handleCreate} />
-          </>
+          <IconButton onClick={handleCreate} size="small" color="primary">
+            <AddOutlined />
+          </IconButton>
         }
       >
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHeaderCell>Category</TableHeaderCell>
-              <TableHeaderCell>Date</TableHeaderCell>
-              <TableHeaderCell>Amount</TableHeaderCell>
-              <TableHeaderCell>Actions</TableHeaderCell>
-            </TableRow>
-          </TableHeader>
-
-          <TableBody>
-            {data?.map((e) => (
-              <TableRow key={e.id}>
-                <TableCell>{e.category.name}</TableCell>
-                <TableCell>{e.date}</TableCell>
-                <TableCell>{e.amount}</TableCell>
-                <TableCell>
-                  <Button icon={<EditRegular />} appearance="subtle" onClick={() => handleEdit(e)} />
-                  <Button icon={<DeleteRegular />} appearance="subtle" onClick={async () => await handleRemove(e)} />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Box>
+        <Box sx={{ width: '100%', height: 400 }}>
+          <DataGrid
+            rows={data ?? []}
+            columns={columns}
+            loading={isLoading}
+            getRowId={(row) => row.id}
+            disableRowSelectionOnClick
+            pageSizeOptions={[5, 10, 25]}
+            initialState={{
+              pagination: { paginationModel: { pageSize: 5 } },
+            }}
+            sx={{
+              border: 'none',
+              '& .MuiDataGrid-cell:focus': { outline: 'none' },
+            }}
+          />
+        </Box>
+      </ContentCard>
 
       <ExpenseEditDialog
         open={expenseDialogOpen}

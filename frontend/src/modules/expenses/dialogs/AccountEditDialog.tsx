@@ -1,9 +1,8 @@
-import { Field, Input } from '@fluentui/react-components';
 import type { AccountDTO, AccountEditDTO } from '../models/account';
 import { EditDialog } from '../../../components/dialog/EditDialog';
 import { useEffect, useState } from 'react';
 import { useCurrencies } from '../../../hooks/useCurrencies';
-import { ComboBox } from '../../../components/common/ComboBox';
+import { Box, MenuItem, TextField } from '@mui/material';
 
 type Props = {
   open: boolean;
@@ -59,36 +58,53 @@ export const AccountEditDialog: React.FC<Props> = ({ open, account, onClose, onS
         onSubmit={handleSubmit}
         loading={loading}
       >
-        <Field label="Name" required>
-          <Input
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 1 }}>
+          <TextField
+            label="Name"
+            required
+            fullWidth
             autoFocus
             value={name}
-            onChange={(_, d) => setName(d.value)}
+            onChange={(e) => setName(e.target.value)}
             disabled={loading}
             placeholder="My private account"
+            variant="outlined"
+            size="small"
           />
-        </Field>
 
-        <Field label="Currency" required>
-          <ComboBox
-            data={currencies}
-            value={currencyId?.toString()}
-            identifierProvider={(d) => d.id.toString()}
-            displayTextProvider={(d) => `${d.name} [${d.abbreviation}]`}
-            onValueChange={(v) => setCurrencyId(Number(v))}
+          <TextField
+            select
+            label="Currency"
+            required
+            fullWidth
+            value={currencyId}
+            onChange={(e) => setCurrencyId(Number(e.target.value))}
             disabled={loading || isEdit}
-          />
-        </Field>
+            variant="outlined"
+            size="small"
+          >
+            {currencies?.map((currency) => (
+              <MenuItem key={currency.id} value={currency.id}>
+                {currency.name} [{currency.abbreviation}]
+              </MenuItem>
+            ))}
+          </TextField>
 
-        <Field label="Base Value" required>
-          <Input
+          <TextField
+            label="Base Value"
+            required
+            fullWidth
             type="number"
-            step="0.000001"
+            slotProps={{
+              htmlInput: { step: '0.000001' },
+            }}
             value={baseValue}
-            onChange={(_, data) => setBaseValue(data.value)}
+            onChange={(e) => setBaseValue(e.target.value)}
             disabled={loading}
+            variant="outlined"
+            size="small"
           />
-        </Field>
+        </Box>
       </EditDialog>
     </>
   );

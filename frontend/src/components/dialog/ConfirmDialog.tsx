@@ -1,6 +1,7 @@
-import { Button, Checkbox, Spinner, type CheckboxProps } from '@fluentui/react-components';
 import { AppDialog } from './AppDialog';
 import { useState } from 'react';
+import { Box, Button, Checkbox, FormControlLabel } from '@mui/material';
+import { LoadingButton } from '../common/LoadingButton';
 
 type Props = {
   open: boolean;
@@ -30,45 +31,65 @@ export const ConfirmDialog: React.FC<Props> = ({
   onConfirm,
   onClose,
 }) => {
-  const [checkboxConfirmed, setCheckboxConfirmed] = useState<CheckboxProps["checked"]>(false);
+  const [checkboxConfirmed, setCheckboxConfirmed] = useState<boolean>(false);
 
-  const isCheckboxConfirmed = checkbox && checkboxConfirmed === true;
+  const isRequirementMet = !checkbox || checkboxConfirmed;
 
   const handleConfirm = async () => {
-    if (loading) return;
+    if (loading || !isRequirementMet) return;
     await onConfirm();
+  };
+
+  const handleClose = () => {
+    if (!loading) {
+      onClose();
+    }
   };
 
   return (
     <AppDialog
       open={open}
-      onOpenChange={(o) => !o && !loading && isCheckboxConfirmed && onClose()}
-      footer={
-        <>
-          {checkbox ? (
-            <Checkbox
-              checked={checkboxConfirmed}
-              onChange={(_, data) => setCheckboxConfirmed(data.checked)}
-              label="Are you sure want to confirm it?"
-              labelPosition='after'
-            />
-          ) : (
-            <></>
-          )}
-          <Button appearance="secondary" onClick={onClose} disabled={loading && !isCheckboxConfirmed}>
-            {cancelText}
-          </Button>
-
-          <Button
-            appearance={danger ? 'primary' : 'secondary'}
-            onClick={handleConfirm}
-            disabled={loading && !isCheckboxConfirmed}
-          >
-            {loading ? <Spinner size="tiny" /> : confirmText}
-          </Button>
-        </>
-      }
+      onClose={handleClose}
       title={title}
+      footer={
+        <Box
+          sx={{
+            display: 'flex',
+            width: '100%',
+            alignItems: 'center',
+            justifyContent: checkbox ? 'space-between' : 'flex-end',
+            gap: 1,
+          }}
+        >
+          {checkbox && (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={checkboxConfirmed}
+                  onChange={(e) => setCheckboxConfirmed(e.target.checked)}
+                  color={danger ? 'error' : 'primary'}
+                />
+              }
+              label="Are you sure want to confirm it?"
+            />
+          )}
+
+          <Box sx={{ display: 'flex', gap: 1, ml: 'auto' }}>
+            <Button variant="text" onClick={onClose} disabled={loading}>
+              {cancelText}
+            </Button>
+
+            <LoadingButton
+              variant={danger ? 'contained' : 'outlined'}
+              color={danger ? 'error' : 'primary'}
+              onClick={handleConfirm}
+              disabled={loading || !isRequirementMet}
+            >
+              {confirmText}
+            </LoadingButton>
+          </Box>
+        </Box>
+      }
     >
       {message}
     </AppDialog>

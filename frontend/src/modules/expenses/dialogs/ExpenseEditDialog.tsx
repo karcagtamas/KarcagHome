@@ -1,11 +1,9 @@
-import { Field, Input, Textarea } from '@fluentui/react-components';
 import { EditDialog } from '../../../components/dialog/EditDialog';
 import { useEffect, useState } from 'react';
-import { ComboBox } from '../../../components/common/ComboBox';
 import type { ExpenseDTO, ExpenseEditDTO } from '../models/expenses';
 import { useExpenseCategories } from '../../../hooks/useExpenseCategories';
-import { DatePicker } from '@fluentui/react-datepicker-compat';
 import { fromLocalDate, toLocalDate } from '../../../common/helpers';
+import { Box, MenuItem, TextField } from '@mui/material';
 
 type Props = {
   open: boolean;
@@ -69,39 +67,68 @@ export const ExpenseEditDialog: React.FC<Props> = ({ open, expense, accountId, o
         onSubmit={handleSubmit}
         loading={loading}
       >
-        <Field label="Amount" required>
-          <Input
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 1 }}>
+          <TextField
+            label="Amount"
+            required
+            fullWidth
             autoFocus
             type="number"
-            step="0.000001"
+            slotProps={{
+              htmlInput: { step: '0.000001' },
+            }}
             value={amount}
-            onChange={(_, data) => setAmount(data.value)}
+            onChange={(e) => setAmount(e.target.value)}
             disabled={loading}
+            variant="outlined"
+            size="small"
           />
-        </Field>
 
-        <Field label="Description">
-          <Textarea value={description ?? undefined} onChange={(_, d) => setDescription(d.value)} disabled={loading} />
-        </Field>
+          <TextField
+            label="Description"
+            fullWidth
+            multiline
+            rows={3}
+            value={description ?? ''}
+            onChange={(e) => setDescription(e.target.value || null)}
+            disabled={loading}
+            variant="outlined"
+            size="small"
+          />
 
-        <Field label="Date" required>
-          <DatePicker
+          <TextField
+            label="Date"
+            required
+            fullWidth
+            type="date"
+            slotProps={{
+              inputLabel: { shrink: true },
+            }}
             value={date ? fromLocalDate(date) : undefined}
-            onSelectDate={(d) => setDate(d ? toLocalDate(d) : null)}
+            onChange={(e) => setDate(e.target.value ? toLocalDate(new Date(e.target.value)) : null)}
             disabled={loading}
+            variant="outlined"
+            size="small"
           />
-        </Field>
 
-        <Field label="Category" required>
-          <ComboBox
-            data={categories ?? []}
-            value={categoryId?.toString()}
-            identifierProvider={(d) => d.id.toString()}
-            displayTextProvider={(d) => `${d.name} (${d.type.name})`}
-            onValueChange={(v) => setCategoryId(Number(v))}
+          <TextField
+            select
+            label="Category"
+            required
+            fullWidth
+            value={categoryId}
+            onChange={(e) => setCategoryId(Number(e.target.value))}
             disabled={loading}
-          />
-        </Field>
+            variant="outlined"
+            size="small"
+          >
+            {categories?.map((d) => (
+              <MenuItem key={d.id} value={d.id}>
+                {d.name} ({d.type.name})
+              </MenuItem>
+            ))}
+          </TextField>
+        </Box>
       </EditDialog>
     </>
   );

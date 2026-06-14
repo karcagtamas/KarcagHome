@@ -1,20 +1,10 @@
-import { Field, makeStyles, tokens, Input } from '@fluentui/react-components';
 import type { CurrencyExchangeDTO } from '../models/currency';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import { MONTHS } from '../../../common/month';
 import { useCurrencies } from '../../../hooks/useCurrencies';
 import { EditDialog } from '../../../components/dialog/EditDialog';
-import { ComboBox } from '../../../components/common/ComboBox';
-
-const useStyles = makeStyles({
-  content: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: tokens.spacingVerticalM,
-    minWidth: '420px',
-  },
-});
+import { Box, MenuItem, TextField } from '@mui/material';
 
 type Props = {
   open: boolean;
@@ -39,8 +29,6 @@ export const CurrencyExchangeEditDialog: React.FC<Props> = ({
   onClose,
   onSubmit,
 }) => {
-  const styles = useStyles();
-
   const isEdit = !!exchange;
   const currencies = useCurrencies();
 
@@ -93,52 +81,88 @@ export const CurrencyExchangeEditDialog: React.FC<Props> = ({
       onSubmit={handleSubmit}
       loading={loading}
     >
-      <div className={styles.content}>
-        <Field label="From Currency" required>
-          <ComboBox
-            data={currencies}
-            value={currencyFromId?.toString()}
-            identifierProvider={(d) => d.id.toString()}
-            displayTextProvider={(d) => `${d.name} [${d.abbreviation}]`}
-            optionFilter={(d) => d.id !== currencyToId}
-            onValueChange={(v) => setCurrencyFromId(Number(v))}
-            disabled={loading || isEdit}
-          />
-        </Field>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 3,
+          pt: 1,
+          minWidth: { xs: '100%', sm: '420px' },
+        }}
+      >
+        <TextField
+          select
+          label="From Currency"
+          required
+          fullWidth
+          value={currencyFromId}
+          onChange={(e) => setCurrencyFromId(Number(e.target.value))}
+          disabled={loading || isEdit}
+          variant="outlined"
+          size="small"
+        >
+          {currencies
+            ?.filter((d) => d.id !== currencyToId) // Filters out target selection directly
+            .map((d) => (
+              <MenuItem key={d.id} value={d.id}>
+                {d.name} [{d.abbreviation}]
+              </MenuItem>
+            ))}
+        </TextField>
 
-        <Field label="To Currency" required>
-          <ComboBox
-            data={currencies}
-            value={currencyToId?.toString()}
-            identifierProvider={(d) => d.id.toString()}
-            displayTextProvider={(d) => `${d.name} [${d.abbreviation}]`}
-            optionFilter={(d) => d.id !== currencyFromId}
-            onValueChange={(v) => setCurrencyToId(Number(v))}
-            disabled={loading || isEdit}
-          />
-        </Field>
+        <TextField
+          select
+          label="To Currency"
+          required
+          fullWidth
+          value={currencyToId}
+          onChange={(e) => setCurrencyToId(Number(e.target.value))}
+          disabled={loading || isEdit}
+          variant="outlined"
+          size="small"
+        >
+          {currencies
+            ?.filter((d) => d.id !== currencyFromId) // Filters out origin selection directly
+            .map((d) => (
+              <MenuItem key={d.id} value={d.id}>
+                {d.name} [{d.abbreviation}]
+              </MenuItem>
+            ))}
+        </TextField>
 
-        <Field label="Month" required>
-          <ComboBox
-            data={Object.values(MONTHS)}
-            value={month?.toString()}
-            identifierProvider={(d) => d.value.toString()}
-            displayTextProvider={(d) => d.displayText}
-            onValueChange={(v) => setMonth(Number(v))}
-            disabled={loading || isEdit}
-          />
-        </Field>
+        <TextField
+          select
+          label="Month"
+          required
+          fullWidth
+          value={month}
+          onChange={(e) => setMonth(Number(e.target.value))}
+          disabled={loading || isEdit}
+          variant="outlined"
+          size="small"
+        >
+          {Object.values(MONTHS).map((d) => (
+            <MenuItem key={d.value} value={d.value}>
+              {d.displayText}
+            </MenuItem>
+          ))}
+        </TextField>
 
-        <Field label={`Exchange Value (${year})`} required>
-          <Input
-            type="number"
-            step="0.000001"
-            value={value}
-            onChange={(_, data) => setValue(data.value)}
-            disabled={loading}
-          />
-        </Field>
-      </div>
+        <TextField
+          label={`Exchange Value (${year})`}
+          required
+          fullWidth
+          type="number"
+          slotProps={{
+            htmlInput: { step: '0.000001' },
+          }}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          disabled={loading}
+          variant="outlined"
+          size="small"
+        />
+      </Box>
     </EditDialog>
   );
 };

@@ -1,8 +1,6 @@
-import { AddRegular, BookmarkRegular, CurrencyDollarEuroRegular } from '@fluentui/react-icons';
 import { PageFrame } from '../../../components/common/PageFrame';
 import { PageHeader } from '../../../components/common/PageHeader';
 import { useAccounts } from '../../../hooks/useAccounts';
-import { Button, makeStyles } from '@fluentui/react-components';
 import { LoadingBox } from '../../../components/common/LoadingBox';
 import { AccountEditDialog } from '../dialogs/AccountEditDialog';
 import { useState } from 'react';
@@ -12,25 +10,12 @@ import { accountApi } from '../../../api/account.api';
 import { accountKeys } from '../../../keys/accountKeys';
 import { useNavigate } from 'react-router-dom';
 import { AccountTile } from '../components/AccountTile';
-
-const useStyles = makeStyles({
-  accountsBox: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-    gap: '16px',
-    alignItems: 'stretch',
-    padding: '1rem',
-  },
-  accountTile: {
-    display: 'flex',
-    flexDirection: 'column',
-  },
-});
+import { Box, Button, IconButton } from '@mui/material';
+import { AddOutlined, BookmarkBorderOutlined, CurrencyExchangeOutlined } from '@mui/icons-material';
 
 export const AccountsPage: React.FC = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const styles = useStyles();
 
   const [accountDialogOpen, setAccountDialogOpen] = useState(false);
   const { data, isLoading } = useAccounts();
@@ -53,26 +38,44 @@ export const AccountsPage: React.FC = () => {
       <PageHeader
         title="Accounts"
         actions={
-          <>
-            <Button icon={<AddRegular />} onClick={() => setAccountDialogOpen(true)} />
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <IconButton onClick={() => navigate('/currencies')} title="Currencies" size="small">
+              <CurrencyExchangeOutlined fontSize="small" />
+            </IconButton>
 
-            <Button icon={<CurrencyDollarEuroRegular />} onClick={() => navigate('/currencies')} />
-            <Button icon={<BookmarkRegular />} onClick={() => navigate('/expense-categories')} />
-          </>
+            <IconButton onClick={() => navigate('/expense-categories')} title="Expense Categories" size="small">
+              <BookmarkBorderOutlined fontSize="small" />
+            </IconButton>
+
+            <Button
+              variant="contained"
+              startIcon={<AddOutlined />}
+              onClick={() => setAccountDialogOpen(true)}
+              size="small"
+              sx={{ ml: 1 }}
+            >
+              Create
+            </Button>
+          </Box>
         }
       ></PageHeader>
 
       <LoadingBox isLoading={isLoading}>
-        <div className={styles.accountsBox}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+            gap: '16px',
+            alignItems: 'stretch',
+            padding: '1rem',
+            boxSizing: 'border-box',
+            width: '100%',
+          }}
+        >
           {data?.map((account) => (
-            <AccountTile
-              className={styles.accountTile}
-              key={account.id}
-              account={account}
-              onClick={() => navigate(`/accounts/${account.id}`)}
-            />
+            <AccountTile key={account.id} account={account} onClick={() => navigate(`/accounts/${account.id}`)} />
           ))}
-        </div>
+        </Box>
       </LoadingBox>
 
       <AccountEditDialog

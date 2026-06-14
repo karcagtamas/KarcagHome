@@ -1,17 +1,9 @@
-import { useState } from 'react';
 import type { CurrencyDTO, CurrencyTreeDTO, MonthNode, RateNode } from '../models/currency';
-import {
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableHeaderCell,
-  TableRow,
-} from '@fluentui/react-components';
 import React from 'react';
-import { AddRegular, ChevronDownRegular, ChevronRightRegular, DeleteRegular, EditRegular } from '@fluentui/react-icons';
 import { MONTHS } from '../../../common/month';
+import { Box, IconButton, Typography } from '@mui/material';
+import { SimpleTreeView, TreeItem, treeItemClasses } from '@mui/x-tree-view';
+import { AddOutlined, DeleteOutlined, EditOutlined } from '@mui/icons-material';
 
 type Props = {
   data?: CurrencyTreeDTO[];
@@ -28,116 +20,110 @@ export const CurrencyTable: React.FC<Props> = ({
   onExchangeEdit,
   onExchangeRemove,
 }) => {
-  const [expanded, setExpanded] = useState<Record<number, boolean>>({});
-  const toggle = (id: number) => {
-    setExpanded((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
-  };
-
-  const handleEdit = (currency: CurrencyTreeDTO) => {
-    onEdit({
-      ...currency.data,
-    });
-  };
-
-  const handleExchangeAdd = (currency: CurrencyTreeDTO) => {
-    onExchangeAdd({
-      ...currency.data,
-    });
-  };
-
-  const handleExchangeEdit = (currency: CurrencyDTO, month: MonthNode, rate: RateNode) => {
-    onExchangeEdit(currency, month, rate);
-  };
-
-  const handleExchangeRemove = (currency: CurrencyDTO, month: MonthNode, rate: RateNode) => {
-    onExchangeRemove(currency, month, rate);
-  };
+  const renderItemLabel = (text: string, actionButtons?: React.ReactNode) => (
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '100%',
+        pr: 1,
+      }}
+    >
+      <Typography variant="body2">{text}</Typography>
+      {actionButtons && (
+        <Box className="tree-item-actions" sx={{ display: 'flex', gap: 0.5 }} onClick={(e) => e.stopPropagation()}>
+          {actionButtons}
+        </Box>
+      )}
+    </Box>
+  );
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHeaderCell>Currency</TableHeaderCell>
-          <TableHeaderCell>Month</TableHeaderCell>
-          <TableHeaderCell>Rates</TableHeaderCell>
-          <TableHeaderCell>Actions</TableHeaderCell>
-        </TableRow>
-      </TableHeader>
+    <Box sx={{ width: '100%', minHeight: 400, boxSizing: 'border-box' }}>
+      <SimpleTreeView
+        sx={{
+          [`&.${treeItemClasses.root}`]: {
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+          },
+        }}
+      >
+        {data.map((currency) => {
+          const currencyIdStr = `currency-${currency.data.id}`;
 
-      <TableBody>
-        {data.map((currency) => (
-          <React.Fragment key={currency.data.id}>
-            <TableRow>
-              <TableCell>
-                <Button
-                  appearance="subtle"
-                  icon={expanded[currency.data.id] ? <ChevronDownRegular /> : <ChevronRightRegular />}
-                  onClick={() => toggle(currency.data.id)}
-                >
-                  {currency.data.name} [{currency.data.abbreviation}]
-                </Button>
-              </TableCell>
-              <TableCell />
-              <TableCell />
-              <TableCell>
-                <Button
-                  icon={<EditRegular />}
-                  appearance="subtle"
-                  onClick={() => handleEdit(currency)}
-                  disabled={currency.data.disabled}
-                />
+          return (
+            <TreeItem
+              key={currencyIdStr}
+              itemId={currencyIdStr}
+              label={renderItemLabel(
+                `${currency.data.name} [${currency.data.abbreviation}]`,
+                <>
+                  <IconButton
+                    size="small"
+                    onClick={() => onEdit({ ...currency.data })}
+                    disabled={currency.data.disabled}
+                  >
+                    <EditOutlined fontSize="small" />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    onClick={() => onExchangeAdd({ ...currency.data })}
+                    disabled={currency.data.disabled}
+                  >
+                    <AddOutlined fontSize="small" />
+                  </IconButton>
+                </>,
+              )}
+            >
+              {currency.months.map((month) => {
+                const monthName = Object.values(MONTHS).find((m) => m.value == month.month)?.displayText ?? 'Unknown';
+                const monthIdStr = `${currencyIdStr}-month-${month.month}`;
 
-                <Button
-                  icon={<AddRegular />}
-                  appearance="subtle"
-                  onClick={() => handleExchangeAdd(currency)}
-                  disabled={currency.data.disabled}
-                />
-              </TableCell>
-            </TableRow>
+                return (
+                  <TreeItem
+                    key={monthIdStr}
+                    itemId={monthIdStr}
+                    label={renderItemLabel(`${monthName} (Base: 1 ${currency.data.abbreviation})`)}
+                  >
+                    {month.rates.map((rate) => {
+                      const rateIdStr = `${monthIdStr}-rate-${rate.currencyToId}`;
+                      const rateLabelText = `${rate.value} ${rate.currencyToName} [${rate.currencyToAbbreviation}]`;
 
-            {expanded[currency.data.id] &&
-              currency.months.map((month) => (
-                <React.Fragment key={month.month}>
-                  <TableRow>
-                    <TableCell />
-                    <TableCell>{Object.values(MONTHS).find((m) => m.value === month.month)?.displayText}</TableCell>
-                    <TableCell>
-                      1 {currency.data.name} [{currency.data.abbreviation}]
-                    </TableCell>
-                  </TableRow>
-
-                  {month.rates.map((rate) => (
-                    <TableRow key={`${currency.data.id}-${month.month}-${rate.currencyToId}`}>
-                      <TableCell />
-                      <TableCell />
-                      <TableCell>
-                        {rate.value} {rate.currencyToName} [{rate.currencyToAbbreviation}]
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          icon={<EditRegular />}
-                          appearance="subtle"
-                          onClick={() => handleExchangeEdit(currency.data, month, rate)}
-                          disabled={currency.data.disabled}
+                      return (
+                        <TreeItem
+                          key={rateIdStr}
+                          itemId={rateIdStr}
+                          label={renderItemLabel(
+                            rateLabelText,
+                            <>
+                              <IconButton
+                                size="small"
+                                onClick={() => onExchangeEdit(currency.data, month, rate)}
+                                disabled={currency.data.disabled}
+                              >
+                                <EditOutlined fontSize="small" />
+                              </IconButton>
+                              <IconButton
+                                size="small"
+                                color="error"
+                                onClick={() => onExchangeRemove(currency.data, month, rate)}
+                                disabled={currency.data.disabled}
+                              >
+                                <DeleteOutlined fontSize="small" />
+                              </IconButton>
+                            </>,
+                          )}
                         />
-                        <Button
-                          icon={<DeleteRegular />}
-                          appearance="subtle"
-                          onClick={() => handleExchangeRemove(currency.data, month, rate)}
-                          disabled={currency.data.disabled}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </React.Fragment>
-              ))}
-          </React.Fragment>
-        ))}
-      </TableBody>
-    </Table>
+                      );
+                    })}
+                  </TreeItem>
+                );
+              })}
+            </TreeItem>
+          );
+        })}
+      </SimpleTreeView>
+    </Box>
   );
 };

@@ -1,52 +1,6 @@
-import {
-  AlphaSlider,
-  Button,
-  ColorArea,
-  ColorPicker,
-  ColorSlider,
-  makeStyles,
-  Popover,
-  PopoverSurface,
-  PopoverTrigger,
-  type ColorPickerProps,
-} from '@fluentui/react-components';
-import { tinycolor } from '@ctrl/tinycolor';
-
-import React, { useCallback, useEffect } from 'react';
-
-const useStyles = makeStyles({
-  example: {
-    width: '300px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px',
-  },
-  previewColor: {
-    margin: '10px 0',
-    width: '50px',
-    height: '50px',
-    borderRadius: '4px',
-    border: '1px solid #ccc',
-    '@media (forced-colors: active)': {
-      forcedColorAdjust: 'none',
-    },
-  },
-  row: {
-    display: 'flex',
-    gap: '10px',
-  },
-  sliders: {
-    display: 'flex',
-    flexDirection: 'column',
-  },
-});
-
-type HSV = {
-  h: number;
-  s: number;
-  v: number;
-  a: number;
-};
+import { Box, Button, Popover } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import ColorPicker from 'react-best-gradient-color-picker';
 
 type Props = {
   color: string;
@@ -54,85 +8,84 @@ type Props = {
 };
 
 export const ColorPickerPopup: React.FC<Props> = ({ color, onColorChange }) => {
-  const styles = useStyles();
-  const [popoverOpen, setPopoverOpen] = React.useState(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
-  const toHSV = useCallback((hex: string): HSV => {
-    const c = tinycolor(hex).toHsv();
-
-    return {
-      h: c.h,
-      s: c.s,
-      v: c.v,
-      a: c.a ?? 1,
-    };
-  }, []);
-
-  const fromHSV = useCallback((hsv: HSV): string => {
-    return tinycolor(hsv).toHexString();
-  }, []);
-
-  const [previewColor, setPreviewColor] = React.useState<HSV>(() => toHSV(color));
-  const [committedColor, setCommittedColor] = React.useState<HSV>(() => toHSV(color));
+  const [previewColor, setPreviewColor] = React.useState<string>(color);
+  const [committedColor, setCommittedColor] = React.useState<string>(color);
 
   useEffect(() => {
-    if (popoverOpen) {
-      setPreviewColor(toHSV(color));
-    }
+    setPreviewColor(color);
+    setCommittedColor(color);
+  }, [color]);
 
-    setCommittedColor(toHSV(color));
-  }, [popoverOpen, color, toHSV]);
-
-  const handleChange: ColorPickerProps['onColorChange'] = (_, data) => {
-    setPreviewColor({ ...data.color, a: data.color.a ?? 1 });
+  const handleOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setPreviewColor(committedColor);
+    setAnchorEl(event.currentTarget);
   };
 
   const handleCancel = () => {
     setPreviewColor(committedColor);
-    setPopoverOpen(false);
+    setAnchorEl(null);
   };
 
   const handleOk = () => {
-    const hex = fromHSV(previewColor);
-
     setCommittedColor(previewColor);
-    onColorChange(hex);
-    setPopoverOpen(false);
+    onColorChange(previewColor);
+    setAnchorEl(null);
   };
 
+  const popoverOpen = Boolean(anchorEl);
+
   return (
-    <>
-      <Popover open={popoverOpen} trapFocus onOpenChange={(_, data) => setPopoverOpen(data.open)}>
-        <PopoverTrigger disableButtonEnhancement>
-          <Button>Choose color</Button>
-        </PopoverTrigger>
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+      <Button variant="outlined" onClick={handleOpen} size="small">
+        Choose color
+      </Button>
 
-        <PopoverSurface>
-          <ColorPicker color={previewColor} onColorChange={handleChange}>
-            <ColorArea inputX={{ 'aria-label': 'Saturation' }} inputY={{ 'aria-label': 'Brightness' }} />
-            <div className={styles.row}>
-              <div className={styles.sliders}>
-                <ColorSlider aria-label="Hue" />
-                <AlphaSlider aria-label="Alpha" />
-              </div>
-              <div
-                className={styles.previewColor}
-                style={{
-                  backgroundColor: tinycolor(previewColor).toRgbString(),
-                }}
-              />
-            </div>
-          </ColorPicker>
+      <Popover
+        open={popoverOpen}
+        anchorEl={anchorEl}
+        onClose={handleCancel}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        slotProps={{
+          paper: {
+            sx: { padding: 2, display: 'flex', flexDirection: 'column', gap: 2 },
+          },
+        }}
+      >
+        <ColorPicker
+          value={previewColor}
+          onChange={setPreviewColor}
+          hideControls
+          hideInputs
+          hidePresets
+          hideOpacity={false}
+        />
 
-          <div className={styles.row}>
-            <Button appearance="primary" onClick={handleOk}>
-              Ok
-            </Button>
-            <Button onClick={handleCancel}>Cancel</Button>
-          </div>
-        </PopoverSurface>
+        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+          <Button variant="contained" size="small" onClick={handleOk}>
+            Ok
+          </Button>
+          <Button variant="text" size="small" onClick={handleCancel}>
+            Cancel
+          </Button>
+        </Box>
       </Popover>
-      <div className={styles.previewColor} style={{ backgroundColor: color }} />
-    </>
+
+      <Box
+        sx={{
+          width: '32px',
+          height: '32px',
+          borderRadius: '50%',
+          backgroundColor: committedColor,
+          border: '1px solid',
+          borderColor: 'divider',
+          boxShadow: 1,
+        }}
+      />
+    </Box>
   );
 };

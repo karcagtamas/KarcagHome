@@ -6,4 +6,5 @@ import kotlinx.serialization.Serializable
 data class TaskEditDTO(
     val title: String,
     val description: String? = null,
+    val importance: Int,
 )

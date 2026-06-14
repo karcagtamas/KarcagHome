@@ -1,42 +1,24 @@
-import {
-  Dialog,
-  DialogActions,
-  DialogBody,
-  DialogContent,
-  DialogSurface,
-  DialogTitle,
-  DialogTrigger,
-} from "@fluentui/react-components";
+import { Box, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
 type Props = {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onClose: () => void;
 
   title?: React.ReactNode;
   children?: React.ReactNode;
   footer?: React.ReactNode;
-
-  trigger?: React.ReactElement;
 };
 
-export const AppDialog: React.FC<Props> = ({ open, onOpenChange, title, children, footer, trigger }) => {
+export const AppDialog: React.FC<Props> = ({ open, onClose, title, children, footer }) => {
   return (
-    <Dialog open={open} onOpenChange={(_, data) => onOpenChange(data.open)}>
-      {trigger ? (
-        <DialogTrigger>{trigger}</DialogTrigger>
-      ) : (
-        <></>
-      )}
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+      {title && <DialogTitle sx={{ fontWeight: 600 }}>{title}</DialogTitle>}
 
-      <DialogSurface>
-        {title && <DialogTitle>{title}</DialogTitle>}
+      <DialogContent dividers={!!title}>
+        <Box sx={{ pt: title ? 0 : 1 }}>{children}</Box>
+      </DialogContent>
 
-        <DialogBody>
-          <DialogContent>{children}</DialogContent>
-
-          {footer && <DialogActions>{footer}</DialogActions>}
-        </DialogBody>
-      </DialogSurface>
+      {footer && <DialogActions sx={{ px: 3, pb: 2 }}>{footer}</DialogActions>}
     </Dialog>
   );
 };

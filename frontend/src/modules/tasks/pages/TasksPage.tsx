@@ -159,13 +159,15 @@ export const TasksPage: React.FC = () => {
         </Box>
       </Box>
 
-      <TaskEditDialog
-        open={taskDialogOpen}
-        task={selectedTask}
-        onClose={() => setTaskDialogOpen(false)}
-        onSubmit={handleSubmit}
-        loading={apiLoading}
-      />
+      {taskDialogOpen && (
+        <TaskEditDialog
+          open={taskDialogOpen}
+          task={selectedTask}
+          onClose={() => setTaskDialogOpen(false)}
+          onSubmit={handleSubmit}
+          loading={apiLoading}
+        />
+      )}
     </PageFrame>
   );
 };

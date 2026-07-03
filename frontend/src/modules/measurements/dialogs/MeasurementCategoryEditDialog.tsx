@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import type { MeasurementCategoryDTO, MeasurementCategoryEditDTO } from '../models/measurement';
 import { EditDialog } from '../../../components/dialog/EditDialog';
-import { Box, TextField } from '@mui/material';
+import { Box, FormHelperText, TextField } from '@mui/material';
 import { ColorPickerPopup } from '../../../components/common/ColorPickerPopup';
+import { Controller, useForm } from 'react-hook-form';
 
 type Props = {
   open: boolean;
@@ -21,29 +22,37 @@ export const MeasurementCategoryEditDialog: React.FC<Props> = ({
 }) => {
   const isEdit = !!measurementCategory;
 
-  const [name, setName] = useState('');
-  const [color, setColor] = useState('');
-  const [unit, setUnit] = useState('');
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { isValid },
+  } = useForm<MeasurementCategoryEditDTO>({
+    defaultValues: {
+      name: '',
+      color: '',
+      unit: '',
+    },
+    mode: 'onChange',
+  });
 
   useEffect(() => {
-    if (open) {
-      setName(measurementCategory?.name ?? '');
-      setColor(measurementCategory?.color ?? '');
-      setUnit(measurementCategory?.unit ?? '');
-    }
-  }, [measurementCategory, open]);
+    reset({
+      name: measurementCategory?.name ?? '',
+      color: measurementCategory?.color ?? '',
+      unit: measurementCategory?.unit ?? '',
+    });
+  }, [measurementCategory, reset]);
 
-  const isValid = name.trim().length > 0 && color.trim().length > 0 && unit.trim().length > 0;
-
-  const handleSubmit = async () => {
+  const handleValidSubmit = async (data: MeasurementCategoryEditDTO) => {
     if (!isValid || loading) return;
 
     try {
       await onSubmit(
         {
-          name,
-          color,
-          unit,
+          name: data.name.trim(),
+          color: data.color.trim(),
+          unit: data.unit.trim(),
         },
         measurementCategory?.id,
       );
@@ -62,38 +71,72 @@ export const MeasurementCategoryEditDialog: React.FC<Props> = ({
         isEdit={isEdit}
         isValid={isValid}
         onClose={onClose}
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(handleValidSubmit)}
         loading={loading}
       >
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 1 }}>
-          <TextField
-            label="Name"
-            required
-            fullWidth
-            autoFocus
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            disabled={loading}
-            variant="outlined"
-            size="small"
+        <Box
+          component="form"
+          onSubmit={(e) => e.preventDefault()}
+          sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 1 }}
+        >
+          <Controller
+            name="name"
+            control={control}
+            rules={{ required: 'Name is required', validate: (v) => !!v?.trim() || 'Cannot be empty spaces' }}
+            render={({ field, fieldState: { error } }) => (
+              <TextField
+                {...field}
+                label="Name"
+                required
+                fullWidth
+                autoFocus
+                disabled={loading}
+                error={!!error}
+                helperText={error?.message}
+                variant="outlined"
+                size="small"
+              />
+            )}
           />
 
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            <Box component="span" sx={{ fontSize: '0.85rem', fontWeight: 500, color: 'text.secondary' }}>
-              Color *
-            </Box>
-            <ColorPickerPopup color={color} onColorChange={(d) => setColor(d)} />
-          </Box>
+          <Controller
+            name="color"
+            control={control}
+            rules={{ required: 'Color selection is required' }}
+            render={({ field: { value, onChange }, fieldState: { error } }) => (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Box
+                  component="span"
+                  sx={{ fontSize: '0.85rem', fontWeight: 500, color: error ? 'error.main' : 'text.secondary' }}
+                >
+                  Color *
+                </Box>
+                <ColorPickerPopup color={value} onColorChange={onChange} />
+                {error && <FormHelperText error>{error.message}</FormHelperText>}
+              </Box>
+            )}
+          />
 
-          <TextField
-            label="Unit"
-            required
-            fullWidth
-            value={unit}
-            onChange={(e) => setUnit(e.target.value)}
-            disabled={loading}
-            variant="outlined"
-            size="small"
+          <Controller
+            name="unit"
+            control={control}
+            rules={{
+              required: 'Unit measurement is required',
+              validate: (v) => !!v?.trim() || 'Cannot be empty spaces',
+            }}
+            render={({ field, fieldState: { error } }) => (
+              <TextField
+                {...field}
+                label="Unit"
+                required
+                fullWidth
+                disabled={loading}
+                error={!!error}
+                helperText={error?.message}
+                variant="outlined"
+                size="small"
+              />
+            )}
           />
         </Box>
       </EditDialog>

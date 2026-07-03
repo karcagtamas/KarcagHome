@@ -125,10 +125,7 @@ export const MeasurementCategoriesPage: React.FC = () => {
             loading={isLoading}
             getRowId={(row) => row.id}
             disableRowSelectionOnClick
-            initialState={{
-              pagination: { paginationModel: { pageSize: 10 } },
-            }}
-            pageSizeOptions={[5, 10, 20]}
+            hideFooter
             sx={{
               '& .MuiDataGrid-cell:focus': { outline: 'none' },
             }}
@@ -136,13 +133,16 @@ export const MeasurementCategoriesPage: React.FC = () => {
         </Box>
       </LoadingBox>
 
-      <MeasurementCategoryEditDialog
-        open={measurementCategoryDialogOpen}
-        measurementCategory={selectedMeasurementCategory}
-        loading={apiLoading}
-        onClose={() => setMeasurementCategoryDialogOpen(false)}
-        onSubmit={handleSubmit}
-      />
+      {measurementCategoryDialogOpen && (
+        <MeasurementCategoryEditDialog
+          key={selectedMeasurementCategory ? `edit-measurement-cat-${selectedMeasurementCategory.id}` : 'create-measurement-cat'} // Forces react-hook-form to unmount and clear cache safely between runs
+          open={measurementCategoryDialogOpen}
+          measurementCategory={selectedMeasurementCategory}
+          loading={apiLoading}
+          onClose={() => setMeasurementCategoryDialogOpen(false)}
+          onSubmit={handleSubmit}
+        />
+      )}
     </PageFrame>
   );
 };

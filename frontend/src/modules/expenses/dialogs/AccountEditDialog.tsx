@@ -1,7 +1,7 @@
 import type { AccountDTO, AccountEditDTO } from '../models/account';
 import { EditDialog } from '../../../components/dialog/EditDialog';
 import { useEffect } from 'react';
-import { useCurrencies } from '../../../hooks/useCurrencies';
+import { useCurrencies } from '../hooks/useCurrencies';
 import { Box, MenuItem, TextField } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 

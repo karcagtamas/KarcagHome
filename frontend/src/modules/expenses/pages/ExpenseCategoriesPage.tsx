@@ -1,44 +1,24 @@
 import { PageFrame } from '../../../components/common/PageFrame';
 import { PageHeader } from '../../../components/common/PageHeader';
 import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { expenseCategoryApi } from '../../../api/expense-category.api';
-import { expenseKeys } from '../../../keys/expenseKeys';
-import { useExpenseCategories } from '../../../hooks/useExpenseCategories';
+import { useExpenseCategories } from '../hooks/useExpenseCategories';
 import { LoadingBox } from '../../../components/common/LoadingBox';
 import type { ExpenseCategoryDTO, ExpenseCategoryEditDTO } from '../models/expenses';
 import { ExpenseCategoryEditDialog } from '../dialogs/ExpenseCategoryEditDialog';
 import { Box, Button, IconButton } from '@mui/material';
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
-import { AddOutlined, DeleteOutlined, EditOutlined } from '@mui/icons-material';
+import { AddOutlined, ArrowBackOutlined, DeleteOutlined, EditOutlined } from '@mui/icons-material';
+import { useExpenseCategoryMutations } from '../hooks/useExpenseCategoryMutations';
+import { useNavigate } from 'react-router-dom';
 
 export const ExpenseCategoriesPage: React.FC = () => {
-  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
   const [expenseCategoryDialogOpen, setExpenseCategoryDialogOpen] = useState(false);
   const [selectedExpenseCategory, setSelectedExpenseCategory] = useState<ExpenseCategoryDTO | null>(null);
 
   const { data, isLoading } = useExpenseCategories();
-
-  const createMutation = useMutation({
-    mutationFn: expenseCategoryApi.create,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: expenseKeys.categories() });
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: ExpenseCategoryEditDTO }) => expenseCategoryApi.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: expenseKeys.categories() });
-    },
-  });
-
-  const removeMutation = useMutation({
-    mutationFn: expenseCategoryApi.delete,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: expenseKeys.categories() });
-    },
-  });
+  const { createMutation, updateMutation, removeMutation, isPending: apiLoading } = useExpenseCategoryMutations();
 
   const handleCreate = () => {
     setSelectedExpenseCategory(null);
@@ -51,16 +31,22 @@ export const ExpenseCategoriesPage: React.FC = () => {
   };
 
   const handleRemove = async (expenseCategory: ExpenseCategoryDTO) => {
-    await removeMutation.mutateAsync(expenseCategory.id);
+    try {
+      await removeMutation.mutateAsync(expenseCategory.id);
+    } catch (err) {
+      console.error('Category deletion failed', err);
+    }
   };
 
-  const apiLoading = createMutation.isPending || updateMutation.isPending || removeMutation.isPending;
-
   const handleSubmit = async (data: ExpenseCategoryEditDTO, id: number | undefined) => {
-    if (id) {
-      await updateMutation.mutateAsync({ id, data });
-    } else {
-      await createMutation.mutateAsync(data);
+    try {
+      if (id) {
+        await updateMutation.mutateAsync({ id, data });
+      } else {
+        await createMutation.mutateAsync(data);
+      }
+    } catch (err) {
+      console.error('Category configuration save failed', err);
     }
   };
 
@@ -104,7 +90,7 @@ export const ExpenseCategoriesPage: React.FC = () => {
       filterable: false,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center', height: '100%' }}>
-          <IconButton size="small" onClick={() => handleEdit(params.row)} disabled={apiLoading}>
+          <IconButton size="small" color="warning" onClick={() => handleEdit(params.row)} disabled={apiLoading}>
             <EditOutlined fontSize="small" />
           </IconButton>
           <IconButton size="small" color="error" onClick={() => handleRemove(params.row)} disabled={apiLoading}>
@@ -120,14 +106,20 @@ export const ExpenseCategoriesPage: React.FC = () => {
       <PageHeader
         title="Expense Categories"
         actions={
-          <Button variant="contained" startIcon={<AddOutlined />} onClick={handleCreate} size="small">
-            Create
-          </Button>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Button variant="contained" startIcon={<AddOutlined />} onClick={handleCreate} size="small">
+              Create
+            </Button>
+
+            <IconButton size="small" color="info" onClick={() => navigate('/accounts')} disabled={apiLoading}>
+              <ArrowBackOutlined fontSize="small" />
+            </IconButton>
+          </Box>
         }
       ></PageHeader>
 
       <LoadingBox isLoading={isLoading}>
-        <Box sx={{ padding: '1rem', width: '100%', height: 500, boxSizing: 'border-box' }}>
+        <Box sx={{ padding: '1rem', width: '100%', height: 500 }}>
           <DataGrid
             rows={data ?? []}
             columns={columns}

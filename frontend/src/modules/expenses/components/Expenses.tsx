@@ -1,4 +1,4 @@
-import { useExpenses } from '../../../hooks/useExpenses';
+import { useExpenses } from '../hooks/useExpenses';
 import { ContentCard } from '../../../components/common/ContentCard';
 import { useState } from 'react';
 import { ExpenseEditDialog } from '../dialogs/ExpenseEditDialog';
@@ -94,7 +94,7 @@ export const Expenses: React.FC<Props> = ({ accountId }) => {
       filterable: false,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center', height: '100%' }}>
-          <IconButton size="small" onClick={() => handleEdit(params.row)} disabled={apiLoading}>
+          <IconButton size="small" color='warning' onClick={() => handleEdit(params.row)} disabled={apiLoading}>
             <EditOutlined fontSize="small" />
           </IconButton>
           <IconButton size="small" color="error" onClick={() => handleRemove(params.row)} disabled={apiLoading}>

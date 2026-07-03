@@ -1,7 +1,7 @@
 import { EditDialog } from '../../../components/dialog/EditDialog';
 import { useEffect } from 'react';
 import type { ExpenseDTO, ExpenseEditDTO } from '../models/expenses';
-import { useExpenseCategories } from '../../../hooks/useExpenseCategories';
+import { useExpenseCategories } from '../hooks/useExpenseCategories';
 import { Box, MenuItem, TextField } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 

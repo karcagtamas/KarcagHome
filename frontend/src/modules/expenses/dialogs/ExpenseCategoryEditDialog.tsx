@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { EditDialog } from '../../../components/dialog/EditDialog';
-import { useExpenseCategoryTypes } from '../../../hooks/useExpenseCategoryTypes';
+import { useExpenseCategoryTypes } from '../hooks/useExpenseCategoryTypes';
 import type { ExpenseCategoryDTO, ExpenseCategoryEditDTO } from '../models/expenses';
 import { ColorPickerPopup } from '../../../components/common/ColorPickerPopup';
 import { Box, FormHelperText, MenuItem, TextField } from '@mui/material';

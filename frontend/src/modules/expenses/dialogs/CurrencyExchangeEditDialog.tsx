@@ -2,7 +2,7 @@ import type { CurrencyExchangeDTO } from '../models/currency';
 import type React from 'react';
 import { useEffect } from 'react';
 import { MONTHS } from '../../../common/month';
-import { useCurrencies } from '../../../hooks/useCurrencies';
+import { useCurrencies } from '../hooks/useCurrencies';
 import { EditDialog } from '../../../components/dialog/EditDialog';
 import { Box, MenuItem, TextField } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';

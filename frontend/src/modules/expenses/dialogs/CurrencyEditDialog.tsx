@@ -3,6 +3,7 @@ import type { CurrencyDTO } from '../models/currency';
 import { ConfirmDialog } from '../../../components/dialog/ConfirmDialog';
 import { EditDialog } from '../../../components/dialog/EditDialog';
 import { Alert, Box, FormControlLabel, Switch, TextField } from '@mui/material';
+import { Controller, useForm } from 'react-hook-form';
 
 type Props = {
   open: boolean;
@@ -12,30 +13,51 @@ type Props = {
   loading?: boolean;
 };
 
+type FormValues = Omit<CurrencyDTO, 'id'>;
+
 export const CurrencyEditDialog: React.FC<Props> = ({ open, currency, onClose, onSubmit, loading }) => {
   const isEdit = !!currency;
-
-  const [name, setName] = useState('');
-  const [abbreviation, setAbbreviation] = useState('');
-  const [disabled, setDisabled] = useState(false);
-
   const [confirmDisableOpen, setConfirmDisableOpen] = useState(false);
 
+  const {
+    control,
+    handleSubmit,
+    reset,
+    setValue,
+    watch,
+    formState: { isValid },
+  } = useForm<FormValues>({
+    defaultValues: {
+      name: '',
+      abbreviation: '',
+      disabled: false,
+    },
+    mode: 'onChange',
+  });
+
+  const formName = watch('name');
+  const isDisabled = watch('disabled');
+
   useEffect(() => {
-    if (open) {
-      setName(currency?.name ?? '');
-      setAbbreviation(currency?.abbreviation ?? '');
-      setDisabled(currency?.disabled ?? false);
-    }
-  }, [currency, open]);
+    reset({
+      name: currency?.name ?? '',
+      abbreviation: currency?.abbreviation ?? '',
+      disabled: currency?.disabled ?? false,
+    });
+  }, [currency, reset]);
 
-  const isValid = name.trim().length > 0 && abbreviation.trim().length > 0;
-
-  const handleSubmit = async () => {
+  const handleValidSubmit = async (data: FormValues) => {
     if (!isValid || loading) return;
 
     try {
-      await onSubmit({ name: name.trim(), abbreviation: abbreviation.trim().toUpperCase(), disabled }, currency?.id);
+      await onSubmit(
+        {
+          name: data.name.trim(),
+          abbreviation: data.abbreviation.trim().toUpperCase(),
+          disabled: data.disabled,
+        },
+        currency?.id,
+      );
 
       onClose();
     } catch (err) {
@@ -43,13 +65,9 @@ export const CurrencyEditDialog: React.FC<Props> = ({ open, currency, onClose, o
     }
   };
 
-  const handleDisabledChange = (checked: boolean) => {
+  const handleDisabledToggle = (checked: boolean) => {
     if (!checked) {
-      setDisabled(false);
-      return;
-    }
-
-    if (disabled) {
+      setValue('disabled', false, { shouldValidate: true, shouldDirty: true });
       return;
     }
 
@@ -64,33 +82,53 @@ export const CurrencyEditDialog: React.FC<Props> = ({ open, currency, onClose, o
         isEdit={isEdit}
         isValid={isValid}
         onClose={onClose}
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(handleValidSubmit)}
         loading={loading}
       >
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 1 }}>
-          <TextField
-            label="Name"
-            required
-            fullWidth
-            autoFocus
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            disabled={loading}
-            placeholder="e.g. Euro"
-            variant="outlined"
-            size="small"
+        <Box
+          component="form"
+          onSubmit={(e) => e.preventDefault()}
+          sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 1 }}
+        >
+          <Controller
+            name="name"
+            control={control}
+            rules={{ required: 'Name is required', validate: (v) => !!v?.trim() || 'Cannot be empty spaces' }}
+            render={({ field, fieldState: { error } }) => (
+              <TextField
+                {...field}
+                label="Name"
+                required
+                fullWidth
+                autoFocus
+                disabled={loading}
+                placeholder="e.g. Euro"
+                error={!!error}
+                helperText={error?.message}
+                variant="outlined"
+                size="small"
+              />
+            )}
           />
 
-          <TextField
-            label="Abbreviation"
-            required
-            fullWidth
-            value={abbreviation}
-            onChange={(e) => setAbbreviation(e.target.value)}
-            disabled={loading}
-            placeholder="e.g. EUR"
-            variant="outlined"
-            size="small"
+          <Controller
+            name="abbreviation"
+            control={control}
+            rules={{ required: 'Abbreviation is required', validate: (v) => !!v?.trim() || 'Cannot be empty spaces' }}
+            render={({ field, fieldState: { error } }) => (
+              <TextField
+                {...field}
+                label="Abbreviation"
+                required
+                fullWidth
+                disabled={loading}
+                placeholder="e.g. EUR"
+                error={!!error}
+                helperText={error?.message}
+                variant="outlined"
+                size="small"
+              />
+            )}
           />
 
           {isEdit && (
@@ -99,8 +137,8 @@ export const CurrencyEditDialog: React.FC<Props> = ({ open, currency, onClose, o
                 control={
                   <Switch
                     id="currency-disabled"
-                    checked={disabled}
-                    onChange={(e) => handleDisabledChange(e.target.checked)}
+                    checked={isDisabled}
+                    onChange={(e) => handleDisabledToggle(e.target.checked)}
                     disabled={loading}
                   />
                 }
@@ -109,26 +147,27 @@ export const CurrencyEditDialog: React.FC<Props> = ({ open, currency, onClose, o
             </Box>
           )}
 
-          {disabled && (
+          {isDisabled && (
             <Alert severity="warning" sx={{ mt: 1 }}>
               Disabled currencies will be hidden from exchange lists unless "Show Disabled" is enabled.
             </Alert>
           )}
         </Box>
       </EditDialog>
+
       <ConfirmDialog
         open={confirmDisableOpen}
         title="Disable Currency"
         message={
           <>
-            Are you sure you want to disable <strong>{name}</strong>?{' '}
+            Are you sure you want to disable <strong>{formName}</strong>?{' '}
           </>
         }
         confirmText="Disable"
         danger
         onClose={() => setConfirmDisableOpen(false)}
         onConfirm={async () => {
-          setDisabled(true);
+          setValue('disabled', true, { shouldValidate: true, shouldDirty: true });
           setConfirmDisableOpen(false);
         }}
       ></ConfirmDialog>

@@ -70,7 +70,7 @@ export const TasksPage: React.FC = () => {
         actions={
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <FormControlLabel
-              control={<Switch id="show-all-toggle" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} />}
+              control={<Switch id="show-all-toggle" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} size='small' />}
               label="Show All"
             />
             <TextField
@@ -91,7 +91,7 @@ export const TasksPage: React.FC = () => {
                 </MenuItem>
               ))}
             </TextField>
-            <Button variant="contained" startIcon={<AddOutlined />} onClick={handleCreate}>
+            <Button variant="contained" startIcon={<AddOutlined />} onClick={handleCreate} size='small'>
               Create
             </Button>
           </Box>

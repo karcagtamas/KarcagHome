@@ -91,7 +91,7 @@ export const TaskEditDialog: React.FC<Props> = ({ open, task, onClose, onSubmit,
             <TextField
               {...field}
               value={field.value ?? ''}
-              onChange={(e) => field.onChange(e.target.value)}
+              onChange={(e) => field.onChange(e.target.value || null)}
               label="Description"
               fullWidth
               multiline
@@ -106,13 +106,17 @@ export const TaskEditDialog: React.FC<Props> = ({ open, task, onClose, onSubmit,
         <Controller
           name="importance"
           control={control}
-          render={({ field }) => (
+          rules={{ required: 'Importance is required' }}
+          render={({ field, fieldState: { error } }) => (
             <TextField
               {...field}
               select
               label="Importance"
+              required
               fullWidth
               disabled={loading}
+              error={!!error}
+              helperText={error?.message}
               variant="outlined"
               size="small"
             >

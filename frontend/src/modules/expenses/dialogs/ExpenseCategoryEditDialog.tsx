@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { EditDialog } from '../../../components/dialog/EditDialog';
 import { useExpenseCategoryTypes } from '../../../hooks/useExpenseCategoryTypes';
 import type { ExpenseCategoryDTO, ExpenseCategoryEditDTO } from '../models/expenses';
 import { ColorPickerPopup } from '../../../components/common/ColorPickerPopup';
-import { Box, MenuItem, TextField } from '@mui/material';
+import { Box, FormHelperText, MenuItem, TextField } from '@mui/material';
+import { Controller, useForm } from 'react-hook-form';
 
 type Props = {
   open: boolean;
@@ -17,29 +18,37 @@ export const ExpenseCategoryEditDialog: React.FC<Props> = ({ open, expenseCatego
   const isEdit = !!expenseCategory;
   const { data: types } = useExpenseCategoryTypes();
 
-  const [name, setName] = useState('');
-  const [color, setColor] = useState('');
-  const [typeId, setTypeId] = useState<number>();
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { isValid },
+  } = useForm<ExpenseCategoryEditDTO>({
+    defaultValues: {
+      name: '',
+      color: '',
+      typeId: undefined,
+    },
+    mode: 'onChange',
+  });
 
   useEffect(() => {
-    if (open) {
-      setName(expenseCategory?.name ?? '');
-      setColor(expenseCategory?.color ?? '');
-      setTypeId(expenseCategory?.type.id);
-    }
-  }, [expenseCategory, open]);
+    reset({
+      name: expenseCategory?.name ?? '',
+      color: expenseCategory?.color ?? '',
+      typeId: expenseCategory?.type.id,
+    });
+  }, [expenseCategory, reset]);
 
-  const isValid = name.trim().length > 0 && color.trim().length > 0 && !!typeId;
-
-  const handleSubmit = async () => {
+  const handleValidSubmit = async (data: ExpenseCategoryEditDTO) => {
     if (!isValid || loading) return;
 
     try {
       await onSubmit(
         {
-          name,
-          color,
-          typeId,
+          name: data.name,
+          color: data.color,
+          typeId: Number(data.typeId),
         },
         expenseCategory?.id,
       );
@@ -58,46 +67,78 @@ export const ExpenseCategoryEditDialog: React.FC<Props> = ({ open, expenseCatego
         isEdit={isEdit}
         isValid={isValid}
         onClose={onClose}
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(handleValidSubmit)}
         loading={loading}
       >
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 1 }}>
-          <TextField
-            label="Name"
-            required
-            fullWidth
-            autoFocus
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            disabled={loading}
-            variant="outlined"
-            size="small"
+        <Box
+          component="form"
+          onSubmit={(e) => e.preventDefault()}
+          sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 1 }}
+        >
+          <Controller
+            name="name"
+            control={control}
+            rules={{ required: 'Name is required', validate: (v) => !!v?.trim() || 'Cannot be empty spaces' }}
+            render={({ field, fieldState: { error } }) => (
+              <TextField
+                {...field}
+                label="Name"
+                required
+                fullWidth
+                autoFocus
+                disabled={loading}
+                error={!!error}
+                helperText={error?.message}
+                variant="outlined"
+                size="small"
+              />
+            )}
           />
 
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            <Box component="span" sx={{ fontSize: '0.85rem', fontWeight: 500, color: 'text.secondary' }}>
-              Color *
-            </Box>
-            <ColorPickerPopup color={color} onColorChange={(d) => setColor(d)} />
-          </Box>
+          <Controller
+            name="color"
+            control={control}
+            rules={{ required: 'Color selection is required' }}
+            render={({ field: { value, onChange }, fieldState: { error } }) => (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Box
+                  component="span"
+                  sx={{ fontSize: '0.85rem', fontWeight: 500, color: error ? 'error.main' : 'text.secondary' }}
+                >
+                  Color *
+                </Box>
+                <ColorPickerPopup color={value} onColorChange={onChange} />
+                {error && <FormHelperText error>{error.message}</FormHelperText>}
+              </Box>
+            )}
+          />
 
-          <TextField
-            select
-            label="Type"
-            required
-            fullWidth
-            value={typeId}
-            onChange={(e) => setTypeId(Number(e.target.value))}
-            disabled={loading}
-            variant="outlined"
-            size="small"
-          >
-            {types?.map((type) => (
-              <MenuItem key={type.id} value={type.id}>
-                {type.name}
-              </MenuItem>
-            ))}
-          </TextField>
+          <Controller
+            name="typeId"
+            control={control}
+            rules={{ required: 'Category type is required' }}
+            render={({ field, fieldState: { error } }) => (
+              <TextField
+                {...field}
+                value={field.value ?? ''}
+                select
+                label="Type"
+                required
+                fullWidth
+                disabled={loading}
+                error={!!error}
+                helperText={error?.message}
+                variant="outlined"
+                size="small"
+              >
+                {types?.map((type) => (
+                  <MenuItem key={type.id} value={type.id}>
+                    {type.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+            )}
+          />
         </Box>
       </EditDialog>
     </>

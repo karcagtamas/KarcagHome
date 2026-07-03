@@ -4,7 +4,7 @@ import { MeasurementList } from '../components/MeasurementList';
 import { useMeasurements } from '../hooks/useMeasurements';
 import { MeasurementCategoryList } from '../components/MeasurementCategoryList';
 import { Box, Button, CircularProgress, Drawer, IconButton, Typography } from '@mui/material';
-import { AddOutlined, CloseOutlined, HistoryOutlined, SettingsOutlined } from '@mui/icons-material';
+import { AddOutlined, CategoryOutlined, CloseOutlined, HistoryOutlined, SettingsOutlined } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
 const DRAWER_WIDTH = 320;
@@ -101,10 +101,10 @@ export const MeasurementPage: React.FC = () => {
           <Button variant="text" startIcon={<HistoryOutlined />} onClick={() => setLeftDrawerOpen(!leftDrawerOpen)}>
             Measurements
           </Button>
-          <Button variant="text" startIcon={<SettingsOutlined />} onClick={() => navigate('/measurement-categories')}>
+          <Button variant="text" startIcon={<CategoryOutlined />} onClick={() => navigate('/measurement-categories')} size='small'>
             Categories
           </Button>
-          <Button variant="contained" startIcon={<AddOutlined />}>
+          <Button variant="contained" startIcon={<AddOutlined />} size='small'>
             Add
           </Button>
         </Box>

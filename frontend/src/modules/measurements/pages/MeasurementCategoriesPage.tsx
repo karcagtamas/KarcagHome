@@ -2,45 +2,23 @@ import type React from 'react';
 import { PageFrame } from '../../../components/common/PageFrame';
 import { PageHeader } from '../../../components/common/PageHeader';
 import { Box, Button, IconButton } from '@mui/material';
-import { AddOutlined, DeleteOutlined, EditOutlined } from '@mui/icons-material';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { AddOutlined, ArrowBackOutlined, DeleteOutlined, EditOutlined } from '@mui/icons-material';
 import { useState } from 'react';
 import type { MeasurementCategoryDTO, MeasurementCategoryEditDTO } from '../models/measurement';
 import { useMeasurementCategories } from '../hooks/useMeasurementCategories';
-import { measurementCategoryApi } from '../api/measurement-category.api';
-import { measurementKeys } from '../../../keys/measurementKeys';
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 import { LoadingBox } from '../../../components/common/LoadingBox';
 import { MeasurementCategoryEditDialog } from '../dialogs/MeasurementCategoryEditDialog';
+import { useMeasurementCategoryMutations } from '../hooks/useMeasurementCategoryMutations';
+import { useNavigate } from 'react-router-dom';
 
 export const MeasurementCategoriesPage: React.FC = () => {
-  const queryClient = useQueryClient();
-
+  const navigate = useNavigate();
   const [measurementCategoryDialogOpen, setMeasurementCategoryDialogOpen] = useState(false);
   const [selectedMeasurementCategory, setSelectedMeasurementCategory] = useState<MeasurementCategoryDTO | null>(null);
+
   const { data, isLoading } = useMeasurementCategories();
-
-  const createMutation = useMutation({
-    mutationFn: measurementCategoryApi.create,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: measurementKeys.categories() });
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: MeasurementCategoryEditDTO }) =>
-      measurementCategoryApi.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: measurementKeys.categories() });
-    },
-  });
-
-  const removeMutation = useMutation({
-    mutationFn: measurementCategoryApi.delete,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: measurementKeys.categories() });
-    },
-  });
+  const { createMutation, updateMutation, removeMutation, isPending: apiLoading } = useMeasurementCategoryMutations();
 
   const handleCreate = () => {
     setSelectedMeasurementCategory(null);
@@ -53,16 +31,22 @@ export const MeasurementCategoriesPage: React.FC = () => {
   };
 
   const handleRemove = async (measurementCategory: MeasurementCategoryDTO) => {
-    await removeMutation.mutateAsync(measurementCategory.id);
+    try {
+      await removeMutation.mutateAsync(measurementCategory.id);
+    } catch (err) {
+      console.error('Measurement category deletion encountered errors', err);
+    }
   };
 
-  const apiLoading = createMutation.isPending || updateMutation.isPending || removeMutation.isPending;
-
   const handleSubmit = async (data: MeasurementCategoryEditDTO, id?: number) => {
-    if (id) {
-      await updateMutation.mutateAsync({ id, data });
-    } else {
-      await createMutation.mutateAsync(data);
+    try {
+      if (id) {
+        await updateMutation.mutateAsync({ id, data });
+      } else {
+        await createMutation.mutateAsync(data);
+      }
+    } catch (err) {
+      console.error('Measurement category payload submission failed', err);
     }
   };
 
@@ -105,7 +89,7 @@ export const MeasurementCategoriesPage: React.FC = () => {
       filterable: false,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center', height: '100%' }}>
-          <IconButton size="small" onClick={() => handleEdit(params.row)} disabled={apiLoading}>
+          <IconButton size="small" color="warning" onClick={() => handleEdit(params.row)} disabled={apiLoading}>
             <EditOutlined fontSize="small" />
           </IconButton>
           <IconButton size="small" color="error" onClick={() => handleRemove(params.row)} disabled={apiLoading}>
@@ -121,9 +105,15 @@ export const MeasurementCategoriesPage: React.FC = () => {
       <PageHeader
         title="Measurement Categories"
         actions={
-          <Button variant="contained" startIcon={<AddOutlined />} onClick={handleCreate}>
-            Create
-          </Button>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Button variant="contained" startIcon={<AddOutlined />} onClick={handleCreate} size="small">
+              Create
+            </Button>
+
+            <IconButton size="small" color="info" onClick={() => navigate('/measurements')} disabled={apiLoading}>
+              <ArrowBackOutlined fontSize="small" />
+            </IconButton>
+          </Box>
         }
       ></PageHeader>
 

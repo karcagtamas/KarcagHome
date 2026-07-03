@@ -3,44 +3,21 @@ import { ContentCard } from '../../../components/common/ContentCard';
 import { useState } from 'react';
 import { ExpenseEditDialog } from '../dialogs/ExpenseEditDialog';
 import type { ExpenseDTO, ExpenseEditDTO } from '../models/expenses';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { expenseApi } from '../../../api/expense.api';
-import { expenseKeys } from '../../../keys/expenseKeys';
 import { Box, IconButton } from '@mui/material';
 import { AddOutlined, DeleteOutlined, EditOutlined } from '@mui/icons-material';
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
+import { useExpenseMutations } from '../hooks/useExpenseMutations';
 
 type Props = {
   accountId: number;
 };
 
 export const Expenses: React.FC<Props> = ({ accountId }) => {
-  const queryClient = useQueryClient();
   const { data, isLoading } = useExpenses(accountId);
+  const { createMutation, updateMutation, removeMutation, isPending: apiLoading } = useExpenseMutations();
 
   const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<ExpenseDTO | null>(null);
-
-  const createMutation = useMutation({
-    mutationFn: expenseApi.create,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: expenseKeys.all });
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: ExpenseEditDTO }) => expenseApi.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: expenseKeys.all });
-    },
-  });
-
-  const removeMutation = useMutation({
-    mutationFn: expenseApi.delete,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: expenseKeys.all });
-    },
-  });
 
   const handleCreate = () => {
     setSelectedExpense(null);
@@ -53,16 +30,22 @@ export const Expenses: React.FC<Props> = ({ accountId }) => {
   };
 
   const handleRemove = async (expense: ExpenseDTO) => {
-    await removeMutation.mutateAsync(expense.id);
+    try {
+      await removeMutation.mutateAsync(expense.id);
+    } catch (err) {
+      console.error('Expense removal failed', err);
+    }
   };
 
-  const apiLoading = createMutation.isPending || updateMutation.isPending || removeMutation.isPending;
-
-  const handleSubmit = async (data: Omit<ExpenseEditDTO, 'id'>, id: number | undefined) => {
-    if (id) {
-      await updateMutation.mutateAsync({ id, data });
-    } else {
-      await createMutation.mutateAsync(data);
+  const handleSubmit = async (data: ExpenseEditDTO, id: number | undefined) => {
+    try {
+      if (id) {
+        await updateMutation.mutateAsync({ id, data });
+      } else {
+        await createMutation.mutateAsync(data);
+      }
+    } catch (err) {
+      console.error('Expense modification failed', err);
     }
   };
 
@@ -94,7 +77,7 @@ export const Expenses: React.FC<Props> = ({ accountId }) => {
       filterable: false,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center', height: '100%' }}>
-          <IconButton size="small" color='warning' onClick={() => handleEdit(params.row)} disabled={apiLoading}>
+          <IconButton size="small" color="warning" onClick={() => handleEdit(params.row)} disabled={apiLoading}>
             <EditOutlined fontSize="small" />
           </IconButton>
           <IconButton size="small" color="error" onClick={() => handleRemove(params.row)} disabled={apiLoading}>

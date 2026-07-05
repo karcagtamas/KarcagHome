@@ -9,7 +9,7 @@ export interface MeasurementDTO {
   id: number;
   value: number;
   date: string;
-  categoryId: number;
+  category: MeasurementCategoryDTO;
 }
 
 export interface MeasurementCategoryEditDTO {

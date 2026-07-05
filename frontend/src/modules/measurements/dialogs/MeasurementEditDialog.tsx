@@ -37,7 +37,7 @@ export const MeasurementEditDialog: React.FC<Props> = ({ open, measurement, meas
     reset({
       value: measurement?.value ?? 0,
       date: measurement?.date ?? '',
-      categoryId: measurement?.categoryId ?? measurementCategory?.id,
+      categoryId: measurement?.category.id ?? measurementCategory?.id,
     });
   }, [measurement, reset]);
 

@@ -1,4 +1,4 @@
-import { Box, IconButton, MenuItem, TextField } from '@mui/material';
+import { Box, Chip, IconButton, MenuItem, TextField } from '@mui/material';
 import { ContentCard } from '../../../components/common/ContentCard';
 import type { MeasurementCategoryDTO, MeasurementEditDTO } from '../models/measurement';
 import { useState } from 'react';
@@ -71,9 +71,11 @@ export const MeasurementCategoryTile: React.FC<Props> = ({ category }) => {
       }
     >
       <LoadingBox isLoading={isYearsLoading || isMeasurementsLoading}>
-        {measurements?.map((measurement) => (
-          <div key={measurement.id}>asd</div>
-        ))}
+        <Box sx={{ padding: '4px' }}>
+          {measurements?.map((measurement) => (
+            <Chip color="warning" key={measurement.id} label={`${measurement.value} (${measurement.date})`}></Chip>
+          ))}
+        </Box>
       </LoadingBox>
 
       {measurementDialogOpen && (

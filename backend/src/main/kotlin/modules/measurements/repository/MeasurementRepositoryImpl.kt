@@ -160,5 +160,6 @@ class MeasurementRepositoryImpl : MeasurementRepository {
             .selectAll()
             .where { MeasurementsTable.categoryId eq categoryId }
             .map { it[MeasurementsTable.date].year }
+            .distinct()
     }
 }

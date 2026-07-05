@@ -2,7 +2,6 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { HomePage } from './pages/HomePage';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CurrenciesPage } from './modules/expenses/pages/CurrenciesPage';
-import { MeasurementPage } from './modules/measurements/pages/MeasurementPage';
 import { AppBar } from './components/common/AppBar';
 import { useEffect, useState } from 'react';
 import { getInitialTheme, THEME_STORAGE_KEY, THEMES, type ThemeKey } from './common/theme';
@@ -12,6 +11,7 @@ import { ExpenseCategoriesPage } from './modules/expenses/pages/ExpenseCategorie
 import { TasksPage } from './modules/tasks/pages/TasksPage';
 import { Box, FormControl, MenuItem, Select, ThemeProvider, type SelectChangeEvent } from '@mui/material';
 import { MeasurementCategoriesPage } from './modules/measurements/pages/MeasurementCategoriesPage';
+import { MeasurementsDashboardPage } from './modules/measurements/pages/MeasurementsDashboardPage';
 
 function App() {
   const [themeKey, setThemeKey] = useState<ThemeKey>(getInitialTheme());
@@ -62,8 +62,7 @@ function App() {
             ></AppBar>
             <Routes>
               <Route path="/" element={<HomePage />} />
-              <Route path="/dashboard" element={<MeasurementPage />} />
-              <Route path="/measurements" element={<MeasurementPage />} />
+              <Route path="/measurements" element={<MeasurementsDashboardPage />} />
               <Route path="/measurement-categories" element={<MeasurementCategoriesPage />} />
               <Route path="/tasks" element={<TasksPage />} />
               <Route path="/accounts" element={<AccountsPage />} />

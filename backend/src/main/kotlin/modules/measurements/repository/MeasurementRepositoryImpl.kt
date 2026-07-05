@@ -2,8 +2,12 @@ package modules.measurements.repository
 
 import kotlinx.datetime.LocalDate
 import modules.measurements.data.*
+import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.core.between
 import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.greaterEq
 import org.jetbrains.exposed.v1.core.innerJoin
+import org.jetbrains.exposed.v1.core.lessEq
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
@@ -65,15 +69,27 @@ class MeasurementRepositoryImpl : MeasurementRepository {
         MeasurementCategoriesTable.deleteWhere { MeasurementCategoriesTable.id eq id } > 0
     }
 
-    override fun getMeasurements(): List<Measurement> = transaction {
+    override fun getMeasurements(categoryId: Long, year: Int?): List<Measurement> = transaction {
         val join = MeasurementsTable.innerJoin(
             MeasurementCategoriesTable,
-            { categoryId },
+            { MeasurementsTable.categoryId },
             { MeasurementCategoriesTable.id }
         )
 
         join
             .selectAll()
+            .where {
+                var condition = (MeasurementsTable.id eq categoryId)
+
+                if (year != null) {
+                    val start = LocalDate(year, 1, 1)
+                    val end = LocalDate(year, 12, 31)
+
+                    condition = (MeasurementsTable.date greaterEq start) and (MeasurementsTable.date lessEq end)
+                }
+
+                condition
+            }
             .map {
                 val category = it.toMeasurementCategory()
                 it.toMeasurement(category)
@@ -137,5 +153,12 @@ class MeasurementRepositoryImpl : MeasurementRepository {
         MeasurementsTable.deleteWhere {
             MeasurementsTable.id eq id
         } > 0
+    }
+
+    override fun getMeasurementYears(categoryId: Long): List<Int> = transaction {
+        MeasurementsTable
+            .selectAll()
+            .where { MeasurementsTable.categoryId eq categoryId }
+            .map { it[MeasurementsTable.date].year }
     }
 }

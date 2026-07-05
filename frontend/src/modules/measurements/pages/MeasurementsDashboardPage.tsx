@@ -1,19 +1,32 @@
 import React from 'react';
-import { useState } from 'react';
-import { MeasurementList } from '../components/MeasurementList';
-import { useMeasurements } from '../hooks/useMeasurements';
-import { MeasurementCategoryList } from '../components/MeasurementCategoryList';
 import { Box, Button, CircularProgress, Drawer, IconButton, Typography } from '@mui/material';
-import { AddOutlined, CategoryOutlined, CloseOutlined, HistoryOutlined, SettingsOutlined } from '@mui/icons-material';
+import { AddOutlined, CategoryOutlined, CloseOutlined, HistoryOutlined } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { useMeasurementCategories } from '../hooks/useMeasurementCategories';
+import { PageFrame } from '../../../components/common/PageFrame';
+import { PageHeader } from '../../../components/common/PageHeader';
+import { LoadingBox } from '../../../components/common/LoadingBox';
+import { MeasurementCategoryTile } from '../components/MeasurementCategoryTile';
 
 const DRAWER_WIDTH = 320;
 
-export const MeasurementPage: React.FC = () => {
+export const MeasurementsDashboardPage: React.FC = () => {
   const navigate = useNavigate();
-  const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
-  const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
-  const { data: measurements, isLoading } = useMeasurements();
+  const { data: categories, isLoading } = useMeasurementCategories();
+
+  return (
+    <PageFrame>
+      <PageHeader title="Measurements"></PageHeader>
+
+      <LoadingBox isLoading={isLoading}>
+        <Box>
+          {categories?.map((category) => (
+            <MeasurementCategoryTile key={category.id} category={category} />
+          ))}
+        </Box>
+      </LoadingBox>
+    </PageFrame>
+  );
 
   if (isLoading) {
     return (
@@ -50,9 +63,9 @@ export const MeasurementPage: React.FC = () => {
       <Drawer
         variant="persistent"
         anchor="left"
-        open={leftDrawerOpen}
+        open={false}
         sx={{
-          width: leftDrawerOpen ? DRAWER_WIDTH : 0,
+          width: false ? DRAWER_WIDTH : 0,
           flexShrink: 0,
           '& .MuiDrawer-paper': {
             width: DRAWER_WIDTH,
@@ -69,11 +82,10 @@ export const MeasurementPage: React.FC = () => {
           <Typography variant="h6" sx={{ fontWeight: 600 }}>
             Measurements
           </Typography>
-          <IconButton size="small" onClick={() => setLeftDrawerOpen(false)}>
+          <IconButton size="small">
             <CloseOutlined fontSize="small" />
           </IconButton>
         </Box>
-        <MeasurementList measurements={measurements ?? []} onAdd={() => {}} onEdit={() => {}} onDelete={() => {}} />
       </Drawer>
 
       <Box
@@ -98,13 +110,18 @@ export const MeasurementPage: React.FC = () => {
             bgcolor: 'background.paper',
           }}
         >
-          <Button variant="text" startIcon={<HistoryOutlined />} onClick={() => setLeftDrawerOpen(!leftDrawerOpen)}>
+          <Button variant="text" startIcon={<HistoryOutlined />}>
             Measurements
           </Button>
-          <Button variant="text" startIcon={<CategoryOutlined />} onClick={() => navigate('/measurement-categories')} size='small'>
+          <Button
+            variant="text"
+            startIcon={<CategoryOutlined />}
+            onClick={() => navigate('/measurement-categories')}
+            size="small"
+          >
             Categories
           </Button>
-          <Button variant="contained" startIcon={<AddOutlined />} size='small'>
+          <Button variant="contained" startIcon={<AddOutlined />} size="small">
             Add
           </Button>
         </Box>
@@ -124,9 +141,9 @@ export const MeasurementPage: React.FC = () => {
       <Drawer
         variant="persistent"
         anchor="right"
-        open={rightDrawerOpen}
+        open={false}
         sx={{
-          width: rightDrawerOpen ? DRAWER_WIDTH : 0,
+          width: false ? DRAWER_WIDTH : 0,
           flexShrink: 0,
           '& .MuiDrawer-paper': {
             width: DRAWER_WIDTH,
@@ -143,11 +160,10 @@ export const MeasurementPage: React.FC = () => {
           <Typography variant="h6" sx={{ fontWeight: 600 }}>
             Categories
           </Typography>
-          <IconButton size="small" onClick={() => setRightDrawerOpen(false)}>
+          <IconButton size="small">
             <CloseOutlined fontSize="small" />
           </IconButton>
         </Box>
-        <MeasurementCategoryList />
       </Drawer>
     </Box>
   );

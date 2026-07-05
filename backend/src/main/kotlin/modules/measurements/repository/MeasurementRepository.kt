@@ -12,9 +12,10 @@ interface MeasurementRepository {
     fun updateCategory(id: Long, name: String, color: String, unit: String): MeasurementCategory?
     fun deleteCategory(id: Long): Boolean
 
-    fun getMeasurements(): List<Measurement>
+    fun getMeasurements(categoryId: Long, year: Int?): List<Measurement>
     fun getMeasurementById(id: Long): Measurement?
     fun createMeasurement(value: Double, categoryId: Long, date: LocalDate): Measurement
     fun updateMeasurement(id: Long, value: Double, categoryId: Long, date: LocalDate): Measurement?
     fun deleteMeasurement(id: Long): Boolean
+    fun getMeasurementYears(categoryId: Long): List<Int>
 }

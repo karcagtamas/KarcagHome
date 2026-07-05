@@ -67,7 +67,7 @@ export const MeasurementCategoryEditDialog: React.FC<Props> = ({
     <>
       <EditDialog
         open={open}
-        title={isEdit ? 'Edit Expense Category' : 'Create Expense Category'}
+        title={isEdit ? 'Edit Measurement Category' : 'Create Measurement Category'}
         isEdit={isEdit}
         isValid={isValid}
         onClose={onClose}

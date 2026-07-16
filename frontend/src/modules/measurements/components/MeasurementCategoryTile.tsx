@@ -1,4 +1,4 @@
-import { Box, Chip, IconButton, MenuItem, TextField } from '@mui/material';
+import { Box, IconButton, MenuItem, TextField } from '@mui/material';
 import { ContentCard } from '../../../components/common/ContentCard';
 import type { MeasurementCategoryDTO, MeasurementEditDTO } from '../models/measurement';
 import { useState } from 'react';
@@ -10,6 +10,7 @@ import { MeasurementEditDialog } from '../dialogs/MeasurementEditDialog';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { measurementApi } from '../api/measurement.api';
 import { measurementKeys } from '../../../keys/measurementKeys';
+import { MeasurementChip } from './MeasurementChip';
 
 type Props = {
   category: MeasurementCategoryDTO;
@@ -73,7 +74,7 @@ export const MeasurementCategoryTile: React.FC<Props> = ({ category }) => {
       <LoadingBox isLoading={isYearsLoading || isMeasurementsLoading}>
         <Box sx={{ padding: '4px' }}>
           {measurements?.map((measurement) => (
-            <Chip color="warning" key={measurement.id} label={`${measurement.value} (${measurement.date})`}></Chip>
+            <MeasurementChip measurement={measurement} />
           ))}
         </Box>
       </LoadingBox>

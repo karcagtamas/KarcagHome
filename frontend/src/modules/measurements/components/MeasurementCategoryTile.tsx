@@ -93,6 +93,7 @@ export const MeasurementCategoryTile: React.FC<Props> = ({ category }) => {
                 key={measurement.id}
                 measurement={measurement}
                 disabled={apiLoading}
+                onEdit={() => handleEdit(measurement)}
                 onDelete={() => handleRemove(measurement)}
               />
             ))}

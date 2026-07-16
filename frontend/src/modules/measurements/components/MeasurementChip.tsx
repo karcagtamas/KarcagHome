@@ -2,15 +2,16 @@ import { Box, IconButton } from '@mui/material';
 import type { MeasurementDTO } from '../models/measurement';
 import { useMemo } from 'react';
 import { getContrastColor } from '../../../common/colors';
-import { DeleteOutlined } from '@mui/icons-material';
+import { DeleteOutlined, EditOutlined } from '@mui/icons-material';
 
 type Props = {
   measurement: MeasurementDTO;
   disabled?: boolean;
+  onEdit?: () => void;
   onDelete?: () => void;
 };
 
-export const MeasurementChip: React.FC<Props> = ({ measurement, disabled = false, onDelete }) => {
+export const MeasurementChip: React.FC<Props> = ({ measurement, disabled = false, onEdit, onDelete }) => {
   const contrastColor = useMemo(() => {
     return getContrastColor(measurement.category.color);
   }, [measurement]);
@@ -25,7 +26,7 @@ export const MeasurementChip: React.FC<Props> = ({ measurement, disabled = false
         display: 'inline-flex',
         flexDirection: 'row',
         alignItems: 'center',
-        gap: '0.5rem',
+        gap: '4px',
         whiteSpace: 'nowrap',
       }}
     >
@@ -34,6 +35,11 @@ export const MeasurementChip: React.FC<Props> = ({ measurement, disabled = false
         {measurement.category.unit}
       </span>{' '}
       <small>({measurement.date})</small>
+      {onEdit && (
+        <IconButton color="warning" size="small" disabled={disabled} onClick={onEdit}>
+          <EditOutlined fontSize="small" />
+        </IconButton>
+      )}
       {onDelete && (
         <IconButton color="error" size="small" disabled={disabled} onClick={onDelete}>
           <DeleteOutlined fontSize="small" />

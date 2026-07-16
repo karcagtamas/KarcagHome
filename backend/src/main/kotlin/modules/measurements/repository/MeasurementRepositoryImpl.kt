@@ -79,13 +79,13 @@ class MeasurementRepositoryImpl : MeasurementRepository {
         join
             .selectAll()
             .where {
-                var condition = (MeasurementsTable.id eq categoryId)
+                var condition = (MeasurementCategoriesTable.id eq categoryId)
 
                 if (year != null) {
                     val start = LocalDate(year, 1, 1)
                     val end = LocalDate(year, 12, 31)
 
-                    condition = (MeasurementsTable.date greaterEq start) and (MeasurementsTable.date lessEq end)
+                    condition = condition and (MeasurementsTable.date greaterEq start) and (MeasurementsTable.date lessEq end)
                 }
 
                 condition

@@ -1,13 +1,25 @@
-export interface MeasurementCategory {
-    id: string;
-    name: string;
-    color: string;
-    unit: string;
+export interface MeasurementCategoryDTO {
+  id: number;
+  name: string;
+  color: string;
+  unit: string;
 }
 
-export interface Measurement {
-    id: string;
-    value: number;
-    date: string;
-    categoryId: string;
+export interface MeasurementDTO {
+  id: number;
+  value: number;
+  date: string;
+  category: MeasurementCategoryDTO;
+}
+
+export interface MeasurementCategoryEditDTO {
+  name: string;
+  color: string;
+  unit: string;
+}
+
+export interface MeasurementEditDTO {
+  value: number;
+  date: string;
+  categoryId: number;
 }

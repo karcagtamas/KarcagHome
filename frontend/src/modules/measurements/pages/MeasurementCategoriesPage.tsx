@@ -1,44 +1,44 @@
+import type React from 'react';
 import { PageFrame } from '../../../components/common/PageFrame';
 import { PageHeader } from '../../../components/common/PageHeader';
-import { useState } from 'react';
-import { useExpenseCategories } from '../hooks/useExpenseCategories';
-import { LoadingBox } from '../../../components/common/LoadingBox';
-import type { ExpenseCategoryDTO, ExpenseCategoryEditDTO } from '../models/expenses';
-import { ExpenseCategoryEditDialog } from '../dialogs/ExpenseCategoryEditDialog';
 import { Box, Button, IconButton } from '@mui/material';
-import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 import { AddOutlined, ArrowBackOutlined, DeleteOutlined, EditOutlined } from '@mui/icons-material';
-import { useExpenseCategoryMutations } from '../hooks/useExpenseCategoryMutations';
+import { useState } from 'react';
+import type { MeasurementCategoryDTO, MeasurementCategoryEditDTO } from '../models/measurement';
+import { useMeasurementCategories } from '../hooks/useMeasurementCategories';
+import { DataGrid, type GridColDef } from '@mui/x-data-grid';
+import { LoadingBox } from '../../../components/common/LoadingBox';
+import { MeasurementCategoryEditDialog } from '../dialogs/MeasurementCategoryEditDialog';
+import { useMeasurementCategoryMutations } from '../hooks/useMeasurementCategoryMutations';
 import { useNavigate } from 'react-router-dom';
 
-export const ExpenseCategoriesPage: React.FC = () => {
+export const MeasurementCategoriesPage: React.FC = () => {
   const navigate = useNavigate();
+  const [measurementCategoryDialogOpen, setMeasurementCategoryDialogOpen] = useState(false);
+  const [selectedMeasurementCategory, setSelectedMeasurementCategory] = useState<MeasurementCategoryDTO | null>(null);
 
-  const [expenseCategoryDialogOpen, setExpenseCategoryDialogOpen] = useState(false);
-  const [selectedExpenseCategory, setSelectedExpenseCategory] = useState<ExpenseCategoryDTO | null>(null);
-
-  const { data, isLoading } = useExpenseCategories();
-  const { createMutation, updateMutation, removeMutation, isPending: apiLoading } = useExpenseCategoryMutations();
+  const { data, isLoading } = useMeasurementCategories();
+  const { createMutation, updateMutation, removeMutation, isPending: apiLoading } = useMeasurementCategoryMutations();
 
   const handleCreate = () => {
-    setSelectedExpenseCategory(null);
-    setExpenseCategoryDialogOpen(true);
+    setSelectedMeasurementCategory(null);
+    setMeasurementCategoryDialogOpen(true);
   };
 
-  const handleEdit = (expenseCategory: ExpenseCategoryDTO) => {
-    setSelectedExpenseCategory(expenseCategory);
-    setExpenseCategoryDialogOpen(true);
+  const handleEdit = (measurementCategory: MeasurementCategoryDTO) => {
+    setSelectedMeasurementCategory(measurementCategory);
+    setMeasurementCategoryDialogOpen(true);
   };
 
-  const handleRemove = async (expenseCategory: ExpenseCategoryDTO) => {
+  const handleRemove = async (measurementCategory: MeasurementCategoryDTO) => {
     try {
-      await removeMutation.mutateAsync(expenseCategory.id);
+      await removeMutation.mutateAsync(measurementCategory.id);
     } catch (err) {
-      console.error('Category deletion failed', err);
+      console.error('Measurement category deletion encountered errors', err);
     }
   };
 
-  const handleSubmit = async (data: ExpenseCategoryEditDTO, id: number | undefined) => {
+  const handleSubmit = async (data: MeasurementCategoryEditDTO, id?: number) => {
     try {
       if (id) {
         await updateMutation.mutateAsync({ id, data });
@@ -46,11 +46,11 @@ export const ExpenseCategoriesPage: React.FC = () => {
         await createMutation.mutateAsync(data);
       }
     } catch (err) {
-      console.error('Category configuration save failed', err);
+      console.error('Measurement category payload submission failed', err);
     }
   };
 
-  const columns: GridColDef<ExpenseCategoryDTO>[] = [
+  const columns: GridColDef<MeasurementCategoryDTO>[] = [
     {
       field: 'name',
       headerName: 'Name',
@@ -77,10 +77,9 @@ export const ExpenseCategoriesPage: React.FC = () => {
       ),
     },
     {
-      field: 'type',
-      headerName: 'Type',
+      field: 'unit',
+      headerName: 'Unit',
       flex: 1,
-      valueGetter: (_, row) => row.type?.name ?? '',
     },
     {
       field: 'actions',
@@ -104,14 +103,14 @@ export const ExpenseCategoriesPage: React.FC = () => {
   return (
     <PageFrame>
       <PageHeader
-        title="Expense Categories"
+        title="Measurement Categories"
         actions={
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Button variant="contained" startIcon={<AddOutlined />} onClick={handleCreate} size="small">
               Create
             </Button>
 
-            <IconButton size="small" color="info" onClick={() => navigate('/accounts')} disabled={apiLoading}>
+            <IconButton size="small" color="info" onClick={() => navigate('/measurements')} disabled={apiLoading}>
               <ArrowBackOutlined fontSize="small" />
             </IconButton>
           </Box>
@@ -119,17 +118,14 @@ export const ExpenseCategoriesPage: React.FC = () => {
       ></PageHeader>
 
       <LoadingBox isLoading={isLoading}>
-        <Box sx={{ padding: '1rem', width: '100%', height: 500 }}>
+        <Box sx={{ padding: '1rem', width: '100%', height: 500, boxSizing: 'border-box' }}>
           <DataGrid
             rows={data ?? []}
             columns={columns}
             loading={isLoading}
             getRowId={(row) => row.id}
             disableRowSelectionOnClick
-            initialState={{
-              pagination: { paginationModel: { pageSize: 10 } },
-            }}
-            pageSizeOptions={[5, 10, 20]}
+            hideFooter
             sx={{
               '& .MuiDataGrid-cell:focus': { outline: 'none' },
             }}
@@ -137,13 +133,16 @@ export const ExpenseCategoriesPage: React.FC = () => {
         </Box>
       </LoadingBox>
 
-      <ExpenseCategoryEditDialog
-        open={expenseCategoryDialogOpen}
-        expenseCategory={selectedExpenseCategory}
-        loading={apiLoading}
-        onClose={() => setExpenseCategoryDialogOpen(false)}
-        onSubmit={handleSubmit}
-      />
+      {measurementCategoryDialogOpen && (
+        <MeasurementCategoryEditDialog
+          key={selectedMeasurementCategory ? `edit-measurement-cat-${selectedMeasurementCategory.id}` : 'create-measurement-cat'}
+          open={measurementCategoryDialogOpen}
+          measurementCategory={selectedMeasurementCategory}
+          loading={apiLoading}
+          onClose={() => setMeasurementCategoryDialogOpen(false)}
+          onSubmit={handleSubmit}
+        />
+      )}
     </PageFrame>
   );
 };

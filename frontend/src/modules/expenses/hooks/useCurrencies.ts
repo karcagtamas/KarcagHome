@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { currencyApi } from "../api/currency.api";
-import { currencyKeys } from "../keys/currencyKeys";
+import { currencyApi } from "../../../api/currency.api";
+import { currencyKeys } from "../../../keys/currencyKeys";
 
 export const useCurrencies = () => {
   return (

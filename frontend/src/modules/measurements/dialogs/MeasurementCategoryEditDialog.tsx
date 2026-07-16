@@ -1,56 +1,60 @@
 import { useEffect } from 'react';
+import type { MeasurementCategoryDTO, MeasurementCategoryEditDTO } from '../models/measurement';
 import { EditDialog } from '../../../components/dialog/EditDialog';
-import { useExpenseCategoryTypes } from '../hooks/useExpenseCategoryTypes';
-import type { ExpenseCategoryDTO, ExpenseCategoryEditDTO } from '../models/expenses';
+import { Box, FormHelperText, TextField } from '@mui/material';
 import { ColorPickerPopup } from '../../../components/common/ColorPickerPopup';
-import { Box, FormHelperText, MenuItem, TextField } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 
 type Props = {
   open: boolean;
-  expenseCategory: ExpenseCategoryDTO | null;
+  measurementCategory: MeasurementCategoryDTO | null;
   onClose: () => void;
-  onSubmit: (data: ExpenseCategoryEditDTO, id?: number) => Promise<void>;
+  onSubmit: (data: MeasurementCategoryEditDTO, id?: number) => Promise<void>;
   loading?: boolean;
 };
 
-export const ExpenseCategoryEditDialog: React.FC<Props> = ({ open, expenseCategory, onClose, onSubmit, loading }) => {
-  const isEdit = !!expenseCategory;
-  const { data: types } = useExpenseCategoryTypes();
+export const MeasurementCategoryEditDialog: React.FC<Props> = ({
+  open,
+  measurementCategory,
+  onClose,
+  onSubmit,
+  loading,
+}) => {
+  const isEdit = !!measurementCategory;
 
   const {
     control,
     handleSubmit,
     reset,
     formState: { isValid },
-  } = useForm<ExpenseCategoryEditDTO>({
+  } = useForm<MeasurementCategoryEditDTO>({
     defaultValues: {
       name: '',
       color: '',
-      typeId: undefined,
+      unit: '',
     },
     mode: 'onChange',
   });
 
   useEffect(() => {
     reset({
-      name: expenseCategory?.name ?? '',
-      color: expenseCategory?.color ?? '',
-      typeId: expenseCategory?.type.id,
+      name: measurementCategory?.name ?? '',
+      color: measurementCategory?.color ?? '',
+      unit: measurementCategory?.unit ?? '',
     });
-  }, [expenseCategory, reset]);
+  }, [measurementCategory, reset]);
 
-  const handleValidSubmit = async (data: ExpenseCategoryEditDTO) => {
+  const handleValidSubmit = async (data: MeasurementCategoryEditDTO) => {
     if (!isValid || loading) return;
 
     try {
       await onSubmit(
         {
-          name: data.name,
-          color: data.color,
-          typeId: Number(data.typeId),
+          name: data.name.trim(),
+          color: data.color.trim(),
+          unit: data.unit.trim(),
         },
-        expenseCategory?.id,
+        measurementCategory?.id,
       );
 
       onClose();
@@ -63,7 +67,7 @@ export const ExpenseCategoryEditDialog: React.FC<Props> = ({ open, expenseCatego
     <>
       <EditDialog
         open={open}
-        title={isEdit ? 'Edit Expense Category' : 'Create Expense Category'}
+        title={isEdit ? 'Edit Measurement Category' : 'Create Measurement Category'}
         isEdit={isEdit}
         isValid={isValid}
         onClose={onClose}
@@ -114,15 +118,16 @@ export const ExpenseCategoryEditDialog: React.FC<Props> = ({ open, expenseCatego
           />
 
           <Controller
-            name="typeId"
+            name="unit"
             control={control}
-            rules={{ required: 'Category type is required' }}
+            rules={{
+              required: 'Unit measurement is required',
+              validate: (v) => !!v?.trim() || 'Cannot be empty spaces',
+            }}
             render={({ field, fieldState: { error } }) => (
               <TextField
                 {...field}
-                value={field.value ?? ''}
-                select
-                label="Type"
+                label="Unit"
                 required
                 fullWidth
                 disabled={loading}
@@ -130,13 +135,7 @@ export const ExpenseCategoryEditDialog: React.FC<Props> = ({ open, expenseCatego
                 helperText={error?.message}
                 variant="outlined"
                 size="small"
-              >
-                {types?.map((type) => (
-                  <MenuItem key={type.id} value={type.id}>
-                    {type.name}
-                  </MenuItem>
-                ))}
-              </TextField>
+              />
             )}
           />
         </Box>

@@ -1,8 +1,9 @@
 import type { AccountDTO, AccountEditDTO } from '../models/account';
 import { EditDialog } from '../../../components/dialog/EditDialog';
-import { useEffect, useState } from 'react';
-import { useCurrencies } from '../../../hooks/useCurrencies';
+import { useEffect } from 'react';
+import { useCurrencies } from '../hooks/useCurrencies';
 import { Box, MenuItem, TextField } from '@mui/material';
+import { Controller, useForm } from 'react-hook-form';
 
 type Props = {
   open: boolean;
@@ -16,29 +17,36 @@ export const AccountEditDialog: React.FC<Props> = ({ open, account, onClose, onS
   const isEdit = !!account;
   const currencies = useCurrencies();
 
-  const [name, setName] = useState('');
-  const [currencyId, setCurrencyId] = useState<number>();
-  const [baseValue, setBaseValue] = useState('');
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { isValid },
+  } = useForm<AccountEditDTO>({
+    defaultValues: {
+      name: '',
+      currencyId: undefined,
+      baseValue: 0,
+    },
+    mode: 'onChange',
+  });
 
   useEffect(() => {
-    if (open) {
-      setName(account?.name ?? '');
-      setCurrencyId(account?.currency.id);
-      setBaseValue(account?.baseValue.toString() ?? '');
-    }
-  }, [account, open]);
+    reset({
+      name: account?.name ?? '',
+      currencyId: account?.currency.id,
+      baseValue: account?.baseValue ?? 0,
+    });
+  }, [account, reset]);
 
-  const parsedBaseValue = Number(baseValue);
-  const isValid = name.trim().length > 0 && !!currencyId && !Number.isNaN(parsedBaseValue) && parsedBaseValue >= 0;
-
-  const handleSubmit = async () => {
+  const handleValidSubmit = async (data: AccountEditDTO) => {
     if (!isValid || loading) return;
 
     try {
       await onSubmit({
-        name,
-        currencyId,
-        baseValue: parsedBaseValue,
+        name: data.name,
+        currencyId: Number(data.currencyId),
+        baseValue: Number(data.baseValue),
       });
 
       onClose();
@@ -55,54 +63,87 @@ export const AccountEditDialog: React.FC<Props> = ({ open, account, onClose, onS
         isEdit={isEdit}
         isValid={isValid}
         onClose={onClose}
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(handleValidSubmit)}
         loading={loading}
       >
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 1 }}>
-          <TextField
-            label="Name"
-            required
-            fullWidth
-            autoFocus
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            disabled={loading}
-            placeholder="My private account"
-            variant="outlined"
-            size="small"
+        <Box
+          component="form"
+          onSubmit={(e) => e.preventDefault()}
+          sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 1 }}
+        >
+          <Controller
+            name="name"
+            control={control}
+            rules={{ required: 'Name is required', validate: (v) => !!v?.trim() || 'Cannot be empty spaces' }}
+            render={({ field, fieldState: { error } }) => (
+              <TextField
+                {...field}
+                label="Name"
+                required
+                fullWidth
+                autoFocus
+                disabled={loading}
+                placeholder="My private account"
+                error={!!error}
+                helperText={error?.message}
+                variant="outlined"
+                size="small"
+              />
+            )}
           />
 
-          <TextField
-            select
-            label="Currency"
-            required
-            fullWidth
-            value={currencyId}
-            onChange={(e) => setCurrencyId(Number(e.target.value))}
-            disabled={loading || isEdit}
-            variant="outlined"
-            size="small"
-          >
-            {currencies?.map((currency) => (
-              <MenuItem key={currency.id} value={currency.id}>
-                {currency.name} [{currency.abbreviation}]
-              </MenuItem>
-            ))}
-          </TextField>
+          <Controller
+            name="currencyId"
+            control={control}
+            rules={{ required: 'Currency is required' }}
+            render={({ field, fieldState: { error } }) => (
+              <TextField
+                {...field}
+                value={field.value ?? ''}
+                select
+                label="Currency"
+                required
+                fullWidth
+                disabled={loading || isEdit}
+                error={!!error}
+                helperText={error?.message}
+                variant="outlined"
+                size="small"
+              >
+                {currencies?.map((currency) => (
+                  <MenuItem key={currency.id} value={currency.id}>
+                    {currency.name} [{currency.abbreviation}]
+                  </MenuItem>
+                ))}
+              </TextField>
+            )}
+          />
 
-          <TextField
-            label="Base Value"
-            required
-            fullWidth
-            type="number"
-            slotProps={{
-              htmlInput: { step: '0.000001' },
+          <Controller
+            name="baseValue"
+            control={control}
+            rules={{
+              required: 'Base value is required',
+              min: { value: 0, message: 'Base value must be greater than or equal to 0' },
+              validate: (v) => !Number.isNaN(Number(v)) || 'Must be a valid number',
             }}
-            value={baseValue}
-            onChange={(e) => setBaseValue(e.target.value)}
-            disabled={loading}
-            variant="outlined"
-            size="small"
+            render={({ field, fieldState: { error } }) => (
+              <TextField
+                {...field}
+                label="Base Value"
+                required
+                fullWidth
+                type="number"
+                slotProps={{
+                  htmlInput: { step: '0.000001' },
+                }}
+                disabled={loading}
+                error={!!error}
+                helperText={error?.message}
+                variant="outlined"
+                size="small"
+              />
+            )}
           />
         </Box>
       </EditDialog>

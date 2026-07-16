@@ -61,6 +61,7 @@ export const CurrencyTable: React.FC<Props> = ({
                 <>
                   <IconButton
                     size="small"
+                    color='warning'
                     onClick={() => onEdit({ ...currency.data })}
                     disabled={currency.data.disabled}
                   >
@@ -68,6 +69,7 @@ export const CurrencyTable: React.FC<Props> = ({
                   </IconButton>
                   <IconButton
                     size="small"
+                    color='info'
                     onClick={() => onExchangeAdd({ ...currency.data })}
                     disabled={currency.data.disabled}
                   >
@@ -99,6 +101,7 @@ export const CurrencyTable: React.FC<Props> = ({
                             <>
                               <IconButton
                                 size="small"
+                                color="warning"
                                 onClick={() => onExchangeEdit(currency.data, month, rate)}
                                 disabled={currency.data.disabled}
                               >

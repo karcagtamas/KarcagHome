@@ -3,21 +3,20 @@ import { PageHeader } from '../../../components/common/PageHeader';
 import { useState } from 'react';
 import type { CurrencyDTO, CurrencyExchangeDTO, MonthNode, RateNode } from '../models/currency';
 import { CurrencyEditDialog } from '../dialogs/CurrencyEditDialog';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { currencyApi } from '../../../api/currency.api';
-import { currencyKeys } from '../../../keys/currencyKeys';
-import { useCurrencyTree } from '../../../hooks/useCurrencyTree';
+import { useCurrencyTree } from '../hooks/useCurrencyTree';
 import { CurrencyTable } from '../components/CurrencyTable';
 import { CurrencyExchangeEditDialog } from '../dialogs/CurrencyExchangeEditDialog';
 import { MONTHS } from '../../../common/month';
 import { LoadingBox } from '../../../components/common/LoadingBox';
-import { useExchangeYears } from '../../../hooks/useExchangeYears';
-import { currencyExchangeApi } from '../../../api/currency-exchange.api';
-import { Box, Button, FormControlLabel, MenuItem, Switch, TextField } from '@mui/material';
-import { AddOutlined } from '@mui/icons-material';
+import { useExchangeYears } from '../hooks/useExchangeYears';
+import { Box, Button, FormControlLabel, IconButton, MenuItem, Switch, TextField } from '@mui/material';
+import { AddOutlined, ArrowBackOutlined } from '@mui/icons-material';
+import { useCurrencyMutations } from '../hooks/useCurrencyMutations';
+import { useNavigate } from 'react-router-dom';
 
 export const CurrenciesPage: React.FC = () => {
-  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
   const [showDisabled, setShowDisabled] = useState(false);
   const [year, setYear] = useState(new Date().getFullYear());
   const [currencyDialogOpen, setCurrencyDialogOpen] = useState(false);
@@ -27,46 +26,13 @@ export const CurrenciesPage: React.FC = () => {
 
   const { data, isLoading } = useCurrencyTree(year, showDisabled);
   const years = useExchangeYears();
-
-  const createMutation = useMutation({
-    mutationFn: currencyApi.create,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: currencyKeys.all });
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: Omit<CurrencyDTO, 'id'> }) => currencyApi.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: currencyKeys.all });
-    },
-  });
-
-  const exchangeSaveMutation = useMutation({
-    mutationFn: currencyExchangeApi.save,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: currencyKeys.all });
-      queryClient.invalidateQueries({ queryKey: currencyKeys.exchangeYears() });
-    },
-  });
-
-  const exchangeRemoveMutation = useMutation({
-    mutationFn: ({
-      currencyFromId,
-      currencyToId,
-      year,
-      month,
-    }: {
-      currencyFromId: number;
-      currencyToId: number;
-      year: number;
-      month: number;
-    }) => currencyExchangeApi.delete(currencyFromId, currencyToId, year, month),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: currencyKeys.all });
-      queryClient.invalidateQueries({ queryKey: currencyKeys.exchangeYears() });
-    },
-  });
+  const {
+    createMutation,
+    updateMutation,
+    exchangeSaveMutation,
+    exchangeRemoveMutation,
+    isPending: apiLoading,
+  } = useCurrencyMutations();
 
   const handleCreate = () => {
     setSelectedCurrency(null);
@@ -96,31 +62,37 @@ export const CurrenciesPage: React.FC = () => {
     setCurrencyExchangeDialogOpen(true);
   };
 
-  const apiLoading =
-    createMutation.isPending ||
-    updateMutation.isPending ||
-    exchangeSaveMutation.isPending ||
-    exchangeRemoveMutation.isPending;
-
   const handleSubmit = async (data: Omit<CurrencyDTO, 'id'>, id: number | undefined) => {
-    if (id) {
-      await updateMutation.mutateAsync({ id, data });
-    } else {
-      await createMutation.mutateAsync(data);
+    try {
+      if (id) {
+        await updateMutation.mutateAsync({ id, data: data });
+      } else {
+        await createMutation.mutateAsync(data);
+      }
+    } catch (err) {
+      console.error('Currency transaction failed', err);
     }
   };
 
   const handleExchangeSubmit = async (data: CurrencyExchangeDTO) => {
-    await exchangeSaveMutation.mutateAsync(data);
+    try {
+      await exchangeSaveMutation.mutateAsync(data);
+    } catch (err) {
+      console.error('Exchange save failed', err);
+    }
   };
 
   const handleExchangeRemove = async (currency: CurrencyDTO, month: MonthNode, rate: RateNode) => {
-    await exchangeRemoveMutation.mutateAsync({
-      currencyFromId: currency.id,
-      currencyToId: rate.currencyToId,
-      year: year,
-      month: month.month,
-    });
+    try {
+      await exchangeRemoveMutation.mutateAsync({
+        currencyFromId: currency.id,
+        currencyToId: rate.currencyToId,
+        year: year,
+        month: month.month,
+      });
+    } catch (err) {
+      console.error('Exchange removal failed', err);
+    }
   };
 
   return (
@@ -128,7 +100,7 @@ export const CurrenciesPage: React.FC = () => {
       <PageHeader
         title="Currencies"
         actions={
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <FormControlLabel
               control={
                 <Switch
@@ -158,6 +130,10 @@ export const CurrenciesPage: React.FC = () => {
             <Button variant="contained" startIcon={<AddOutlined />} onClick={handleCreate} size="small">
               Create
             </Button>
+
+            <IconButton size="small" color="info" onClick={() => navigate('/accounts')} disabled={apiLoading}>
+              <ArrowBackOutlined fontSize="small" />
+            </IconButton>
           </Box>
         }
       ></PageHeader>
@@ -172,24 +148,34 @@ export const CurrenciesPage: React.FC = () => {
         />
       </LoadingBox>
 
-      <CurrencyEditDialog
-        open={currencyDialogOpen}
-        currency={selectedCurrency}
-        onClose={() => setCurrencyDialogOpen(false)}
-        onSubmit={handleSubmit}
-        loading={apiLoading}
-      />
+      {currencyDialogOpen && (
+        <CurrencyEditDialog
+          key={selectedCurrency ? `edit-currency-${selectedCurrency.id}` : 'create-currency'}
+          open={currencyDialogOpen}
+          currency={selectedCurrency}
+          onClose={() => setCurrencyDialogOpen(false)}
+          onSubmit={handleSubmit}
+          loading={apiLoading}
+        />
+      )}
 
-      <CurrencyExchangeEditDialog
-        open={currencyExchangeDialogOpen}
-        exchange={selectedExchange}
-        year={year}
-        defaultCurrencyFromId={selectedCurrency?.id}
-        defaultMonth={MONTHS.january.value}
-        loading={apiLoading}
-        onClose={() => setCurrencyExchangeDialogOpen(false)}
-        onSubmit={handleExchangeSubmit}
-      />
+      {currencyExchangeDialogOpen && (
+        <CurrencyExchangeEditDialog
+          key={
+            selectedExchange
+              ? `edit-rate-${selectedExchange.currencyFromId}-${selectedExchange.currencyToId}-${selectedExchange.month}`
+              : 'add-rate'
+          }
+          open={currencyExchangeDialogOpen}
+          exchange={selectedExchange}
+          year={year}
+          defaultCurrencyFromId={selectedCurrency?.id}
+          defaultMonth={MONTHS.january.value}
+          loading={apiLoading}
+          onClose={() => setCurrencyExchangeDialogOpen(false)}
+          onSubmit={handleExchangeSubmit}
+        />
+      )}
     </PageFrame>
   );
 };

@@ -1,6 +1,6 @@
 import { PageFrame } from '../../../components/common/PageFrame';
 import { PageHeader } from '../../../components/common/PageHeader';
-import { useAccounts } from '../../../hooks/useAccounts';
+import { useAccounts } from '../hooks/useAccounts';
 import { LoadingBox } from '../../../components/common/LoadingBox';
 import { AccountEditDialog } from '../dialogs/AccountEditDialog';
 import { useState } from 'react';
@@ -30,7 +30,11 @@ export const AccountsPage: React.FC = () => {
   const apiLoading = createMutation.isPending;
 
   const handleSubmit = async (data: AccountEditDTO) => {
-    await createMutation.mutateAsync(data);
+    try {
+      await createMutation.mutateAsync(data);
+    } catch (err) {
+      console.error('Account creation submitted with errors', err);
+    }
   };
 
   return (
@@ -78,13 +82,16 @@ export const AccountsPage: React.FC = () => {
         </Box>
       </LoadingBox>
 
-      <AccountEditDialog
-        open={accountDialogOpen}
-        account={null}
-        onClose={() => setAccountDialogOpen(false)}
-        onSubmit={handleSubmit}
-        loading={apiLoading}
-      />
+      {accountDialogOpen && (
+        <AccountEditDialog
+          key="create-account-dialog"
+          open={accountDialogOpen}
+          account={null}
+          onClose={() => setAccountDialogOpen(false)}
+          onSubmit={handleSubmit}
+          loading={apiLoading}
+        />
+      )}
     </PageFrame>
   );
 };

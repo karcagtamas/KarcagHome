@@ -1,10 +1,11 @@
 import type { CurrencyExchangeDTO } from '../models/currency';
 import type React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { MONTHS } from '../../../common/month';
-import { useCurrencies } from '../../../hooks/useCurrencies';
+import { useCurrencies } from '../hooks/useCurrencies';
 import { EditDialog } from '../../../components/dialog/EditDialog';
 import { Box, MenuItem, TextField } from '@mui/material';
+import { Controller, useForm } from 'react-hook-form';
 
 type Props = {
   open: boolean;
@@ -32,43 +33,52 @@ export const CurrencyExchangeEditDialog: React.FC<Props> = ({
   const isEdit = !!exchange;
   const currencies = useCurrencies();
 
-  const [currencyFromId, setCurrencyFromId] = useState<number>();
-  const [currencyToId, setCurrencyToId] = useState<number>();
-  const [month, setMonth] = useState<number>();
-  const [value, setValue] = useState('');
+  const {
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { isValid },
+  } = useForm<CurrencyExchangeDTO>({
+    defaultValues: {
+      currencyFromId: undefined,
+      currencyToId: undefined,
+      month: undefined,
+      year: year,
+      value: 0,
+    },
+    mode: 'onChange',
+  });
+
+  const watchedFromId = watch('currencyFromId');
+  const watchedToId = watch('currencyToId');
 
   useEffect(() => {
-    if (!open) return;
-
-    setCurrencyFromId(exchange?.currencyFromId ?? defaultCurrencyFromId);
-    setCurrencyToId(exchange?.currencyToId);
-    setMonth(exchange?.month ?? defaultMonth);
-    setValue(exchange?.value?.toString() ?? '');
-  }, [exchange, open, defaultCurrencyFromId, defaultMonth]);
-
-  const parsedValue = Number(value);
-  const isValid =
-    !!currencyFromId &&
-    !!currencyToId &&
-    !!month &&
-    !Number.isNaN(parsedValue) &&
-    parsedValue > 0 &&
-    currencyFromId !== currencyToId;
-
-  const handleSubmit = async () => {
-    if (!isValid || loading) {
-      return;
-    }
-
-    await onSubmit({
-      currencyFromId,
-      currencyToId,
-      year,
-      month,
-      value: parsedValue,
+    reset({
+      currencyFromId: exchange?.currencyFromId ?? defaultCurrencyFromId,
+      currencyToId: exchange?.currencyToId,
+      month: exchange?.month ?? defaultMonth,
+      year: exchange?.year ?? year,
+      value: exchange?.value ?? 0,
     });
+  }, [exchange, defaultCurrencyFromId, defaultMonth, year, reset]);
 
-    onClose();
+  const handleValidSubmit = async (data: CurrencyExchangeDTO) => {
+    if (!isValid || loading) return;
+
+    try {
+      await onSubmit({
+        currencyFromId: Number(data.currencyFromId),
+        currencyToId: Number(data.currencyToId),
+        month: Number(data.month),
+        year: year,
+        value: Number(data.value),
+      });
+
+      onClose();
+    } catch (err) {
+      console.error('Save failed', err);
+    }
   };
 
   return (
@@ -78,10 +88,12 @@ export const CurrencyExchangeEditDialog: React.FC<Props> = ({
       isEdit={isEdit}
       isValid={isValid}
       onClose={onClose}
-      onSubmit={handleSubmit}
+      onSubmit={handleSubmit(handleValidSubmit)}
       loading={loading}
     >
       <Box
+        component="form"
+        onSubmit={(e) => e.preventDefault()}
         sx={{
           display: 'flex',
           flexDirection: 'column',
@@ -90,77 +102,122 @@ export const CurrencyExchangeEditDialog: React.FC<Props> = ({
           minWidth: { xs: '100%', sm: '420px' },
         }}
       >
-        <TextField
-          select
-          label="From Currency"
-          required
-          fullWidth
-          value={currencyFromId}
-          onChange={(e) => setCurrencyFromId(Number(e.target.value))}
-          disabled={loading || isEdit}
-          variant="outlined"
-          size="small"
-        >
-          {currencies
-            ?.filter((d) => d.id !== currencyToId) // Filters out target selection directly
-            .map((d) => (
-              <MenuItem key={d.id} value={d.id}>
-                {d.name} [{d.abbreviation}]
-              </MenuItem>
-            ))}
-        </TextField>
-
-        <TextField
-          select
-          label="To Currency"
-          required
-          fullWidth
-          value={currencyToId}
-          onChange={(e) => setCurrencyToId(Number(e.target.value))}
-          disabled={loading || isEdit}
-          variant="outlined"
-          size="small"
-        >
-          {currencies
-            ?.filter((d) => d.id !== currencyFromId) // Filters out origin selection directly
-            .map((d) => (
-              <MenuItem key={d.id} value={d.id}>
-                {d.name} [{d.abbreviation}]
-              </MenuItem>
-            ))}
-        </TextField>
-
-        <TextField
-          select
-          label="Month"
-          required
-          fullWidth
-          value={month}
-          onChange={(e) => setMonth(Number(e.target.value))}
-          disabled={loading || isEdit}
-          variant="outlined"
-          size="small"
-        >
-          {Object.values(MONTHS).map((d) => (
-            <MenuItem key={d.value} value={d.value}>
-              {d.displayText}
-            </MenuItem>
-          ))}
-        </TextField>
-
-        <TextField
-          label={`Exchange Value (${year})`}
-          required
-          fullWidth
-          type="number"
-          slotProps={{
-            htmlInput: { step: '0.000001' },
+        <Controller
+          name="currencyFromId"
+          control={control}
+          rules={{
+            required: 'Origin currency is required',
+            validate: (v) => v !== watchedToId || 'Currencies cannot match',
           }}
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          disabled={loading}
-          variant="outlined"
-          size="small"
+          render={({ field, fieldState: { error } }) => (
+            <TextField
+              {...field}
+              value={field.value ?? ''}
+              select
+              label="From Currency"
+              required
+              fullWidth
+              disabled={loading || isEdit}
+              error={!!error}
+              helperText={error?.message}
+              variant="outlined"
+              size="small"
+            >
+              {currencies
+                ?.filter((d) => d.id !== watchedToId)
+                .map((d) => (
+                  <MenuItem key={d.id} value={d.id}>
+                    {d.name} [{d.abbreviation}]
+                  </MenuItem>
+                ))}
+            </TextField>
+          )}
+        />
+
+        <Controller
+          name="currencyToId"
+          control={control}
+          rules={{
+            required: 'Target currency is required',
+            validate: (v) => v !== watchedFromId || 'Currencies cannot match',
+          }}
+          render={({ field, fieldState: { error } }) => (
+            <TextField
+              {...field}
+              value={field.value ?? ''}
+              select
+              label="To Currency"
+              required
+              fullWidth
+              disabled={loading || isEdit}
+              error={!!error}
+              helperText={error?.message}
+              variant="outlined"
+              size="small"
+            >
+              {currencies
+                ?.filter((d) => d.id !== watchedFromId)
+                .map((d) => (
+                  <MenuItem key={d.id} value={d.id}>
+                    {d.name} [{d.abbreviation}]
+                  </MenuItem>
+                ))}
+            </TextField>
+          )}
+        />
+
+        <Controller
+          name="month"
+          control={control}
+          rules={{ required: 'Month selection is required' }}
+          render={({ field, fieldState: { error } }) => (
+            <TextField
+              {...field}
+              value={field.value ?? ''}
+              select
+              label="Month"
+              required
+              fullWidth
+              disabled={loading || isEdit}
+              error={!!error}
+              helperText={error?.message}
+              variant="outlined"
+              size="small"
+            >
+              {Object.values(MONTHS).map((d) => (
+                <MenuItem key={d.value} value={d.value}>
+                  {d.displayText}
+                </MenuItem>
+              ))}
+            </TextField>
+          )}
+        />
+
+        <Controller
+          name="value"
+          control={control}
+          rules={{
+            required: 'Exchange value is required',
+            min: { value: 0.000001, message: 'Value must be greater than 0' },
+            validate: (v) => !Number.isNaN(Number(v)) || 'Must be a valid number',
+          }}
+          render={({ field, fieldState: { error } }) => (
+            <TextField
+              {...field}
+              label={`Exchange Value (${year})`}
+              required
+              fullWidth
+              type="number"
+              slotProps={{
+                htmlInput: { step: '0.000001' },
+              }}
+              disabled={loading}
+              error={!!error}
+              helperText={error?.message}
+              variant="outlined"
+              size="small"
+            />
+          )}
         />
       </Box>
     </EditDialog>

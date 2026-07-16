@@ -1,62 +1,57 @@
-import { EditDialog } from '../../../components/dialog/EditDialog';
 import { useEffect } from 'react';
-import type { ExpenseDTO, ExpenseEditDTO } from '../models/expenses';
-import { useExpenseCategories } from '../hooks/useExpenseCategories';
+import type { MeasurementCategoryDTO, MeasurementDTO, MeasurementEditDTO } from '../models/measurement';
+import { EditDialog } from '../../../components/dialog/EditDialog';
 import { Box, MenuItem, TextField } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
+import { useMeasurementCategories } from '../hooks/useMeasurementCategories';
 
 type Props = {
   open: boolean;
-  expense?: ExpenseDTO | null;
-  accountId: number;
+  measurement: MeasurementDTO | null;
+  measurementCategory?: MeasurementCategoryDTO;
   onClose: () => void;
-  onSubmit: (data: ExpenseEditDTO, id?: number) => Promise<void>;
+  onSubmit: (data: MeasurementEditDTO, id?: number) => Promise<void>;
   loading?: boolean;
 };
 
-export const ExpenseEditDialog: React.FC<Props> = ({ open, expense, accountId, onClose, onSubmit, loading }) => {
-  const isEdit = !!expense;
-  const { data: categories } = useExpenseCategories();
+export const MeasurementEditDialog: React.FC<Props> = ({ open, measurement, measurementCategory, onClose, onSubmit, loading }) => {
+  const isEdit = !!measurement;
 
   const {
     control,
     handleSubmit,
     reset,
     formState: { isValid },
-  } = useForm<ExpenseEditDTO>({
+  } = useForm<MeasurementEditDTO>({
     defaultValues: {
-      amount: 0,
-      description: null,
+      value: 0,
       date: '',
-      categoryId: undefined,
-      accountId: accountId,
+      categoryId: measurementCategory?.id,
     },
     mode: 'onChange',
   });
 
+  const { data: categories } = useMeasurementCategories();
+
   useEffect(() => {
     reset({
-      amount: expense?.amount ?? 0,
-      description: expense?.description ?? null,
-      date: expense?.date ?? '',
-      categoryId: expense?.category.id,
-      accountId: accountId,
+      value: measurement?.value ?? 0,
+      date: measurement?.date ?? '',
+      categoryId: measurement?.category.id ?? measurementCategory?.id,
     });
-  }, [expense, accountId, reset]);
+  }, [measurement, reset]);
 
-  const handleValidSubmit = async (data: ExpenseEditDTO) => {
+  const handleValidSubmit = async (data: MeasurementEditDTO) => {
     if (!isValid || loading) return;
 
     try {
       await onSubmit(
         {
-          amount: Number(data.amount),
-          description: data.description || null,
+          value: Number(data.value),
           date: data.date,
           categoryId: Number(data.categoryId),
-          accountId: accountId,
         },
-        expense?.id,
+        measurement?.id,
       );
 
       onClose();
@@ -69,7 +64,7 @@ export const ExpenseEditDialog: React.FC<Props> = ({ open, expense, accountId, o
     <>
       <EditDialog
         open={open}
-        title={isEdit ? 'Edit Expense' : 'Create Expense'}
+        title={isEdit ? 'Edit Measurement' : 'Create Measurement'}
         isEdit={isEdit}
         isValid={isValid}
         onClose={onClose}
@@ -82,16 +77,16 @@ export const ExpenseEditDialog: React.FC<Props> = ({ open, expense, accountId, o
           sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 1 }}
         >
           <Controller
-            name="amount"
+            name="value"
             control={control}
             rules={{
-              required: 'Amount is required',
+              required: 'Value is required',
               validate: (v) => !Number.isNaN(Number(v)) || 'Must be a valid number',
             }}
             render={({ field, fieldState: { error } }) => (
               <TextField
                 {...field}
-                label="Amount"
+                label="Value"
                 required
                 fullWidth
                 autoFocus
@@ -102,25 +97,6 @@ export const ExpenseEditDialog: React.FC<Props> = ({ open, expense, accountId, o
                 disabled={loading}
                 error={!!error}
                 helperText={error?.message}
-                variant="outlined"
-                size="small"
-              />
-            )}
-          />
-
-          <Controller
-            name="description"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                value={field.value ?? ''}
-                onChange={(e) => field.onChange(e.target.value || null)}
-                label="Description"
-                fullWidth
-                multiline
-                rows={3}
-                disabled={loading}
                 variant="outlined"
                 size="small"
               />
@@ -164,7 +140,7 @@ export const ExpenseEditDialog: React.FC<Props> = ({ open, expense, accountId, o
                 label="Category"
                 required
                 fullWidth
-                disabled={loading}
+                disabled={loading || !!measurementCategory}
                 error={!!error}
                 helperText={error?.message}
                 variant="outlined"
@@ -172,7 +148,7 @@ export const ExpenseEditDialog: React.FC<Props> = ({ open, expense, accountId, o
               >
                 {categories?.map((d) => (
                   <MenuItem key={d.id} value={d.id}>
-                    {d.name} ({d.type.name})
+                    {d.name}
                   </MenuItem>
                 ))}
               </TextField>

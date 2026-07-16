@@ -8,6 +8,7 @@ import dto.measurements.MeasurementEditDTO
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.util.getOrFail
 import modules.measurements.data.toDTO
 import modules.measurements.repository.MeasurementRepository
 
@@ -16,7 +17,10 @@ fun Route.measurementRoutes(repository: MeasurementRepository) {
     route("/measurements") {
 
         get {
-            call.respond(repository.getMeasurements().map { it.toDTO() })
+            val categoryId = call.queryParameters.getOrFail<Long>("categoryId")
+            val year = call.queryParameters["year"]?.toIntOrNull()
+
+            call.respond(repository.getMeasurements(categoryId, year).map { it.toDTO() })
         }
 
         get("/{id}") {
@@ -32,7 +36,7 @@ fun Route.measurementRoutes(repository: MeasurementRepository) {
                     body.value,
                     body.categoryId,
                     body.date,
-                )
+                ).toDTO()
             )
         }
 
@@ -54,6 +58,12 @@ fun Route.measurementRoutes(repository: MeasurementRepository) {
             val id = call.idLong()
 
             call.sendDeleted(repository.deleteMeasurement(id))
+        }
+
+        get("/years") {
+            val categoryId = call.queryParameters.getOrFail<Long>("categoryId")
+
+            call.respond(repository.getMeasurementYears(categoryId))
         }
     }
 
@@ -77,7 +87,7 @@ fun Route.measurementRoutes(repository: MeasurementRepository) {
                     body.name,
                     body.color,
                     body.unit,
-                )
+                ).toDTO()
             )
         }
 

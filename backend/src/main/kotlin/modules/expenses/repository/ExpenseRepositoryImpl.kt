@@ -92,7 +92,7 @@ class ExpenseRepositoryImpl : ExpenseRepository {
 
     override fun getExpenseById(id: Long): Expense? = transaction {
         ExpensesTable.fullQuery()
-            .where { ExpenseCategoriesTable.id eq id }
+            .where { ExpensesTable.id eq id }
             .singleOrNull()
             ?.let {
                 val category = it.toExpenseCategory(it.toExpenseCategoryType())

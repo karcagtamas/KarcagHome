@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { PageFrame } from '../../../components/common/PageFrame';
 import { PageHeader } from '../../../components/common/PageHeader';
-import { useAccount } from '../../../hooks/useAccount';
+import { useAccount } from '../hooks/useAccount';
 import { LoadingBox } from '../../../components/common/LoadingBox';
 import { AccountEditDialog } from '../dialogs/AccountEditDialog';
 import { useState } from 'react';
@@ -13,7 +13,7 @@ import { ConfirmDialog } from '../../../components/dialog/ConfirmDialog';
 import { AccountSummary } from '../components/AccountSummary';
 import { Expenses } from '../components/Expenses';
 import { Box, IconButton } from '@mui/material';
-import { DeleteOutlined, EditOutlined } from '@mui/icons-material';
+import { ArrowBackOutlined, DeleteOutlined, EditOutlined } from '@mui/icons-material';
 
 export const AccountPage: React.FC = () => {
   const { id } = useParams();
@@ -48,7 +48,24 @@ export const AccountPage: React.FC = () => {
 
   const handleSubmit = async (data: AccountEditDTO) => {
     if (accountId !== undefined) {
-      await updateMutation.mutateAsync({ id: accountId, data });
+      try {
+        await updateMutation.mutateAsync({ id: accountId, data: data });
+      } catch (err) {
+        console.error('Account updates failed to complete', err);
+      }
+    }
+  };
+
+  const handleConfirmRemove = async () => {
+    if (accountId !== undefined) {
+      try {
+        await removeMutation.mutateAsync(accountId);
+        navigate('/accounts');
+      } catch (err) {
+        console.error('Account removal failed to complete', err);
+      } finally {
+        setConfirmRemoveDialogOpen(false);
+      }
     }
   };
 
@@ -59,7 +76,15 @@ export const AccountPage: React.FC = () => {
           title={data?.name}
           actions={
             <Box sx={{ display: 'flex', gap: 1 }}>
-              <IconButton size="small" onClick={() => setAccountDialogOpen(true)} disabled={apiLoading}>
+              <IconButton
+                size="small"
+                color="info"
+                onClick={() => navigate('/accounts')}
+                disabled={apiLoading}
+              >
+                <ArrowBackOutlined fontSize="small" />
+              </IconButton>
+              <IconButton size="small" color="warning" onClick={() => setAccountDialogOpen(true)} disabled={apiLoading}>
                 <EditOutlined fontSize="small" />
               </IconButton>
               <IconButton
@@ -84,38 +109,35 @@ export const AccountPage: React.FC = () => {
             width: '100%',
           }}
         >
-          <AccountSummary accountId={accountId!} />
-          <Expenses accountId={accountId!} />
+          {accountId !== undefined && <AccountSummary accountId={accountId} />}
+          {accountId !== undefined && <Expenses accountId={accountId} />}
         </Box>
       </PageFrame>
 
-      <AccountEditDialog
-        open={accountDialogOpen}
-        account={data}
-        onClose={() => setAccountDialogOpen(false)}
-        onSubmit={handleSubmit}
-        loading={apiLoading}
-      />
+      {accountDialogOpen && (
+        <AccountEditDialog
+          key={data ? `edit-${data.id}` : 'empty-account'}
+          open={accountDialogOpen}
+          account={data}
+          onClose={() => setAccountDialogOpen(false)}
+          onSubmit={handleSubmit}
+          loading={apiLoading}
+        />
+      )}
 
       <ConfirmDialog
         open={confirmRemoveDialogOpen}
         title="Remove Account"
         message={
           <>
-            Are you sure you want to remove <strong>{data?.name}</strong> account?{' '}
+            Are you sure you want to remove the <strong>{data?.name}</strong> account?{' '}
           </>
         }
         confirmText="Remove"
         danger
         onClose={() => setConfirmRemoveDialogOpen(false)}
-        onConfirm={async () => {
-          if (accountId !== undefined) {
-            await removeMutation.mutateAsync(accountId);
-            navigate('/accounts');
-          }
-          setConfirmRemoveDialogOpen(false);
-        }}
-      ></ConfirmDialog>
+        onConfirm={handleConfirmRemove}
+      />
     </LoadingBox>
   );
 };

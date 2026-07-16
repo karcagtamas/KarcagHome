@@ -53,6 +53,7 @@ export const TaskTile: React.FC<Props> = ({ task, onEdit, onRemove, className, o
               startIcon={<EditOutlined sx={{ color: 'darkorange' }} />}
               onClick={() => onEdit && onEdit()}
               sx={{ color: 'text.primary' }}
+              size='small'
             >
               Edit
             </Button>
@@ -61,6 +62,7 @@ export const TaskTile: React.FC<Props> = ({ task, onEdit, onRemove, className, o
               startIcon={<DeleteOutlined sx={{ color: 'red' }} />}
               onClick={() => onRemove && onRemove()}
               sx={{ color: 'text.primary' }}
+              size='small'
             >
               Delete
             </Button>
@@ -90,6 +92,7 @@ export const TaskTile: React.FC<Props> = ({ task, onEdit, onRemove, className, o
           }
           onClick={() => onToggle && onToggle()}
           sx={{ color: 'text.primary', borderColor: 'text.primary' }}
+          size='small'
         >
           {task.completed ? 'Unsolve' : 'Solve'}
         </Button>

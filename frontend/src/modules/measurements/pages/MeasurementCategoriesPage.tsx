@@ -135,7 +135,7 @@ export const MeasurementCategoriesPage: React.FC = () => {
 
       {measurementCategoryDialogOpen && (
         <MeasurementCategoryEditDialog
-          key={selectedMeasurementCategory ? `edit-measurement-cat-${selectedMeasurementCategory.id}` : 'create-measurement-cat'} // Forces react-hook-form to unmount and clear cache safely between runs
+          key={selectedMeasurementCategory ? `edit-measurement-cat-${selectedMeasurementCategory.id}` : 'create-measurement-cat'}
           open={measurementCategoryDialogOpen}
           measurementCategory={selectedMeasurementCategory}
           loading={apiLoading}

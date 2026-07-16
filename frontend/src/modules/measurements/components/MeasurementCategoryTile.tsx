@@ -1,47 +1,56 @@
 import { Box, IconButton, MenuItem, TextField, Typography } from '@mui/material';
 import { ContentCard } from '../../../components/common/ContentCard';
-import type { MeasurementCategoryDTO, MeasurementEditDTO } from '../models/measurement';
+import type { MeasurementCategoryDTO, MeasurementDTO, MeasurementEditDTO } from '../models/measurement';
 import { useState } from 'react';
 import { AddOutlined } from '@mui/icons-material';
 import { useMeasurements } from '../hooks/useMeasurements';
 import { useMeasurementYears } from '../hooks/useMeasurementYears';
 import { LoadingBox } from '../../../components/common/LoadingBox';
 import { MeasurementEditDialog } from '../dialogs/MeasurementEditDialog';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { measurementApi } from '../api/measurement.api';
-import { measurementKeys } from '../../../keys/measurementKeys';
 import { MeasurementChip } from './MeasurementChip';
 import { MeasurementChart } from './MeasurementChart';
+import { useMeasurementMutations } from '../hooks/useMeasurementMutations';
 
 type Props = {
   category: MeasurementCategoryDTO;
 };
 
 export const MeasurementCategoryTile: React.FC<Props> = ({ category }) => {
-  const queryClient = useQueryClient();
   const [measurementDialogOpen, setMeasurementDialogOpen] = useState(false);
+  const [selectedMeasurement, setSelectedMeasurement] = useState<MeasurementDTO | null>(null);
   const { data: years, isLoading: isYearsLoading } = useMeasurementYears(category.id);
   const [year, setYear] = useState<number | null>(years && years.length > 0 ? years[years.length - 1] : null);
   const { data: measurements, isLoading: isMeasurementsLoading } = useMeasurements(category.id, year);
 
+  const { createMutation, updateMutation, removeMutation, isPending: apiLoading } = useMeasurementMutations();
+
   const handleCreate = () => {
+    setSelectedMeasurement(null);
     setMeasurementDialogOpen(true);
   };
 
-  const createMutation = useMutation({
-    mutationFn: measurementApi.create,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: measurementKeys.all });
-    },
-  });
+  const handleEdit = (measurement: MeasurementDTO) => {
+    setSelectedMeasurement(measurement);
+    setMeasurementDialogOpen(true);
+  };
 
-  const apiLoading = createMutation.isPending;
-
-  const handleSubmit = async (data: MeasurementEditDTO, _?: number) => {
+  const handleRemove = async (measurementCategory: MeasurementDTO) => {
     try {
-      await createMutation.mutateAsync(data);
+      await removeMutation.mutateAsync(measurementCategory.id);
     } catch (err) {
-      console.error('Measurement category payload submission failed', err);
+      console.error('Measurement category deletion encountered errors', err);
+    }
+  };
+
+  const handleSubmit = async (data: MeasurementEditDTO, id?: number) => {
+    try {
+      if (id) {
+        await updateMutation.mutateAsync({ id, data });
+      } else {
+        await createMutation.mutateAsync(data);
+      }
+    } catch (err) {
+      console.error('Measurement payload submission failed', err);
     }
   };
 
@@ -80,7 +89,12 @@ export const MeasurementCategoryTile: React.FC<Props> = ({ category }) => {
         <Box sx={{ display: 'flex', flex: 1, flexDirection: 'column', justifyContent: 'space-between' }}>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', flexDirection: 'row', gap: '4px', padding: '8px' }}>
             {measurements?.map((measurement) => (
-              <MeasurementChip key={measurement.id} measurement={measurement} />
+              <MeasurementChip
+                key={measurement.id}
+                measurement={measurement}
+                disabled={apiLoading}
+                onDelete={() => handleRemove(measurement)}
+              />
             ))}
           </Box>
 
@@ -90,9 +104,9 @@ export const MeasurementCategoryTile: React.FC<Props> = ({ category }) => {
 
       {measurementDialogOpen && (
         <MeasurementEditDialog
-          key={'create-measurement'}
+          key={selectedMeasurement ? `edit-measurement-${selectedMeasurement.id}` : 'create-measurement'}
           open={measurementDialogOpen}
-          measurement={null}
+          measurement={selectedMeasurement}
           measurementCategory={category}
           loading={apiLoading}
           onClose={() => setMeasurementDialogOpen(false)}

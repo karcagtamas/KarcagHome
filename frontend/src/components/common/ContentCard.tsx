@@ -1,14 +1,14 @@
-import { Box, Card, CardHeader } from '@mui/material';
+import { Box, Card, CardHeader, Typography } from '@mui/material';
 
 type Props = {
-  caption: string;
+  caption: React.ReactNode | string;
   actions?: React.ReactNode;
   children?: React.ReactNode;
 };
 
 export const ContentCard: React.FC<Props> = ({ caption, actions, children }) => {
   return (
-    <Card>
+    <Card sx={{ display: 'flex', flexDirection: 'column' }}>
       <CardHeader
         title={
           <Box
@@ -20,7 +20,7 @@ export const ContentCard: React.FC<Props> = ({ caption, actions, children }) => 
               width: '100%',
             }}
           >
-            <span>{caption}</span>{' '}
+            {typeof caption === 'string' ? <Typography variant="h5">{caption}</Typography> : caption}
             <Box
               sx={{
                 display: 'flex',

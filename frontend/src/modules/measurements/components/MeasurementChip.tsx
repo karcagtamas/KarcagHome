@@ -23,6 +23,7 @@ export const MeasurementChip: React.FC<Props> = ({ measurement }) => {
         flexDirection: 'row',
         alignItems: 'center',
         gap: '0.5rem',
+        whiteSpace: 'nowrap',
       }}
     >
       <span><strong>{measurement.value}</strong>{measurement.category.unit}</span> <small>({measurement.date})</small>

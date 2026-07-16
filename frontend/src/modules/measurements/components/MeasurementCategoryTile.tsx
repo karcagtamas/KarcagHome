@@ -1,4 +1,4 @@
-import { Box, IconButton, MenuItem, TextField } from '@mui/material';
+import { Box, IconButton, MenuItem, TextField, Typography } from '@mui/material';
 import { ContentCard } from '../../../components/common/ContentCard';
 import type { MeasurementCategoryDTO, MeasurementEditDTO } from '../models/measurement';
 import { useState } from 'react';
@@ -11,6 +11,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { measurementApi } from '../api/measurement.api';
 import { measurementKeys } from '../../../keys/measurementKeys';
 import { MeasurementChip } from './MeasurementChip';
+import { MeasurementChart } from './MeasurementChart';
 
 type Props = {
   category: MeasurementCategoryDTO;
@@ -46,7 +47,11 @@ export const MeasurementCategoryTile: React.FC<Props> = ({ category }) => {
 
   return (
     <ContentCard
-      caption={category.name}
+      caption={
+        <Typography variant="h5" sx={{ color: category.color }}>
+          <strong>{category.name}</strong>
+        </Typography>
+      }
       actions={
         <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center' }}>
           <TextField
@@ -72,10 +77,14 @@ export const MeasurementCategoryTile: React.FC<Props> = ({ category }) => {
       }
     >
       <LoadingBox isLoading={isYearsLoading || isMeasurementsLoading}>
-        <Box sx={{ padding: '4px' }}>
-          {measurements?.map((measurement) => (
-            <MeasurementChip measurement={measurement} />
-          ))}
+        <Box sx={{ display: 'flex', flex: 1, flexDirection: 'column', justifyContent: 'space-between' }}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', flexDirection: 'row', gap: '4px', padding: '8px' }}>
+            {measurements?.map((measurement) => (
+              <MeasurementChip key={measurement.id} measurement={measurement} />
+            ))}
+          </Box>
+
+          <MeasurementChart category={category} measurements={measurements ?? []} />
         </Box>
       </LoadingBox>
 

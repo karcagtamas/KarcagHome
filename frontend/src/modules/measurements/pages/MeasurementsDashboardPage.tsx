@@ -29,7 +29,7 @@ export const MeasurementsDashboardPage: React.FC = () => {
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(620px, 1fr))',
             gap: '1rem',
             alignItems: 'stretch',
             padding: '1rem',

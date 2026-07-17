@@ -63,7 +63,6 @@ export const CurrencyTable: React.FC<Props> = ({
                     size="small"
                     color='warning'
                     onClick={() => onEdit({ ...currency.data })}
-                    disabled={currency.data.disabled}
                   >
                     <EditOutlined fontSize="small" />
                   </IconButton>

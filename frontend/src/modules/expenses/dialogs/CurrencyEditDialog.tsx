@@ -101,7 +101,7 @@ export const CurrencyEditDialog: React.FC<Props> = ({ open, currency, onClose, o
                 required
                 fullWidth
                 autoFocus
-                disabled={loading}
+                disabled={loading || isDisabled}
                 placeholder="e.g. Euro"
                 error={!!error}
                 helperText={error?.message}
@@ -121,7 +121,7 @@ export const CurrencyEditDialog: React.FC<Props> = ({ open, currency, onClose, o
                 label="Abbreviation"
                 required
                 fullWidth
-                disabled={loading}
+                disabled={loading || isDisabled}
                 placeholder="e.g. EUR"
                 error={!!error}
                 helperText={error?.message}

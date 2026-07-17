@@ -5,6 +5,7 @@ import modules.tasks.data.Task
 import modules.tasks.data.TasksTable
 import modules.tasks.data.toTask
 import org.jetbrains.exposed.v1.core.Op
+import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.compoundAnd
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
@@ -31,7 +32,8 @@ class TaskRepositoryImpl : TaskRepository {
 
                 if (checks.isEmpty()) it else it.where { checks.compoundAnd() }
             }
-            .sortedBy { TasksTable.dueDate }
+            .orderBy(TasksTable.importance to SortOrder.DESC)
+            .orderBy(TasksTable.dueDate to SortOrder.ASC_NULLS_LAST)
             .map { it.toTask() }
     }
 

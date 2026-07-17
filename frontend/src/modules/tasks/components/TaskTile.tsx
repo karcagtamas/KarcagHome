@@ -20,6 +20,7 @@ export const TaskTile: React.FC<Props> = ({ task, onEdit, onRemove, className, o
 
   const bgColor = useMemo(() => getPaletteByTheme(importance.colors, theme).bgColor, [importance, theme]);
   const fgColor = useMemo(() => getPaletteByTheme(importance.colors, theme).fgColor, [importance, theme]);
+  const isOverdue = !!task.dueDate && !task.completed && (new Date(task.dueDate) < new Date());
 
   return (
     <Card
@@ -30,6 +31,8 @@ export const TaskTile: React.FC<Props> = ({ task, onEdit, onRemove, className, o
         flexDirection: 'column',
         justifyContent: 'space-between',
         height: '100%',
+        border: isOverdue ? '2px solid' : 'unset',
+        borderColor: theme.palette.error.main,
       }}
     >
       <CardHeader

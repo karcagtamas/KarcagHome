@@ -150,9 +150,7 @@ fun Route.currencyRoutes(repository: CurrencyRepository) {
                 }
 
                 val currentYear = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).year
-                val years = (minYear ?: currentYear)..currentYear
-
-                call.respond(years.toList())
+                call.respond((((minYear ?: currentYear)-1)..(currentYear + 1)).toList())
             }
 
             get("/available-months") {

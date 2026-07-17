@@ -9,7 +9,6 @@ import dto.tasks.TaskImportanceChartDTO
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.server.util.getOrFail
 import modules.tasks.data.toDTO
 import modules.tasks.repository.TaskRepository
 
@@ -31,7 +30,7 @@ fun Route.taskRoutes(repository: TaskRepository) {
         post {
             val body = call.receive<TaskEditDTO>()
 
-            val task = repository.create(body.title, body.description, body.importance).toDTO()
+            val task = repository.create(body.title, body.description, body.importance, body.dueDate).toDTO()
             call.respond(task)
         }
 
@@ -39,7 +38,15 @@ fun Route.taskRoutes(repository: TaskRepository) {
             val id = call.idLong()
             val body = call.receive<TaskEditDTO>()
 
-            call.requireAndSend(repository.update(id, body.title, body.description, body.importance)) { it.toDTO() }
+            call.requireAndSend(
+                repository.update(
+                    id,
+                    body.title,
+                    body.description,
+                    body.importance,
+                    body.dueDate,
+                )
+            ) { it.toDTO() }
         }
 
         delete("/{id}") {

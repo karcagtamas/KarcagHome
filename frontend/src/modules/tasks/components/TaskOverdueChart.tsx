@@ -1,24 +1,24 @@
-import { useCompletedChart } from '../hooks/useCompletedChart';
 import { LoadingBox } from '../../../components/common/LoadingBox';
 import { Box, useTheme } from '@mui/material';
 import { PieChart } from '@mui/x-charts';
+import { useOverdueChart } from '../hooks/useOverdueChart';
 
 type Props = {
   showAll: boolean;
   importance: number | null;
 };
 
-export const TaskCompletedChart: React.FC<Props> = ({ showAll, importance }) => {
+export const TaskOverdueChart: React.FC<Props> = ({ showAll, importance }) => {
   const theme = useTheme();
-  const { data: completedChart, isLoading } = useCompletedChart(showAll, importance);
+  const { data: overdueChart, isLoading } = useOverdueChart(showAll, importance);
 
   const seriesData =
-    completedChart?.map((e) => {
+    overdueChart?.map((e) => {
       return {
-        id: `completed-${e.completed ? 'true' : 'false'}`,
+        id: `overdue-${e.overdue ? 'true' : 'false'}`,
         value: e.count,
-        label: e.completed ? 'Completed' : 'Not Completed',
-        color: e.completed ? theme.palette.success.main : '#9e9e9e',
+        label: e.overdue ? 'Overdue' : 'In Time',
+        color: e.overdue ? theme.palette.error.main : '#9e9e9e',
       };
     }) ?? [];
 

@@ -66,6 +66,11 @@ export interface TaskCompletedChartDTO {
   count: number;
 }
 
+export interface TaskOverdueChartDTO {
+  overdue: boolean;
+  count: number;
+}
+
 export interface TaskImportanceChartDTO {
   importance: number;
   count: number;

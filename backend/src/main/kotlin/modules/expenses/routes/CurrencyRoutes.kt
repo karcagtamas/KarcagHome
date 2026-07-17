@@ -157,16 +157,13 @@ fun Route.currencyRoutes(repository: CurrencyRepository) {
             post {
                 val body = call.receive<CurrencyExchangeDTO>()
                 repository.deleteExchange(body.currencyFromId, body.currencyToId, body.year, body.month)
-                call.requireAndSend(
-                    repository.saveExchange(
-                        body.currencyFromId,
-                        body.currencyToId,
-                        body.year,
-                        body.month,
-                        body.value
-                    )
-                ) {
-                    it.toDTO()
+                repository.deleteExchange(body.currencyToId, body.currencyFromId, body.year, body.month)
+                val exchanges = listOf(
+                    repository.saveExchange(body.currencyFromId, body.currencyToId, body.year, body.month, body.value),
+                    repository.saveExchange(body.currencyToId, body.currencyFromId, body.year, body.month,  1.0 / body.value),
+                )
+                call.requireAndSend(exchanges) { e ->
+                    e.map { it.toDTO() }
                 }
             }
 
@@ -176,7 +173,10 @@ fun Route.currencyRoutes(repository: CurrencyRepository) {
                 val year = call.queryParameters.getOrFail<Int>("year")
                 val month = call.queryParameters.getOrFail<Int>("month")
 
-                call.sendDeleted(repository.deleteExchange(currencyFromId, currencyToId, year, month))
+                call.sendDeleted(
+                    repository.deleteExchange(currencyFromId, currencyToId, year, month)
+                            && repository.deleteExchange(currencyToId, currencyFromId, year, month)
+                )
             }
         }
     }

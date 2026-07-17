@@ -1,6 +1,6 @@
 import type { CurrencyExchangeDTO } from '../models/currency';
 import type React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { MONTHS } from '../../../common/month';
 import { useCurrencies } from '../hooks/useCurrencies';
 import { EditDialog } from '../../../components/dialog/EditDialog';
@@ -51,8 +51,16 @@ export const CurrencyExchangeEditDialog: React.FC<Props> = ({
 
   const watchedFromId = watch('currencyFromId');
   const watchedToId = watch('currencyToId');
+  const watchedMonth = watch('month');
 
   const availableMonths = useExchangeAvailableMonths(watchedFromId, watchedToId, year);
+  const months = useMemo(() => {
+    if (isEdit && Boolean(watchedMonth)) {
+      return [watchedMonth, ...availableMonths];
+    } else {
+      return availableMonths;
+    }
+  }, [availableMonths, isEdit, watchedMonth]);
 
   useEffect(() => {
     reset({
@@ -186,7 +194,7 @@ export const CurrencyExchangeEditDialog: React.FC<Props> = ({
               size="small"
             >
               {Object.values(MONTHS)
-                .filter((d) => availableMonths.includes(d.value))
+                .filter((d) => months.includes(d.value))
                 .map((d) => (
                   <MenuItem key={d.value} value={d.value}>
                     {d.displayText}

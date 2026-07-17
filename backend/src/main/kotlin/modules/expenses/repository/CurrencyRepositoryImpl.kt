@@ -70,6 +70,25 @@ class CurrencyRepositoryImpl : CurrencyRepository {
                 }
         }
 
+    override fun getAvailableMonths(
+        currencyFromId: Long,
+        currencyToId: Long,
+        year: Int
+    ): List<Int> = transaction {
+        val months = CurrencyMonthlyExchangesTable.selectAll()
+            .where {
+                (CurrencyMonthlyExchangesTable.currencyFromId eq currencyFromId) and
+                        (CurrencyMonthlyExchangesTable.currencyToId eq currencyToId) and
+                        (CurrencyMonthlyExchangesTable.year eq year)
+            }
+            .map { it[CurrencyMonthlyExchangesTable.month] }
+            .toList()
+
+        (1..12)
+            .filter { it !in months }
+            .toList()
+    }
+
     override fun getExchange(
         currencyFromId: Long,
         currencyToId: Long,

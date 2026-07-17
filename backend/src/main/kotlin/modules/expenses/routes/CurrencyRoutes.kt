@@ -155,13 +155,27 @@ fun Route.currencyRoutes(repository: CurrencyRepository) {
                 call.respond(years.toList())
             }
 
+            get("/available-months") {
+                val year = call.queryParameters.getOrFail<Int>("year")
+                val currencyFromId = call.queryParameters.getOrFail<Long>("currencyFromId")
+                val currencyToId = call.queryParameters.getOrFail<Long>("currencyToId")
+
+                call.respond(repository.getAvailableMonths(currencyFromId, currencyToId, year))
+            }
+
             post {
                 val body = call.receive<CurrencyExchangeDTO>()
                 repository.deleteExchange(body.currencyFromId, body.currencyToId, body.year, body.month)
                 repository.deleteExchange(body.currencyToId, body.currencyFromId, body.year, body.month)
                 val exchanges = listOf(
                     repository.saveExchange(body.currencyFromId, body.currencyToId, body.year, body.month, body.value),
-                    repository.saveExchange(body.currencyToId, body.currencyFromId, body.year, body.month,  1.0 / body.value),
+                    repository.saveExchange(
+                        body.currencyToId,
+                        body.currencyFromId,
+                        body.year,
+                        body.month,
+                        1.0 / body.value
+                    ),
                 )
                 call.requireAndSend(exchanges) { e ->
                     e.map { it.toDTO() }

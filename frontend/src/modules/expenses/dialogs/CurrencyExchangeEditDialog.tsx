@@ -6,6 +6,7 @@ import { useCurrencies } from '../hooks/useCurrencies';
 import { EditDialog } from '../../../components/dialog/EditDialog';
 import { Box, MenuItem, TextField } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
+import { useExchangeAvailableMonths } from '../hooks/useExchangeAvailableMonths';
 
 type Props = {
   open: boolean;
@@ -14,7 +15,6 @@ type Props = {
   loading?: boolean;
 
   defaultCurrencyFromId?: number;
-  defaultMonth?: number;
 
   onClose: () => void;
   onSubmit: (data: CurrencyExchangeDTO) => Promise<void>;
@@ -26,7 +26,6 @@ export const CurrencyExchangeEditDialog: React.FC<Props> = ({
   year,
   loading = false,
   defaultCurrencyFromId,
-  defaultMonth,
   onClose,
   onSubmit,
 }) => {
@@ -53,15 +52,17 @@ export const CurrencyExchangeEditDialog: React.FC<Props> = ({
   const watchedFromId = watch('currencyFromId');
   const watchedToId = watch('currencyToId');
 
+  const availableMonths = useExchangeAvailableMonths(watchedFromId, watchedToId, year);
+
   useEffect(() => {
     reset({
       currencyFromId: exchange?.currencyFromId ?? defaultCurrencyFromId,
       currencyToId: exchange?.currencyToId,
-      month: exchange?.month ?? defaultMonth,
+      month: exchange?.month,
       year: exchange?.year ?? year,
       value: exchange?.value ?? 0,
     });
-  }, [exchange, defaultCurrencyFromId, defaultMonth, year, reset]);
+  }, [exchange, defaultCurrencyFromId, year, reset]);
 
   const handleValidSubmit = async (data: CurrencyExchangeDTO) => {
     if (!isValid || loading) return;
@@ -117,7 +118,7 @@ export const CurrencyExchangeEditDialog: React.FC<Props> = ({
               label="From Currency"
               required
               fullWidth
-              disabled={loading || isEdit}
+              disabled={loading || isEdit || !!defaultCurrencyFromId}
               error={!!error}
               helperText={error?.message}
               variant="outlined"
@@ -178,17 +179,19 @@ export const CurrencyExchangeEditDialog: React.FC<Props> = ({
               label="Month"
               required
               fullWidth
-              disabled={loading || isEdit}
+              disabled={loading || isEdit || !watchedToId}
               error={!!error}
               helperText={error?.message}
               variant="outlined"
               size="small"
             >
-              {Object.values(MONTHS).map((d) => (
-                <MenuItem key={d.value} value={d.value}>
-                  {d.displayText}
-                </MenuItem>
-              ))}
+              {Object.values(MONTHS)
+                .filter((d) => availableMonths.includes(d.value))
+                .map((d) => (
+                  <MenuItem key={d.value} value={d.value}>
+                    {d.displayText}
+                  </MenuItem>
+                ))}
             </TextField>
           )}
         />
@@ -211,7 +214,7 @@ export const CurrencyExchangeEditDialog: React.FC<Props> = ({
               slotProps={{
                 htmlInput: { step: '0.000001' },
               }}
-              disabled={loading}
+              disabled={loading || !watchedToId}
               error={!!error}
               helperText={error?.message}
               variant="outlined"

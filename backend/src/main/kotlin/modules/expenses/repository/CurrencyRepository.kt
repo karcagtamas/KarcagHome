@@ -11,6 +11,7 @@ interface CurrencyRepository {
     fun updateCurrency(id: Long, name: String, abbreviation: String, disabled: Boolean): Currency?
 
     fun getYearlyExchangeRates(year: Int): List<CurrencyMonthlyExchange>
+    fun getAvailableMonths(currencyFromId: Long, currencyToId: Long, year: Int): List<Int>
     fun getExchange(currencyFromId: Long, currencyToId: Long, year: Int, month: Int): CurrencyMonthlyExchange?
     fun saveExchange(
         currencyFromId: Long,

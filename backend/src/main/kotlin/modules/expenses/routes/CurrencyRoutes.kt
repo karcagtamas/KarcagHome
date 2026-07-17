@@ -28,7 +28,8 @@ fun Route.currencyRoutes(repository: CurrencyRepository) {
 
     route("/currencies") {
         get {
-            call.respond(repository.getCurrencies().map { it.toDTO() })
+            val showDisabled = call.queryParameters["showDisabled"]?.toBoolean() ?: false
+            call.respond(repository.getCurrencies(showDisabled).map { it.toDTO() })
         }
 
         get("/{id}") {

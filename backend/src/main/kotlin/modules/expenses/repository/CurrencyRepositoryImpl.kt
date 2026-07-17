@@ -22,8 +22,12 @@ import kotlin.time.Clock
 
 class CurrencyRepositoryImpl : CurrencyRepository {
 
-    override fun getCurrencies(): List<Currency> = transaction {
-        CurrenciesTable.selectAll().map { it.toCurrency() }
+    override fun getCurrencies(showDisabled: Boolean): List<Currency> = transaction {
+        CurrenciesTable.selectAll()
+            .let {
+                if (showDisabled) it else it.where { CurrenciesTable.disabled eq false }
+            }
+            .map { it.toCurrency() }
     }
 
     override fun getCurrencyById(id: Long): Currency? = transaction {

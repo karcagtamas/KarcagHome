@@ -20,6 +20,7 @@ export const CurrencyTable: React.FC<Props> = ({
   onExchangeEdit,
   onExchangeRemove,
 }) => {
+  const rateValueFormatter = new Intl.NumberFormat('en-US', { maximumFractionDigits: 4 });
   const renderItemLabel = (text: string, actionButtons?: React.ReactNode) => (
     <Box
       sx={{
@@ -59,16 +60,12 @@ export const CurrencyTable: React.FC<Props> = ({
               label={renderItemLabel(
                 `${currency.data.name} [${currency.data.abbreviation}]`,
                 <>
-                  <IconButton
-                    size="small"
-                    color='warning'
-                    onClick={() => onEdit({ ...currency.data })}
-                  >
+                  <IconButton size="small" color="warning" onClick={() => onEdit({ ...currency.data })}>
                     <EditOutlined fontSize="small" />
                   </IconButton>
                   <IconButton
                     size="small"
-                    color='info'
+                    color="info"
                     onClick={() => onExchangeAdd({ ...currency.data })}
                     disabled={currency.data.disabled}
                   >
@@ -89,7 +86,8 @@ export const CurrencyTable: React.FC<Props> = ({
                   >
                     {month.rates.map((rate) => {
                       const rateIdStr = `${monthIdStr}-rate-${rate.currencyToId}`;
-                      const rateLabelText = `${rate.value} ${rate.currencyToName} [${rate.currencyToAbbreviation}]`;
+
+                      const rateLabelText = `${rateValueFormatter.format(rate.value)} ${rate.currencyToName} [${rate.currencyToAbbreviation}]`;
 
                       return (
                         <TreeItem

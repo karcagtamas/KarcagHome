@@ -1,5 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import logo from '../../assets/Logo.svg';
 
 type Props = {
   title: string;
@@ -39,9 +40,8 @@ export const AppBar: React.FC<Props> = ({ title, route, left, right }) => {
       >
         {left}
       </Box>
-      <Typography
+      <Box
         onClick={() => navigate(route)}
-        variant="h6"
         sx={{
           display: 'flex',
           flex: 1,
@@ -49,13 +49,21 @@ export const AppBar: React.FC<Props> = ({ title, route, left, right }) => {
           justifyContent: 'center',
           height: '48px',
           paddingX: 2,
-          fontWeight: 600,
           cursor: 'pointer',
           userSelect: 'none',
+          gap: '8px',
         }}
       >
-        {title}
-      </Typography>
+        <img src={logo} style={{ width: '24px', height: '24px' }} />
+        <Typography
+          variant="h6"
+          sx={{
+            fontWeight: 600,
+          }}
+        >
+          {title}
+        </Typography>
+      </Box>
       <Box
         sx={{
           display: 'flex',

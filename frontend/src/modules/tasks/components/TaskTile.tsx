@@ -30,7 +30,6 @@ export const TaskTile: React.FC<Props> = ({ task, onEdit, onRemove, className, o
         flexDirection: 'column',
         justifyContent: 'space-between',
         height: '100%',
-        boxSizing: 'border-box',
       }}
     >
       <CardHeader
@@ -53,7 +52,7 @@ export const TaskTile: React.FC<Props> = ({ task, onEdit, onRemove, className, o
               startIcon={<EditOutlined sx={{ color: 'darkorange' }} />}
               onClick={() => onEdit && onEdit()}
               sx={{ color: 'text.primary' }}
-              size='small'
+              size="small"
             >
               Edit
             </Button>
@@ -62,7 +61,7 @@ export const TaskTile: React.FC<Props> = ({ task, onEdit, onRemove, className, o
               startIcon={<DeleteOutlined sx={{ color: 'red' }} />}
               onClick={() => onRemove && onRemove()}
               sx={{ color: 'text.primary' }}
-              size='small'
+              size="small"
             >
               Delete
             </Button>
@@ -71,9 +70,16 @@ export const TaskTile: React.FC<Props> = ({ task, onEdit, onRemove, className, o
       />
 
       <CardContent sx={{ pt: 0, pb: 1, flexGrow: 1 }}>
-        <Typography variant="body2" sx={{ color: fgColor, fontWeight: 'bold', mb: 1 }}>
-          {importance.displayText}
-        </Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '4px' }}>
+          <Typography variant="body2" sx={{ color: fgColor, fontWeight: 'bold' }}>
+            {importance.displayText}
+          </Typography>
+          {task.dueDate && (
+            <Typography variant="body2" sx={{ color: fgColor }}>
+              [Due: {task.dueDate}]
+            </Typography>
+          )}
+        </Box>
 
         <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
           {task.description}
@@ -92,7 +98,7 @@ export const TaskTile: React.FC<Props> = ({ task, onEdit, onRemove, className, o
           }
           onClick={() => onToggle && onToggle()}
           sx={{ color: 'text.primary', borderColor: 'text.primary' }}
-          size='small'
+          size="small"
         >
           {task.completed ? 'Unsolve' : 'Solve'}
         </Button>

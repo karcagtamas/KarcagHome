@@ -31,6 +31,7 @@ class TaskRepositoryImpl : TaskRepository {
 
                 if (checks.isEmpty()) it else it.where { checks.compoundAnd() }
             }
+            .sortedBy { TasksTable.dueDate }
             .map { it.toTask() }
     }
 

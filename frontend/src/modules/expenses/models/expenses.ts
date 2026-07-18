@@ -21,6 +21,16 @@ export interface ExpenseDTO {
   account: AccountDTO;
 }
 
+export interface ExpenseTreeCategoryDTO {
+  category: ExpenseCategoryDTO;
+  expenses: ExpenseDTO[];
+}
+
+export interface ExpenseTreeDTO {
+  date: string;
+  categories: ExpenseTreeCategoryDTO[];
+}
+
 export interface ExpenseCategoryEditDTO {
   name: string;
   color: string;

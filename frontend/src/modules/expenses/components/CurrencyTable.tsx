@@ -41,7 +41,7 @@ export const CurrencyTable: React.FC<Props> = ({
   );
 
   return (
-    <Box sx={{ width: '100%', minHeight: 400, boxSizing: 'border-box' }}>
+    <Box sx={{ width: '100%', minHeight: 400 }}>
       <SimpleTreeView
         sx={{
           [`&.${treeItemClasses.root}`]: {

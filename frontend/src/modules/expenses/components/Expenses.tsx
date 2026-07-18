@@ -1,19 +1,20 @@
-import { useExpenses } from '../hooks/useExpenses';
 import { ContentCard } from '../../../components/common/ContentCard';
 import { useState } from 'react';
 import { ExpenseEditDialog } from '../dialogs/ExpenseEditDialog';
-import type { ExpenseDTO, ExpenseEditDTO } from '../models/expenses';
-import { Box, IconButton } from '@mui/material';
+import type { ExpenseCategoryDTO, ExpenseDTO, ExpenseEditDTO } from '../models/expenses';
+import { Box, IconButton, Typography } from '@mui/material';
 import { AddOutlined, DeleteOutlined, EditOutlined } from '@mui/icons-material';
-import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 import { useExpenseMutations } from '../hooks/useExpenseMutations';
+import { useExpenseTree } from '../hooks/useExpenseTree';
+import { SimpleTreeView, TreeItem, treeItemClasses } from '@mui/x-tree-view';
+import { LoadingBox } from '../../../components/common/LoadingBox';
 
 type Props = {
   accountId: number;
 };
 
 export const Expenses: React.FC<Props> = ({ accountId }) => {
-  const { data, isLoading } = useExpenses(accountId);
+  const { data, isLoading } = useExpenseTree(accountId);
   const { createMutation, updateMutation, removeMutation, isPending: apiLoading } = useExpenseMutations();
 
   const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
@@ -49,44 +50,44 @@ export const Expenses: React.FC<Props> = ({ accountId }) => {
     }
   };
 
-  const columns: GridColDef<ExpenseDTO>[] = [
-    {
-      field: 'category',
-      headerName: 'Category',
-      flex: 1,
-      valueGetter: (_, row) => row.category.name,
-    },
-    {
-      field: 'date',
-      headerName: 'Date',
-      flex: 1,
-    },
-    {
-      field: 'amount',
-      headerName: 'Amount',
-      type: 'number',
-      flex: 1,
-      headerAlign: 'left',
-      align: 'left',
-    },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      width: 120,
-      sortable: false,
-      filterable: false,
-      renderCell: (params) => (
-        <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center', height: '100%' }}>
-          <IconButton size="small" color="warning" onClick={() => handleEdit(params.row)} disabled={apiLoading}>
-            <EditOutlined fontSize="small" />
-          </IconButton>
-          <IconButton size="small" color="error" onClick={() => handleRemove(params.row)} disabled={apiLoading}>
-            <DeleteOutlined fontSize="small" />
-          </IconButton>
-        </Box>
-      ),
-    },
-  ];
+  const renderParentLabel = (parent: string) => (
+    <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+      <Typography>{parent}</Typography>
+    </Box>
+  );
+
+  const renderCategoryLabel = (category: ExpenseCategoryDTO) => (
+    <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+      <Typography sx={{ color: category.color }}>
+        <strong>{category.name}</strong> [{category.type.name}]
+      </Typography>
+    </Box>
+  );
+
+  const renderExpenseLabel = (expense: ExpenseDTO) => (
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '100%',
+      }}
+    >
+      <Typography>
+        {expense.amount} {expense.account.currency.abbreviation}
+      </Typography>
+
+      <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+        <IconButton size="small" color="warning" onClick={() => handleEdit(expense)} disabled={apiLoading}>
+          <EditOutlined fontSize="small" />
+        </IconButton>
+        <IconButton size="small" color="error" onClick={() => handleRemove(expense)} disabled={apiLoading}>
+          <DeleteOutlined fontSize="small" />
+        </IconButton>
+      </Box>
+    </Box>
+  );
 
   return (
     <>
@@ -99,21 +100,38 @@ export const Expenses: React.FC<Props> = ({ accountId }) => {
         }
       >
         <Box sx={{ width: '100%', height: 400 }}>
-          <DataGrid
-            rows={data ?? []}
-            columns={columns}
-            loading={isLoading}
-            getRowId={(row) => row.id}
-            disableRowSelectionOnClick
-            pageSizeOptions={[5, 10, 25]}
-            initialState={{
-              pagination: { paginationModel: { pageSize: 5 } },
-            }}
-            sx={{
-              border: 'none',
-              '& .MuiDataGrid-cell:focus': { outline: 'none' },
-            }}
-          />
+          <LoadingBox isLoading={isLoading}>
+            <SimpleTreeView
+              sx={{
+                [`&.${treeItemClasses.root}`]: {
+                  borderBottom: '1px solid',
+                  borderColor: 'divider',
+                },
+              }}
+            >
+              {(data ?? []).map((parent) => {
+                const parentId = `parent-${parent.date}`;
+
+                return (
+                  <TreeItem key={parentId} itemId={parentId} label={renderParentLabel(parent.date)}>
+                    {parent.categories.map((category) => {
+                      const categoryId = `cat-${category.category.id}-${parent.date}`;
+
+                      return (
+                        <TreeItem key={categoryId} itemId={categoryId} label={renderCategoryLabel(category.category)}>
+                          {category.expenses.map((expense) => {
+                            const expenseId = `exp-${expense.id}`;
+
+                            return <TreeItem key={expenseId} itemId={expenseId} label={renderExpenseLabel(expense)} />;
+                          })}
+                        </TreeItem>
+                      );
+                    })}
+                  </TreeItem>
+                );
+              })}
+            </SimpleTreeView>
+          </LoadingBox>
         </Box>
       </ContentCard>
 

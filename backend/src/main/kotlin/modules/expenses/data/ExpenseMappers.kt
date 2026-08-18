@@ -47,6 +47,7 @@ fun ResultRow.toExpenseCategoryType(): ExpenseCategoryType = ExpenseCategoryType
     name = this[ExpenseCategoryTypesTable.name],
     color = this[ExpenseCategoryTypesTable.color],
     createdAt = this[ExpenseCategoryTypesTable.createdAt],
+    sign = this[ExpenseCategoryTypesTable.sign],
 )
 
 fun ResultRow.toExpenseCategory(type: ExpenseCategoryType): ExpenseCategory = ExpenseCategory(

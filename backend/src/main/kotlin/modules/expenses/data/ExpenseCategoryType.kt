@@ -7,4 +7,5 @@ data class ExpenseCategoryType(
     val name: String,
     val color: String,
     val createdAt: Instant,
+    val sign: Short,
 )

@@ -40,7 +40,7 @@ fun Route.accountRoutes(repository: AccountRepository, expenseRepository: Expens
 
                 val expenses = expenseRepository.getExpenses(id)
 
-                val total = expenses.sumOf { it.amount }
+                val total = expenses.sumOf { it.amount * it.category.type.sign }
                 val categories = expenses.groupBy { it.category }
                 val categoryTypes = expenses.groupBy { it.category.type }
 

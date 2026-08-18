@@ -1,6 +1,8 @@
 import { Box, Card, CardHeader, Typography } from '@mui/material';
 import type { AccountDTO } from '../models/account';
 import { AccountBalanceWalletOutlined } from '@mui/icons-material';
+import { useAccountSummary } from '../hooks/useAccountSummary';
+import { LoadingBox } from '../../../components/common/LoadingBox';
 
 type Props = {
   account: AccountDTO;
@@ -9,6 +11,8 @@ type Props = {
 };
 
 export const AccountTile: React.FC<Props> = ({ account, onClick, className }) => {
+  const { data: summary, isLoading } = useAccountSummary(account.id);
+
   return (
     <Card
       className={className}
@@ -35,6 +39,14 @@ export const AccountTile: React.FC<Props> = ({ account, onClick, className }) =>
           </Typography>
         }
       ></CardHeader>
+
+      <LoadingBox isLoading={isLoading}>
+        <Box sx={{ padding: '4px' }}>
+          <Typography>
+            <strong>Total:</strong> {summary?.total} {account.currency.abbreviation}
+          </Typography>
+        </Box>
+      </LoadingBox>
     </Card>
   );
 };

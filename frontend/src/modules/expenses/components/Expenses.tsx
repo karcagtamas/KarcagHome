@@ -99,7 +99,7 @@ export const Expenses: React.FC<Props> = ({ accountId }) => {
           </IconButton>
         }
       >
-        <Box sx={{ width: '100%', height: 400 }}>
+        <Box sx={{ width: '100%', minHeight: 400, overflow: 'auto' }}>
           <LoadingBox isLoading={isLoading}>
             <SimpleTreeView
               sx={{

@@ -31,7 +31,7 @@ export const AccountCategoriesChart: React.FC<Props> = ({ summary }) => {
             faded: { innerRadius: 30, additionalRadius: -10, color: 'gray' },
           },
         ]}
-        height={300}
+        height={200}
         slotProps={{
           legend: {
             direction: 'horizontal',

@@ -10,4 +10,8 @@ export interface AccountSummaryDTO {
     categoryType: ExpenseCategoryTypeDTO;
     amount: number;
   }[];
+  expenses: {
+    date: string;
+    amount: number;
+  }[]
 }

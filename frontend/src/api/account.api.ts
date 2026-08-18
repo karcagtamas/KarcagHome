@@ -1,4 +1,5 @@
-import type { AccountDTO, AccountEditDTO, AccountSummaryDTO } from '../modules/expenses/models/account';
+import type { AccountDTO, AccountEditDTO } from '../modules/expenses/models/account';
+import type { AccountSummaryDTO } from '../modules/expenses/models/account-summary';
 import { api } from './client';
 
 const ACCOUNT_API = '/accounts';

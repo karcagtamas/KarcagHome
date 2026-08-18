@@ -7,6 +7,7 @@ import dto.expenses.AccountEditDTO
 import dto.expenses.AccountSummaryCategoryDTO
 import dto.expenses.AccountSummaryCategoryTypeDTO
 import dto.expenses.AccountSummaryDTO
+import dto.expenses.AccountSummaryExpenseDTO
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -43,6 +44,18 @@ fun Route.accountRoutes(repository: AccountRepository, expenseRepository: Expens
                 val total = expenses.sumOf { it.amount * it.category.type.sign }
                 val categories = expenses.groupBy { it.category }
                 val categoryTypes = expenses.groupBy { it.category.type }
+                var runningTotal = 0.0
+                val dates = expenses.groupBy { it.date }
+                val transformedDates = dates.keys
+                    .sorted()
+                    .map { date ->
+                        val dailyList = dates[date].orEmpty()
+                        val dailyTotal = dailyList.sumOf { it.amount * it.category.type.sign }
+
+                        runningTotal += dailyTotal
+
+                        AccountSummaryExpenseDTO(date, runningTotal)
+                    }
 
                 val summary = AccountSummaryDTO(
                     total,
@@ -54,6 +67,7 @@ fun Route.accountRoutes(repository: AccountRepository, expenseRepository: Expens
                         val amount = value.sumOf { it.amount }
                         AccountSummaryCategoryTypeDTO(key.toDTO(), amount)
                     },
+                    transformedDates,
                 )
 
                 call.respond(summary)

@@ -5,6 +5,7 @@ import { useAccountSummary } from '../hooks/useAccountSummary';
 import type { AccountDTO } from '../models/account';
 import { AccountCategoriesChart } from './AccountCategoriesChart';
 import { AccountCategoryTypesChart } from './AccountCategoryTypesChart';
+import { AccountChart } from './AccountChart';
 
 type Props = {
   account: AccountDTO;
@@ -27,6 +28,9 @@ export const AccountSummary: React.FC<Props> = ({ account }) => {
           <Box sx={{ display: 'flex', flexDirection: 'row' }}>
             {summary && <AccountCategoriesChart summary={summary} />}
             {summary && <AccountCategoryTypesChart summary={summary} />}
+          </Box>
+          <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+            {summary && <AccountChart summary={summary} />}
           </Box>
         </LoadingBox>
       </Box>

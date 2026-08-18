@@ -6,7 +6,7 @@ import org.jetbrains.exposed.v1.datetime.timestamp
 object ExpenseCategoriesTable : Table("expense_categories") {
     val id = long("id").autoIncrement()
     val name = varchar("name", 100)
-    val color = varchar("color", 20)
+    val color = varchar("color", 30)
     val typeId = long("type_id")
         .references(ExpenseCategoryTypesTable.id)
     val createdAt = timestamp("created_at")

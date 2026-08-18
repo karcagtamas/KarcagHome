@@ -28,7 +28,8 @@ fun Route.currencyRoutes(repository: CurrencyRepository) {
 
     route("/currencies") {
         get {
-            call.respond(repository.getCurrencies().map { it.toDTO() })
+            val showDisabled = call.queryParameters["showDisabled"]?.toBoolean() ?: false
+            call.respond(repository.getCurrencies(showDisabled).map { it.toDTO() })
         }
 
         get("/{id}") {
@@ -149,24 +150,33 @@ fun Route.currencyRoutes(repository: CurrencyRepository) {
                 }
 
                 val currentYear = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).year
-                val years = (minYear ?: currentYear)..currentYear
+                call.respond((((minYear ?: currentYear)-1)..(currentYear + 1)).toList())
+            }
 
-                call.respond(years.toList())
+            get("/available-months") {
+                val year = call.queryParameters.getOrFail<Int>("year")
+                val currencyFromId = call.queryParameters.getOrFail<Long>("currencyFromId")
+                val currencyToId = call.queryParameters.getOrFail<Long>("currencyToId")
+
+                call.respond(repository.getAvailableMonths(currencyFromId, currencyToId, year))
             }
 
             post {
                 val body = call.receive<CurrencyExchangeDTO>()
                 repository.deleteExchange(body.currencyFromId, body.currencyToId, body.year, body.month)
-                call.requireAndSend(
+                repository.deleteExchange(body.currencyToId, body.currencyFromId, body.year, body.month)
+                val exchanges = listOf(
+                    repository.saveExchange(body.currencyFromId, body.currencyToId, body.year, body.month, body.value),
                     repository.saveExchange(
-                        body.currencyFromId,
                         body.currencyToId,
+                        body.currencyFromId,
                         body.year,
                         body.month,
-                        body.value
-                    )
-                ) {
-                    it.toDTO()
+                        1.0 / body.value
+                    ),
+                )
+                call.requireAndSend(exchanges) { e ->
+                    e.map { it.toDTO() }
                 }
             }
 
@@ -176,7 +186,10 @@ fun Route.currencyRoutes(repository: CurrencyRepository) {
                 val year = call.queryParameters.getOrFail<Int>("year")
                 val month = call.queryParameters.getOrFail<Int>("month")
 
-                call.sendDeleted(repository.deleteExchange(currencyFromId, currencyToId, year, month))
+                call.sendDeleted(
+                    repository.deleteExchange(currencyFromId, currencyToId, year, month)
+                            && repository.deleteExchange(currencyToId, currencyFromId, year, month)
+                )
             }
         }
     }

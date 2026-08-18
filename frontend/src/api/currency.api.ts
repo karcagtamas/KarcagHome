@@ -4,7 +4,7 @@ import { api } from './client';
 const CURRENCY_API = '/currencies';
 
 export const currencyApi = {
-  getAll: () => api.get<CurrencyDTO[]>(CURRENCY_API).then((res) => res.data),
+  getAll: (showDisabled: boolean = false) => api.get<CurrencyDTO[]>(CURRENCY_API, { params: { showDisabled } }).then((res) => res.data),
   get: (id: number) => api.get<CurrencyDTO>(`${CURRENCY_API}/${id}`).then((res) => res.data),
   create: (data: Omit<CurrencyDTO, 'id'>) => api.post<CurrencyDTO>(CURRENCY_API, data).then((res) => res.data),
   update: (id: number, data: Omit<CurrencyDTO, 'id'>) =>

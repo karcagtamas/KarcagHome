@@ -1,5 +1,5 @@
 import { api } from '../../../api/client';
-import type { TaskCompletedChartDTO, TaskDTO, TaskEditDTO, TaskImportanceChartDTO } from '../models/task';
+import type { TaskCompletedChartDTO, TaskDTO, TaskEditDTO, TaskImportanceChartDTO, TaskOverdueChartDTO } from '../models/task';
 
 const TASK_API = '/tasks';
 
@@ -21,6 +21,10 @@ export const taskApi = {
   completedChart: (showAll: boolean, importance: number | null) =>
     api
       .get<TaskCompletedChartDTO[]>(`${TASK_API}/charts/completed`, { params: { showAll, importance } })
+      .then((res) => res.data),
+  overdueChart: (showAll: boolean, importance: number | null) =>
+    api
+      .get<TaskOverdueChartDTO[]>(`${TASK_API}/charts/overdue`, { params: { showAll, importance } })
       .then((res) => res.data),
   importanceChart: (showAll: boolean, importance: number | null) =>
     api

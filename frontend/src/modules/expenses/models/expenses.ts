@@ -3,6 +3,7 @@ import type { AccountDTO } from './account';
 export interface ExpenseCategoryTypeDTO {
   id: number;
   name: string;
+  color: string;
 }
 
 export interface ExpenseCategoryDTO {
@@ -19,6 +20,16 @@ export interface ExpenseDTO {
   date: string;
   category: ExpenseCategoryDTO;
   account: AccountDTO;
+}
+
+export interface ExpenseTreeCategoryDTO {
+  category: ExpenseCategoryDTO;
+  expenses: ExpenseDTO[];
+}
+
+export interface ExpenseTreeDTO {
+  date: string;
+  categories: ExpenseTreeCategoryDTO[];
 }
 
 export interface ExpenseCategoryEditDTO {

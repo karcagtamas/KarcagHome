@@ -5,6 +5,8 @@ import core.requireAndSend
 import core.sendDeleted
 import dto.expenses.ExpenseCategoryEditDTO
 import dto.expenses.ExpenseEditDTO
+import dto.expenses.ExpenseTreeCategoryDTO
+import dto.expenses.ExpenseTreeDTO
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -15,6 +17,7 @@ import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import modules.expenses.data.toDTO
 import modules.expenses.repository.ExpenseRepository
+import kotlin.math.exp
 
 fun Route.expensesRoutes(repository: ExpenseRepository) {
 
@@ -72,6 +75,24 @@ fun Route.expensesRoutes(repository: ExpenseRepository) {
         get {
             val accountId = call.queryParameters["accountId"]?.toLong()
             call.respond(repository.getExpenses(accountId).map { it.toDTO() })
+        }
+
+        get("/tree") {
+            val accountId = call.queryParameters["accountId"]?.toLong()
+
+            val items = repository.getExpenses(accountId)
+                .groupBy { it.date }
+                .map { (date, expenses) ->
+                    val categories = expenses.groupBy { it.category }
+                        .map { (category, expenses) ->
+                            ExpenseTreeCategoryDTO(category.toDTO(), expenses.map { it.toDTO() })
+                        }
+                        .sortedBy { it.category.id }
+                    ExpenseTreeDTO(date, categories)
+                }
+                .sortedBy { it.date }
+
+            call.respond(items)
         }
 
         get("/{id}") {

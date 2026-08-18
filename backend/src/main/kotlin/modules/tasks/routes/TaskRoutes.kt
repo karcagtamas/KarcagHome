@@ -6,12 +6,15 @@ import core.sendDeleted
 import dto.tasks.TaskCompletedChartDTO
 import dto.tasks.TaskEditDTO
 import dto.tasks.TaskImportanceChartDTO
+import dto.tasks.TaskOverdueChartDTO
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.server.util.getOrFail
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import modules.tasks.data.toDTO
 import modules.tasks.repository.TaskRepository
+import kotlin.time.Clock
 
 fun Route.taskRoutes(repository: TaskRepository) {
 
@@ -31,7 +34,7 @@ fun Route.taskRoutes(repository: TaskRepository) {
         post {
             val body = call.receive<TaskEditDTO>()
 
-            val task = repository.create(body.title, body.description, body.importance).toDTO()
+            val task = repository.create(body.title, body.description, body.importance, body.dueDate).toDTO()
             call.respond(task)
         }
 
@@ -39,7 +42,15 @@ fun Route.taskRoutes(repository: TaskRepository) {
             val id = call.idLong()
             val body = call.receive<TaskEditDTO>()
 
-            call.requireAndSend(repository.update(id, body.title, body.description, body.importance)) { it.toDTO() }
+            call.requireAndSend(
+                repository.update(
+                    id,
+                    body.title,
+                    body.description,
+                    body.importance,
+                    body.dueDate,
+                )
+            ) { it.toDTO() }
         }
 
         delete("/{id}") {
@@ -63,6 +74,18 @@ fun Route.taskRoutes(repository: TaskRepository) {
                 val data = repository.getAll(importance, showAll)
                 val dataDTO = data.groupBy { it.completed }
                     .map { TaskCompletedChartDTO(it.key, it.value.size) }
+                call.respond(dataDTO)
+            }
+
+            get("/overdue") {
+                val importance = call.queryParameters["importance"]?.toIntOrNull()
+                val showAll = call.queryParameters["showAll"]?.toBoolean() ?: false
+
+                val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+
+                val data = repository.getAll(importance, showAll)
+                val dataDTO = data.groupBy { it.dueDate != null && it.dueDate < today }
+                    .map { TaskOverdueChartDTO(it.key, it.value.size) }
                 call.respond(dataDTO)
             }
 

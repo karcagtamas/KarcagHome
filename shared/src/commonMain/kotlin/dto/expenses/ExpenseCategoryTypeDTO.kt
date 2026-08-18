@@ -6,4 +6,5 @@ import kotlinx.serialization.Serializable
 data class ExpenseCategoryTypeDTO(
     val id: Long,
     val name: String,
+    val color: String,
 )

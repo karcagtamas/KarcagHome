@@ -6,12 +6,14 @@ export interface TaskDTO {
   description: string | null;
   completed: boolean;
   importance: number;
+  dueDate: string;
 }
 
 export interface TaskEditDTO {
   title: string;
   description: string | null;
   importance: number;
+  dueDate: string;
 }
 
 export const IMPORTANCE_LEVELS: Record<number, { value: number; displayText: string; colors: ThemeColors }> = {
@@ -61,6 +63,11 @@ export const IMPORTANCE_LEVELS: Record<number, { value: number; displayText: str
 
 export interface TaskCompletedChartDTO {
   completed: boolean;
+  count: number;
+}
+
+export interface TaskOverdueChartDTO {
+  overdue: boolean;
   count: number;
 }
 

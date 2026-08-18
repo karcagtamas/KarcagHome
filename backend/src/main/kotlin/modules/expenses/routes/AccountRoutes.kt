@@ -4,6 +4,10 @@ import core.idLong
 import core.requireAndSend
 import core.sendDeleted
 import dto.expenses.AccountEditDTO
+import dto.expenses.AccountSummaryCategoryDTO
+import dto.expenses.AccountSummaryCategoryTypeDTO
+import dto.expenses.AccountSummaryDTO
+import dto.expenses.AccountSummaryExpenseDTO
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -14,18 +18,60 @@ import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import modules.expenses.data.toDTO
 import modules.expenses.repository.AccountRepository
+import modules.expenses.repository.ExpenseRepository
 
-fun Route.accountRoutes(repository: AccountRepository) {
+fun Route.accountRoutes(repository: AccountRepository, expenseRepository: ExpenseRepository) {
     route("/accounts") {
 
         get {
             call.respond(repository.getAccounts().map { it.toDTO() })
         }
 
-        get("/{id}") {
-            val id = call.idLong()
+        route("/{id}") {
 
-            call.requireAndSend(repository.getAccountById(id)) { it.toDTO() }
+
+            get {
+                val id = call.idLong()
+
+                call.requireAndSend(repository.getAccountById(id)) { it.toDTO() }
+            }
+
+            get("/summary") {
+                val id = call.idLong()
+
+                val expenses = expenseRepository.getExpenses(id)
+
+                val total = expenses.sumOf { it.amount * it.category.type.sign }
+                val categories = expenses.groupBy { it.category }
+                val categoryTypes = expenses.groupBy { it.category.type }
+                var runningTotal = 0.0
+                val dates = expenses.groupBy { it.date }
+                val transformedDates = dates.keys
+                    .sorted()
+                    .map { date ->
+                        val dailyList = dates[date].orEmpty()
+                        val dailyTotal = dailyList.sumOf { it.amount * it.category.type.sign }
+
+                        runningTotal += dailyTotal
+
+                        AccountSummaryExpenseDTO(date, runningTotal)
+                    }
+
+                val summary = AccountSummaryDTO(
+                    total,
+                    categories.map { (key, value) ->
+                        val amount = value.sumOf { it.amount }
+                        AccountSummaryCategoryDTO(key.toDTO(), amount)
+                    },
+                    categoryTypes.map { (key, value) ->
+                        val amount = value.sumOf { it.amount }
+                        AccountSummaryCategoryTypeDTO(key.toDTO(), amount)
+                    },
+                    transformedDates,
+                )
+
+                call.respond(summary)
+            }
         }
 
         post {

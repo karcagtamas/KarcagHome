@@ -5,5 +5,7 @@ import kotlin.time.Instant
 data class ExpenseCategoryType(
     val id: Long,
     val name: String,
+    val color: String,
     val createdAt: Instant,
+    val sign: Short,
 )

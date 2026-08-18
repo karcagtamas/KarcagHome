@@ -9,6 +9,7 @@ fun ResultRow.toTask() = Task(
     description = this[TasksTable.description],
     completed = this[TasksTable.completed],
     importance = this[TasksTable.importance],
+    dueDate = this[TasksTable.dueDate],
 )
 
 fun Task.toDTO(): TaskDTO = TaskDTO(
@@ -17,4 +18,5 @@ fun Task.toDTO(): TaskDTO = TaskDTO(
     description = description,
     completed = completed,
     importance = importance,
+    dueDate = dueDate,
 )

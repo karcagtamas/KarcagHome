@@ -25,7 +25,7 @@ class ExpensesModule : AppModule {
         val accountRepository by inject<AccountRepository>()
 
         expensesRoutes(expenseRepository)
-        accountRoutes(accountRepository)
+        accountRoutes(accountRepository, expenseRepository)
         currencyRoutes(currencyRepository)
     }
 

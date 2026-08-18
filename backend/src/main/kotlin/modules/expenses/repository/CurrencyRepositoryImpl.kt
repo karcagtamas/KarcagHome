@@ -22,8 +22,12 @@ import kotlin.time.Clock
 
 class CurrencyRepositoryImpl : CurrencyRepository {
 
-    override fun getCurrencies(): List<Currency> = transaction {
-        CurrenciesTable.selectAll().map { it.toCurrency() }
+    override fun getCurrencies(showDisabled: Boolean): List<Currency> = transaction {
+        CurrenciesTable.selectAll()
+            .let {
+                if (showDisabled) it else it.where { CurrenciesTable.disabled eq false }
+            }
+            .map { it.toCurrency() }
     }
 
     override fun getCurrencyById(id: Long): Currency? = transaction {
@@ -65,6 +69,25 @@ class CurrencyRepositoryImpl : CurrencyRepository {
                     mapper(it)
                 }
         }
+
+    override fun getAvailableMonths(
+        currencyFromId: Long,
+        currencyToId: Long,
+        year: Int
+    ): List<Int> = transaction {
+        val months = CurrencyMonthlyExchangesTable.selectAll()
+            .where {
+                (CurrencyMonthlyExchangesTable.currencyFromId eq currencyFromId) and
+                        (CurrencyMonthlyExchangesTable.currencyToId eq currencyToId) and
+                        (CurrencyMonthlyExchangesTable.year eq year)
+            }
+            .map { it[CurrencyMonthlyExchangesTable.month] }
+            .toList()
+
+        (1..12)
+            .filter { it !in months }
+            .toList()
+    }
 
     override fun getExchange(
         currencyFromId: Long,

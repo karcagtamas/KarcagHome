@@ -1,10 +1,11 @@
 package modules.tasks.repository
 
+import kotlinx.datetime.LocalDate
 import modules.tasks.data.Task
 import modules.tasks.data.TasksTable
-import modules.tasks.data.TasksTable.importance
 import modules.tasks.data.toTask
 import org.jetbrains.exposed.v1.core.Op
+import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.compoundAnd
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
@@ -31,6 +32,8 @@ class TaskRepositoryImpl : TaskRepository {
 
                 if (checks.isEmpty()) it else it.where { checks.compoundAnd() }
             }
+            .orderBy(TasksTable.importance to SortOrder.DESC)
+            .orderBy(TasksTable.dueDate to SortOrder.ASC_NULLS_LAST)
             .map { it.toTask() }
     }
 
@@ -42,12 +45,13 @@ class TaskRepositoryImpl : TaskRepository {
             ?.toTask()
     }
 
-    override fun create(title: String, description: String?, importance: Int): Task = transaction {
+    override fun create(title: String, description: String?, importance: Int, dueDate: LocalDate?): Task = transaction {
         val row = TasksTable.insert {
             it[TasksTable.title] = title
             it[TasksTable.description] = description
             it[completed] = false
             it[TasksTable.importance] = importance
+            it[TasksTable.dueDate] = dueDate
         }
 
         Task(
@@ -56,20 +60,23 @@ class TaskRepositoryImpl : TaskRepository {
             description = description,
             completed = false,
             importance = importance,
+            dueDate = dueDate,
         )
     }
 
-    override fun update(id: Long, title: String, description: String?, importance: Int): Task? = transaction {
-        val updated = TasksTable.update(where = { TasksTable.id eq id }) {
-            it[TasksTable.title] = title
-            it[TasksTable.description] = description
-            it[TasksTable.importance] = importance
+    override fun update(id: Long, title: String, description: String?, importance: Int, dueDate: LocalDate?): Task? =
+        transaction {
+            val updated = TasksTable.update(where = { TasksTable.id eq id }) {
+                it[TasksTable.title] = title
+                it[TasksTable.description] = description
+                it[TasksTable.importance] = importance
+                it[TasksTable.dueDate] = dueDate
+            }
+
+            if (updated == 0) return@transaction null
+
+            getById(id)
         }
-
-        if (updated == 0) return@transaction null
-
-        getById(id)
-    }
 
     override fun delete(id: Long): Boolean = transaction {
         TasksTable.deleteWhere { TasksTable.id eq id } > 0

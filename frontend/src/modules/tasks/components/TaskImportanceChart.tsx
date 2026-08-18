@@ -23,7 +23,7 @@ export const TaskImportanceChart: React.FC<Props> = ({ showAll, importance }) =>
         id: `level-${e.importance}`,
         value: e.count,
         label: levelInfo.displayText,
-        color: colors.bgColor || '#ccc',
+        color: colors.fgColor || '#ccc',
       };
     }) ?? [];
 

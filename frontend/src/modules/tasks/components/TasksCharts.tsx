@@ -1,6 +1,7 @@
 import { TaskCompletedChart } from './TaskCompletedChart';
 import { TaskImportanceChart } from './TaskImportanceChart';
 import { Box } from '@mui/material';
+import { TaskOverdueChart } from './TaskOverdueChart';
 
 type Props = {
   showAll: boolean;
@@ -21,6 +22,7 @@ export const TasksCharts: React.FC<Props> = ({ showAll, importance }) => {
       }}
     >
       <TaskCompletedChart showAll={showAll} importance={importance} />
+      <TaskOverdueChart showAll={showAll} importance={importance} />
       <TaskImportanceChart showAll={showAll} importance={importance} />
     </Box>
   );

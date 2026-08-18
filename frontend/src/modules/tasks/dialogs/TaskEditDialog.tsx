@@ -25,6 +25,7 @@ export const TaskEditDialog: React.FC<Props> = ({ open, task, onClose, onSubmit,
       title: '',
       description: null,
       importance: 0,
+      dueDate: '',
     },
     mode: 'onChange',
   });
@@ -34,6 +35,7 @@ export const TaskEditDialog: React.FC<Props> = ({ open, task, onClose, onSubmit,
       title: task?.title ?? '',
       description: task?.description ?? null,
       importance: task?.importance ?? 0,
+      dueDate: task?.dueDate ?? '',
     });
   }, [task, reset]);
 
@@ -126,6 +128,29 @@ export const TaskEditDialog: React.FC<Props> = ({ open, task, onClose, onSubmit,
                 </MenuItem>
               ))}
             </TextField>
+          )}
+        />
+
+        <Controller
+          name="dueDate"
+          control={control}
+          render={({ field, fieldState: { error } }) => (
+            <TextField
+              {...field}
+              value={field.value ?? ''}
+              onChange={field.onChange}
+              label="Due Date"
+              fullWidth
+              type="date"
+              slotProps={{
+                inputLabel: { shrink: true },
+              }}
+              disabled={loading}
+              error={!!error}
+              helperText={error?.message}
+              variant="outlined"
+              size="small"
+            />
           )}
         />
       </Box>

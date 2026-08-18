@@ -1,10 +1,12 @@
-import type { ExpenseDTO, ExpenseEditDTO } from '../modules/expenses/models/expenses';
+import type { ExpenseDTO, ExpenseEditDTO, ExpenseTreeDTO } from '../modules/expenses/models/expenses';
 import { api } from './client';
 
 const EXPENSE_API = '/expenses';
 
 export const expenseApi = {
   getAll: (accountId: number) => api.get<ExpenseDTO[]>(EXPENSE_API, { params: { accountId } }).then((res) => res.data),
+  tree: (accountId: number) =>
+    api.get<ExpenseTreeDTO[]>(`${EXPENSE_API}/tree`, { params: { accountId } }).then((res) => res.data),
   get: (id: number) => api.get<ExpenseDTO>(`${EXPENSE_API}/${id}`).then((res) => res.data),
   create: (data: ExpenseEditDTO) => api.post<ExpenseDTO>(EXPENSE_API, data).then((res) => res.data),
   update: (id: number, data: ExpenseEditDTO) =>

@@ -3,6 +3,7 @@ import type { AccountDTO } from './account';
 export interface ExpenseCategoryTypeDTO {
   id: number;
   name: string;
+  color: string;
 }
 
 export interface ExpenseCategoryDTO {

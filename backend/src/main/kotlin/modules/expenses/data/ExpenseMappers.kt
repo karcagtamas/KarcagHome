@@ -45,6 +45,7 @@ fun ResultRow.toCurrencyMonthlyExchange(currencyFrom: Currency, currencyTo: Curr
 fun ResultRow.toExpenseCategoryType(): ExpenseCategoryType = ExpenseCategoryType(
     id = this[ExpenseCategoryTypesTable.id],
     name = this[ExpenseCategoryTypesTable.name],
+    color = this[ExpenseCategoryTypesTable.color],
     createdAt = this[ExpenseCategoryTypesTable.createdAt],
 )
 
@@ -91,6 +92,7 @@ fun Account.toDTO(): AccountDTO = AccountDTO(
 fun ExpenseCategoryType.toDTO(): ExpenseCategoryTypeDTO = ExpenseCategoryTypeDTO(
     id = this.id,
     name = this.name,
+    color = this.color,
 )
 
 fun ExpenseCategory.toDTO(): ExpenseCategoryDTO = ExpenseCategoryDTO(

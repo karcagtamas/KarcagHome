@@ -15,7 +15,7 @@ type Props = {
 
 export const Expenses: React.FC<Props> = ({ accountId }) => {
   const { data, isLoading } = useExpenseTree(accountId);
-  const { createMutation, updateMutation, removeMutation, isPending: apiLoading } = useExpenseMutations();
+  const { createMutation, updateMutation, removeMutation, isPending: apiLoading } = useExpenseMutations(accountId);
 
   const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<ExpenseDTO | null>(null);

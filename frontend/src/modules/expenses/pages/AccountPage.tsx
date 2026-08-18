@@ -76,12 +76,7 @@ export const AccountPage: React.FC = () => {
           title={data?.name}
           actions={
             <Box sx={{ display: 'flex', gap: 1 }}>
-              <IconButton
-                size="small"
-                color="info"
-                onClick={() => navigate('/accounts')}
-                disabled={apiLoading}
-              >
+              <IconButton size="small" color="info" onClick={() => navigate('/accounts')} disabled={apiLoading}>
                 <ArrowBackOutlined fontSize="small" />
               </IconButton>
               <IconButton size="small" color="warning" onClick={() => setAccountDialogOpen(true)} disabled={apiLoading}>
@@ -109,7 +104,7 @@ export const AccountPage: React.FC = () => {
             width: '100%',
           }}
         >
-          {accountId !== undefined && <AccountSummary accountId={accountId} />}
+          {data !== undefined && <AccountSummary account={data} />}
           {accountId !== undefined && <Expenses accountId={accountId} />}
         </Box>
       </PageFrame>
